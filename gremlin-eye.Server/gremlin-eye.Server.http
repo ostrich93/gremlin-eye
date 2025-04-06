@@ -1,0 +1,6 @@
+@gremlin_eye.Server_HostAddress = http://localhost:5047
+
+GET {{gremlin_eye.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
