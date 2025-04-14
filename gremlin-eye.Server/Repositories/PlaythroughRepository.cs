@@ -1,9 +1,9 @@
 ﻿using gremlin_eye.Server.Data;
-using gremlin_eye.Server.Models;
+using gremlin_eye.Server.Entity;
 using gremlin_eye.Server.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace gremlin_eye.Server.Repostiories
+namespace gremlin_eye.Server.Repositories
 {
     public class PlaythroughRepository : IPlaythroughRepository
     {

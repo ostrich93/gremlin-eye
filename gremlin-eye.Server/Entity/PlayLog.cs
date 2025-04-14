@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace gremlin_eye.Server.Models
+namespace gremlin_eye.Server.Entity
 {
     [Table("play_logs")]
     public class PlayLog

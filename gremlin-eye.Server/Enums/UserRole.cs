@@ -1,4 +1,4 @@
-﻿namespace gremlin_eye.Server.Models
+﻿namespace gremlin_eye.Server.Entity
 {
     public enum UserRole
     {

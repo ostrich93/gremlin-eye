@@ -1,6 +1,6 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.Interfaces.Services;
-using gremlin_eye.Server.Models;
+using gremlin_eye.Server.Entity;
 
 namespace gremlin_eye.Server.Services
 {
@@ -13,7 +13,7 @@ namespace gremlin_eye.Server.Services
             _context = context;
         }
 
-        public IEnumerable<Review> GetAllReviews()
+        public ICollection<Review> GetAllReviews()
         {
             return _context.Reviews.ToList();
         }

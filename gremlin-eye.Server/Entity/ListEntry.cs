@@ -1,25 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace gremlin_eye.Server.Models
+namespace gremlin_eye.Server.Entity
 {
     public class ListEntry
     {
 
         [Key]
         [Column("entry_id")]
-        public int EntryId { get; set; }
+        public long EntryId { get; set; }
 
         [Key]
         [Column("game_id")]
-        public int GameId { get; set; } //We want to be able to search for lists that have a specific game in them.
+        public long GameId { get; set; } //We want to be able to search for lists that have a specific game in them.
 
         [Column("listing_id")]
-        public int ListingId { get; set; }
+        public long ListingId { get; set; }
 
         [Column("entry_note")]
         public string? EntryNote { get; set; }
 
         public Listing Listing { get; set; } = null!;
+        public GameData Game { get; set; } = null!;
     }
 }

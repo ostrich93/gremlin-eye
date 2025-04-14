@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace gremlin_eye.Server.Models
+namespace gremlin_eye.Server.Entity
 {
     [Table("game_logs")]
     public class GameLog
@@ -10,15 +10,13 @@ namespace gremlin_eye.Server.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("game_log_id")]
-        public int GameLogId { get; set; }
+        public long GameLogId { get; set; }
 
-        [Key]
-        [Required]
         [Column("game_id")]
-        public int GameId { get; set; }
+        public long GameId { get; set; }
 
         [Column("user_id")]
-        public int UserId { get; set; } //required foreign key
+        public long UserId { get; set; } //required foreign key
 
         [Column("play_status")]
         public PlayState? PlayStatus { get; set; }
@@ -41,8 +39,9 @@ namespace gremlin_eye.Server.Models
 
         //Navigation Properties
         public User User { get; set; } = null!;
+        public GameData Game { get; set; } = null!;
         public GameLike? Like { get; set; }
-        public ICollection<Playthrough> Playthroughs { get; set; } = new List<Playthrough>();
+        public virtual ICollection<Playthrough> Playthroughs { get; set; } = new List<Playthrough>();
 
     }
 }

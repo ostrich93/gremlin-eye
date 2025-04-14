@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace gremlin_eye.Server.Models
+namespace gremlin_eye.Server.Entity
 {
 
     [Table("listings")]
@@ -11,10 +11,10 @@ namespace gremlin_eye.Server.Models
 
         [Key]
         [Column("listing_id")]
-        public int ListingId { get; set; }
+        public long ListingId { get; set; }
 
         [Column("user_id")]
-        public int UserId { get; set; } //required foreign key
+        public long UserId { get; set; } //required foreign key
 
         [Column("name")]
         public string Name { get; set; } = string.Empty;
@@ -46,9 +46,9 @@ namespace gremlin_eye.Server.Models
         public bool CommentsLocked { get; set; } = false;
 
         //Navigation Properties
-        public User User { get; set; } = null!;
-        public ICollection<ListEntry> ListEntries { get; set; } = new List<ListEntry>();
-        public ICollection<ListingComment> Comments { get; set; } = new List<ListingComment>();
-        public ICollection<ListingLike> Likes { get; set; } = new List<ListingLike>();
+        public virtual User User { get; set; } = null!;
+        public virtual ICollection<ListEntry> ListEntries { get; set; } = new List<ListEntry>();
+        public virtual ICollection<ListingComment> Comments { get; set; } = new List<ListingComment>();
+        public virtual ICollection<ListingLike> Likes { get; set; } = new List<ListingLike>();
     }
 }

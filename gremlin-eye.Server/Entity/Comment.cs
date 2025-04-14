@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace gremlin_eye.Server.Models
+namespace gremlin_eye.Server.Entity
 {
 
     //A comment ALWAYS belongs to a User. They can belong to either a Listing OR a Review, but not both, and the association is required.
@@ -12,11 +12,11 @@ namespace gremlin_eye.Server.Models
     {
         [Key]
         [Column("author_id")]
-        public int AuthorId { get; set; }
+        public long AuthorId { get; set; }
 
         [Key]
         [Column("review_id")]
-        public int ReviewId { get; set; }
+        public long ReviewId { get; set; }
 
         [Column("comment_body")]
         public string CommentBody { get; set; } = string.Empty;
@@ -37,11 +37,11 @@ namespace gremlin_eye.Server.Models
     {
         [Key]
         [Column("author_id")]
-        public int AuthorId { get; set; }
+        public long AuthorId { get; set; }
 
         [Key]
         [Column("listing_id")]
-        public int ListingId { get; set; }
+        public long ListingId { get; set; }
 
         [Column("comment_body")]
         public string CommentBody { get; set; } = string.Empty;

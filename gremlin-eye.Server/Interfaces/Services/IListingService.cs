@@ -1,10 +1,10 @@
-﻿using gremlin_eye.Server.Models;
+﻿using gremlin_eye.Server.Entity;
 
 namespace gremlin_eye.Server.Interfaces.Services
 {
     public interface IListingService
     {
-        IEnumerable<Listing> GetListingWithGame(int gameId);
-        IEnumerable<Listing> GetAllListings();
+        public ICollection<Listing> GetListingWithGame(int gameId);
+        public ICollection<Listing> GetAllListings();
     }
 }

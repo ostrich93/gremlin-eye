@@ -1,6 +1,6 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.Interfaces.Services;
-using gremlin_eye.Server.Models;
+using gremlin_eye.Server.Entity;
 using Microsoft.EntityFrameworkCore;
 
 namespace gremlin_eye.Server.Services
@@ -14,12 +14,12 @@ namespace gremlin_eye.Server.Services
             _context = context;
         }
 
-        public IEnumerable<Listing> GetAllListings()
+        public ICollection<Listing> GetAllListings()
         {
             return _context.Listings.ToList();
         }
 
-        public IEnumerable<Listing> GetListingWithGame(int gameId)
+        public ICollection<Listing> GetListingWithGame(int gameId)
         {
             List<Listing> listings = _context.Listings.Include(l => l.ListEntries).ToList();
             List<Listing> filteredList = new List<Listing>();

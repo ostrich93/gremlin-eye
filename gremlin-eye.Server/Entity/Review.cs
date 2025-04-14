@@ -1,8 +1,7 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace gremlin_eye.Server.Models
+namespace gremlin_eye.Server.Entity
 {
     [Table("reviews")]
     public class Review
@@ -10,19 +9,16 @@ namespace gremlin_eye.Server.Models
 
         [Key]
         [Column("review_id")]
-        public int ReviewId { get; set; }
+        public long ReviewId { get; set; }
 
         [Column("game_id")]
-        public int GameId { get; set; }
+        public long GameId { get; set; }
 
         [Column("user_id")]
-        public int UserId { get; set; } //Required Foreign Key property
+        public long UserId { get; set; } //Required Foreign Key property
 
         [Column("playthrough_id")]
-        public int PlaythroughId { get; set; } //Required Foreign Key property
-
-        [Column("comment_text")]
-        public string ReviewText { get; set; } = string.Empty;
+        public long PlaythroughId { get; set; } //Required Foreign Key property
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -35,8 +31,9 @@ namespace gremlin_eye.Server.Models
 
         //Navigation Properties
         public User User { get; set; } = null!;
+        public GameData Game { get; set; } = null!;
         public Playthrough Playthrough { get; set; } = null!;
-        public ICollection<ReviewComment> Comments { get; set; } = new List<ReviewComment>();
-        public ICollection<ReviewLike> Likes { get; set; } = new List<ReviewLike>();
+        public virtual ICollection<ReviewComment> Comments { get; set; } = new List<ReviewComment>();
+        public virtual ICollection<ReviewLike> Likes { get; set; } = new List<ReviewLike>();
     }
 }

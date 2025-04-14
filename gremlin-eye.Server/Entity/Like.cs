@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace gremlin_eye.Server.Models
+namespace gremlin_eye.Server.Entity
 {
     [Table("review_likes")]
     public class ReviewLike
@@ -11,11 +9,11 @@ namespace gremlin_eye.Server.Models
 
         [Key]
         [Column("review_id")]
-        public int ReviewId { get; set; }
+        public long ReviewId { get; set; }
 
         [Key]
         [Column("user_id")]
-        public int UserId { get; set; }
+        public long UserId { get; set; }
         
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -32,11 +30,11 @@ namespace gremlin_eye.Server.Models
     {
         [Key]
         [Column("listing_id")]
-        public int ListingId { get; set; }
+        public long ListingId { get; set; }
 
         [Key]
         [Column("user_id")]
-        public int UserId { get; set; }
+        public long UserId { get; set; }
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -53,18 +51,18 @@ namespace gremlin_eye.Server.Models
     {
         [Key]
         [Column("game_id")]
-        public int GameId { get; set; }
+        public long GameId { get; set; }
 
         [Key]
         [Column("game_log_id")]
-        public int GameLogId { get; set; }
+        public long GameLogId { get; set; }
 
         [Column("game_slug")]
         public string GameSlug { get; set; } = string.Empty;
 
         [Key]
         [Column("user_id")]
-        public int UserId { get; set; }
+        public long UserId { get; set; }
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -74,5 +72,6 @@ namespace gremlin_eye.Server.Models
 
         public User User { get; set; } = null!;
         public GameLog GameLog { get; set; } = null!;
+        public GameData Game { get; set; } = null!;
     }
 }
