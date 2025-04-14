@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35919.96 d17.13
+VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "gremlin-eye.client", "gremlin-eye.client\gremlin-eye.client.esproj", "{DBA61974-49F2-BDF8-B3A2-A6D3AFFCF479}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gremlin-eye.Server", "gremlin-eye.Server\gremlin-eye.Server.csproj", "{54D53506-E028-4DAF-B091-208EC080A1D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gremlin-eye.Server.Tests", "gremlin-eye.Server.Tests\gremlin-eye.Server.Tests.csproj", "{AE182F8C-2406-4A26-9F99-412A02F29798}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{54D53506-E028-4DAF-B091-208EC080A1D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54D53506-E028-4DAF-B091-208EC080A1D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54D53506-E028-4DAF-B091-208EC080A1D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE182F8C-2406-4A26-9F99-412A02F29798}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE182F8C-2406-4A26-9F99-412A02F29798}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE182F8C-2406-4A26-9F99-412A02F29798}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE182F8C-2406-4A26-9F99-412A02F29798}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
