@@ -13,7 +13,7 @@ namespace gremlin_eye.Server.Entity
 
         [Key]
         [Column("user_id")]
-        public long UserId { get; set; }
+        public Guid UserId { get; set; }
         
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -21,7 +21,7 @@ namespace gremlin_eye.Server.Entity
         [Column("updated_at")]
         public DateTime UpdatedAt { get; set; }
 
-        public User User { get; set; } = null!;
+        public AppUser User { get; set; } = null!;
         public Review Review { get; set; } = null!;
     }
 
@@ -34,7 +34,7 @@ namespace gremlin_eye.Server.Entity
 
         [Key]
         [Column("user_id")]
-        public long UserId { get; set; }
+        public Guid UserId { get; set; }
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -42,7 +42,7 @@ namespace gremlin_eye.Server.Entity
         [Column("updated_at")]
         public DateTime UpdatedAt { get; set; }
 
-        public User User { get; set; } = null!;
+        public AppUser User { get; set; } = null!;
         public Listing Listing { get; set; } = null!;
     }
 
@@ -62,7 +62,7 @@ namespace gremlin_eye.Server.Entity
 
         [Key]
         [Column("user_id")]
-        public long UserId { get; set; }
+        public Guid UserId { get; set; }
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -70,7 +70,7 @@ namespace gremlin_eye.Server.Entity
         [Column("updated_at")]
         public DateTime UpdatedAt { get; set; }
 
-        public User User { get; set; } = null!;
+        public AppUser User { get; set; } = null!;
         public GameLog GameLog { get; set; } = null!;
         public GameData Game { get; set; } = null!;
     }

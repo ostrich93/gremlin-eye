@@ -18,7 +18,7 @@ namespace gremlin_eye.Server.Services
         }
 
         
-        public async Task<GameLogDTO?> GetGameLogByUser(long gameId, long userId)
+        public async Task<GameLogDTO?> GetGameLogByUser(long gameId, Guid userId)
         {
             GameLog? gameLog = await _logRepository.GetGameLogByUser(gameId, userId);
 

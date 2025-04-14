@@ -12,7 +12,7 @@ namespace gremlin_eye.Server.Entity
     {
         [Key]
         [Column("author_id")]
-        public long AuthorId { get; set; }
+        public Guid AuthorId { get; set; }
 
         [Key]
         [Column("review_id")]
@@ -27,7 +27,7 @@ namespace gremlin_eye.Server.Entity
         [Column("updated_at")]
         public DateTime UpdatedAt { get; set; }
 
-        public User Author { get; set; } = null!;
+        public AppUser Author { get; set; } = null!;
 
         public Review Review { get; set; } = null!;
     }
@@ -37,7 +37,7 @@ namespace gremlin_eye.Server.Entity
     {
         [Key]
         [Column("author_id")]
-        public long AuthorId { get; set; }
+        public Guid AuthorId { get; set; }
 
         [Key]
         [Column("listing_id")]
@@ -52,7 +52,7 @@ namespace gremlin_eye.Server.Entity
         [Column("updated_at")]
         public DateTime UpdatedAt { get; set; }
 
-        public User Author { get; set; } = null!;
+        public AppUser Author { get; set; } = null!;
 
         public Listing Listing { get; set; } = null!;
     }

@@ -1,26 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gremlin_eye.Server.Entity
 {
     [Table("users")]
-    public class User
+    public class AppUser : IdentityUser
     {
-        [Key]
-        [Column("user_id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long UserId { get; set; }
-
-        [Required]
-        [EmailAddress]
-        [Column("email")]
-        public string Email { get; set; } = string.Empty;
-
-        [Required]
-        [Column("password")]
-        public string Password { get; set; } = string.Empty;
 
         [Column("avatar_url")]
         public string? AvatarUrl { get; set; }
@@ -28,12 +14,9 @@ namespace gremlin_eye.Server.Entity
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [Column("last_login")]
-        public DateTime? LastLogin { get; set; }
-
-        [Column("role")]
-        [DefaultValue("user")]
-        public string Role { get; set; } = "user";
+        //[Column("role")]
+        //[DefaultValue("user")]
+        //public string Role { get; set; } = "user";
 
         //Navigation Properties
         public virtual ICollection<GameLog> GameLogs { get; set; } = new List<GameLog>();

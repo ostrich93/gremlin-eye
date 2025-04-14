@@ -4,6 +4,6 @@ namespace gremlin_eye.Server.Services
 {
     public interface IGameService
     {
-        public Task<GameDetailsResponseDTO> GetGameDetailsBySlug(string slug, long? userId = null);
+        public Task<GameDetailsResponseDTO> GetGameDetailsBySlug(string slug, Guid? userId = null);
     }
 }

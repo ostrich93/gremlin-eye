@@ -16,7 +16,7 @@ namespace gremlin_eye.Server.Services
             _reviewRepository = reviewRepository;
         }
 
-        public async Task<GameDetailsResponseDTO> GetGameDetailsBySlug(string slug, long? userId = null)
+        public async Task<GameDetailsResponseDTO> GetGameDetailsBySlug(string slug, Guid? userId = null)
         {
             GameData? data = await _gameRepository.GetGameBySlug(slug);
             if (data != null)

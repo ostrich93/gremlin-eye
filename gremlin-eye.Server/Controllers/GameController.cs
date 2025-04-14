@@ -28,7 +28,7 @@ namespace gremlin_eye.Server.Controllers
         public async Task<IActionResult> GetGameBySlug(string slug)
         {
             Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == "UserId");
-            long? userId = long.Parse(idClaim!.Value);
+            Guid? userId = Guid.Parse(idClaim!.Value);
 
             GameDetailsResponseDTO gameDetails = await _gameService.GetGameDetailsBySlug(slug, userId);
             GameStatsDTO gameStats = await _logService.GetGameStats(gameDetails.Id);
@@ -41,7 +41,7 @@ namespace gremlin_eye.Server.Controllers
             
             if (userId != null) //if requester is a logged in user, then retrieve their game log
             {
-                GameLogDTO? gameLog = await _logService.GetGameLogByUser(gameDetails.Id, (long)userId);
+                GameLogDTO? gameLog = await _logService.GetGameLogByUser(gameDetails.Id, (Guid)userId);
                 if (gameLog != null)
                 {
                     gameDetails.GameLog = gameLog;

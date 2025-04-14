@@ -7,7 +7,7 @@ namespace gremlin_eye.Server.Repositories
     {
         public Task<List<GameLog>> GetAllGameLogs();
         public Task<List<GameLog>> GetAllLogsByGameId(long gameId);
-        public Task<GameLog?> GetGameLogByUser(long gameId, long userId);
+        public Task<GameLog?> GetGameLogByUser(long gameId, Guid userId);
         public Task<int> GetPlayedCount(long gameId);
         public Task<int> GetPlayingCount(long gameId);
         public Task<int> GetBackloggedCount(long gameId);
