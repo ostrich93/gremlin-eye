@@ -7,21 +7,21 @@ namespace gremlin_eye.Server.Services
 {
     public class ListingService : IListingService
     {
-        private readonly DataContext _context;
+        private UnitOfWork _unitOfWork;
 
-        public ListingService(DataContext context)
+        public ListingService(UnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
-        public ICollection<Listing> GetAllListings()
+        public async Task<ICollection<Listing>> GetAllListings()
         {
-            return _context.Listings.ToList();
+            return await _unitOfWork.Lists.GetAllListings();
         }
 
-        public ICollection<Listing> GetListingWithGame(int gameId)
+        public async Task<ICollection<Listing>> GetListingWithGame(int gameId)
         {
-            List<Listing> listings = _context.Listings.Include(l => l.ListEntries).ToList();
+            List<Listing> listings = await _unitOfWork.Lists.GetListingsWithGame(gameId);
             List<Listing> filteredList = new List<Listing>();
             if (listings == null || listings.Count == 0)
             {

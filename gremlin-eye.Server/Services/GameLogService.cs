@@ -10,17 +10,17 @@ namespace gremlin_eye.Server.Services
 {
     public class GameLogService : IGameLogService
     {
-        private readonly IGameLogRepository _logRepository;
+        private UnitOfWork _unitOfWork;
         
-        public GameLogService(IGameLogRepository logRepository)
+        public GameLogService(UnitOfWork unitOfWork)
         {
-            _logRepository = logRepository;
+            _unitOfWork = unitOfWork;
         }
 
         
         public async Task<GameLogDTO?> GetGameLogByUser(long gameId, Guid userId)
         {
-            GameLog? gameLog = await _logRepository.GetGameLogByUser(gameId, userId);
+            GameLog? gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(gameId, userId);
 
             if (gameLog == null) return null;
 
@@ -46,9 +46,9 @@ namespace gremlin_eye.Server.Services
 
         public async Task<GameStatsDTO> GetGameStats(long gameId)
         {
-            GameStatsDTO stats = await _logRepository.GetGameStats(gameId);
-            stats.AverageRating = _logRepository.GetReviewAverage(gameId);
-            stats.RatingCounts = _logRepository.GetReviewCounts(gameId);
+            GameStatsDTO stats = await _unitOfWork.GameLogs.GetGameStats(gameId);
+            stats.AverageRating = _unitOfWork.GameLogs.GetReviewAverage(gameId);
+            stats.RatingCounts = _unitOfWork.GameLogs.GetReviewCounts(gameId);
 
             return stats;
         }

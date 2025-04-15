@@ -5,6 +5,9 @@ namespace gremlin_eye.Server.Repositories
 {
     public interface IGameRepository
     {
-        public Task<GameData?> GetGameBySlug(string slug);
+        Task<GameData?> GetGameBySlug(string slug);
+        Task<GameData[]> GetGames(int offset, int limit);
+        Task<GameData?> GetGameById(long id);
+        Task CreateAndSaveAsync(GameData game);
     }
 }

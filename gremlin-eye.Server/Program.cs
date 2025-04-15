@@ -19,12 +19,13 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
+builder.Services.AddScoped<UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IGameLogService, GameLogService>();
 builder.Services.AddScoped<IIGDBService, IGDBService>();
+builder.Services.AddScoped<IGameSyncService, GameSyncService>();
 builder.Services.AddScoped<IListingService, ListingService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 

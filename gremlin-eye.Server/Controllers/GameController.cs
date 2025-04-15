@@ -1,5 +1,4 @@
 ﻿using gremlin_eye.Server.DTOs;
-using gremlin_eye.Server.Interfaces.Services;
 using gremlin_eye.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

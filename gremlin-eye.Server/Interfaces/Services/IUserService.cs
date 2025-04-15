@@ -6,10 +6,10 @@ namespace gremlin_eye.Server.Services
 {
     public interface IUserService
     {
-        public Task<(IdentityResult, AppUser)> CreateUserAsync(RegisterUserRequestDTO request);
-        public Task<IdentityResult> AddRoleAsync(AppUser user, string role);
-        public Task<SignInResult> Login(LoginDTO request);
-        public Task<AppUser?> GetUserByName(string username);
-        public Task<IList<string>> GetRolesAsync(AppUser user);
+        Task<(IdentityResult, AppUser)> CreateUserAsync(RegisterUserRequestDTO request);
+        Task<IdentityResult> AddRoleAsync(AppUser user, string role);
+        Task<SignInResult> Login(LoginDTO request);
+        Task<AppUser?> GetUserByName(string username);
+        Task<IList<string>> GetRolesAsync(AppUser user);
     }
 }

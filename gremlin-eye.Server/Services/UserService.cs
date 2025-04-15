@@ -1,6 +1,6 @@
-﻿using gremlin_eye.Server.DTOs;
+﻿using gremlin_eye.Server.Data;
+using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
-using gremlin_eye.Server.Repositories;
 using Microsoft.AspNetCore.Identity;
 
 namespace gremlin_eye.Server.Services
@@ -9,13 +9,13 @@ namespace gremlin_eye.Server.Services
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly IUserRepository _userRepository;
+        private UnitOfWork _unitOfWork;
 
-        public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, UserRepository userRepository)
+        public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, UnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<(IdentityResult, AppUser)> CreateUserAsync(RegisterUserRequestDTO request)
@@ -43,7 +43,7 @@ namespace gremlin_eye.Server.Services
 
         public async Task<AppUser?> GetUserByName(string username)
         {
-            return await _userRepository.GetUserByName(username);
+            return await _unitOfWork.Users.GetUserByName(username);
         }
 
         public async Task<IList<string>> GetRolesAsync(AppUser user)

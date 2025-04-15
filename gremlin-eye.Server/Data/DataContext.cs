@@ -11,7 +11,7 @@ namespace gremlin_eye.Server.Data
 
         }
 
-        public DbSet<AppUser> Users { get; set; }
+        //public DbSet<AppUser> Users { get; set; }
         public DbSet<GameLog> GameLogs { get; set; }
         public DbSet<Playthrough> Playthroughs { get; set; }
         public DbSet<PlayLog> PlayLogs { get; set; }
