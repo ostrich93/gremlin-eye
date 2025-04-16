@@ -17,14 +17,14 @@ namespace gremlin_eye.Server.Services
             _signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:SigningKey"] ?? throw new InvalidOperationException("JWT Signing Key is not configured in the application settings")));
         }
 
-        public string GenerateToken(AppUser user, string role)
+        public string GenerateToken(AppUser user)
         {
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.GivenName, user.UserName ?? string.Empty),
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
-                new Claim(ClaimTypes.NameIdentifier, user.Id ?? string.Empty),
-                new Claim(ClaimTypes.Role, role)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString() ?? string.Empty),
+                new Claim(ClaimTypes.Role, user.Role.ToStringValue())
             };
 
             SigningCredentials signingCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha512);

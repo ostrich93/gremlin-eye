@@ -4,6 +4,6 @@ namespace gremlin_eye.Server.Services
 {
     public interface ITokenService
     {
-        public string GenerateToken(AppUser user, string role);
+        public string GenerateToken(AppUser user);
     }
 }

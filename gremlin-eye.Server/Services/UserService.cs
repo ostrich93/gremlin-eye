@@ -1,44 +1,70 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
-using Microsoft.AspNetCore.Identity;
 
 namespace gremlin_eye.Server.Services
 {
     public class UserService : IUserService
     {
-        private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly ITokenService _tokenService;
         private UnitOfWork _unitOfWork;
 
-        public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, UnitOfWork unitOfWork)
+        public UserService(IPasswordHasher passwordHasher, ITokenService tokenService, UnitOfWork unitOfWork)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _passwordHasher = passwordHasher;
+            _tokenService = tokenService;
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<(IdentityResult, AppUser)> CreateUserAsync(RegisterUserRequestDTO request)
+        public async Task<UserResponseDTO> CreateUserAsync(RegisterUserRequestDTO request)
         {
+            _passwordHasher.HashPassword(request.Password, out string hashedPassword, out byte[] salt);
             var user = new AppUser
             {
                 UserName = request.Username,
                 Email = request.Email,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                Role = request.Role,
+                PasswordHash = hashedPassword,
+                Salt = salt
             };
-
-            var result = await _userManager.CreateAsync(user, request.Password);
-            return (result, user);
+            var createdUser = await _unitOfWork.Users.CreateUserAsync(user);
+            
+            return new UserResponseDTO
+            {
+                UserId = createdUser.Id,
+                Username = createdUser.UserName,
+                Email = createdUser.Email,
+                Role = createdUser.Role
+            };
         }
 
-        public async Task<IdentityResult> AddRoleAsync(AppUser user, string role)
+        public async Task<UserResponseDTO> LoginAsync(LoginDTO request)
         {
-            return await _userManager.AddToRoleAsync(user, role);
-        }
+            var foundUser = await GetUserByName(request.Username);
 
-        public async Task<SignInResult> Login(LoginDTO request)
-        {
-            return await _signInManager.PasswordSignInAsync(request.Username, request.Password, true, false);
+            if (foundUser == null)
+            {
+                throw new Exception($"User {request.Username} was not found");
+            }
+
+            bool verified = _passwordHasher.VerifyPassword(request.Password, foundUser.PasswordHash, foundUser.Salt);
+            if (verified)
+            {
+                return new UserResponseDTO
+                {
+                    UserId = foundUser.Id,
+                    Username = foundUser.UserName,
+                    Email = foundUser.Email,
+                    Role = foundUser.Role,
+                    Token = _tokenService.GenerateToken(foundUser)
+                };
+            }
+            else
+            {
+                throw new Exception("The password was invalid");
+            }
         }
 
         public async Task<AppUser?> GetUserByName(string username)
@@ -46,9 +72,9 @@ namespace gremlin_eye.Server.Services
             return await _unitOfWork.Users.GetUserByName(username);
         }
 
-        public async Task<IList<string>> GetRolesAsync(AppUser user)
+        public async Task LogoutAsync()
         {
-            return await _userManager.GetRolesAsync(user);
+            await Task.CompletedTask;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gremlin_eye.Server.Controllers
@@ -10,7 +9,7 @@ namespace gremlin_eye.Server.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        IUserService _userService;
+        private readonly IUserService _userService;
         ITokenService _tokenService;
 
         public UserController(IUserService userService, ITokenService tokenService)
@@ -26,18 +25,13 @@ namespace gremlin_eye.Server.Controllers
             //Validation
 
             //create the user
-            var (createResult, user) = await _userService.CreateUserAsync(request);
-            if (!createResult.Succeeded)
+            var userResponse = await _userService.CreateUserAsync(request);
+            if (userResponse == null)
             {
-                return BadRequest(createResult.Errors);
-            }
-            var roleResult = await _userService.AddRoleAsync(user, "User"); //For now, sets users
-            if (!roleResult.Succeeded)
-            {
-                return BadRequest(roleResult.Errors);
+                return BadRequest("Bad Request Data");
             }
 
-            return Ok(createResult);
+            return Ok(userResponse);
         }
 
         [AllowAnonymous]
@@ -52,28 +46,28 @@ namespace gremlin_eye.Server.Controllers
             if (String.IsNullOrEmpty(request.Password))
                 throw new ArgumentException("Password cannot be empty or null", nameof(request.Password));
 
-            var user = await _userService.GetUserByName(request.Username); //the service throws an exception if the user isn't found
-            if (user == null)
-            {
-                return Unauthorized($"User with username \"{request.Username}\" was not found");
-            }
-
             //login
-            var result = await _userService.Login(request);
-            if (result.Succeeded)
+            try
             {
-                //generate Token
-                var roles = await _userService.GetRolesAsync(user);
-                string token = _tokenService.GenerateToken(user, roles[0]);
-                return Ok(new UserResponseDTO
-                {
-                    UserId = user.Id,
-                    Username = user.UserName,
-                    Token = token,
-                    Role = roles[0]
-                });
+                var user = await _userService.LoginAsync(request);
+                return Ok(user);
+            } catch (Exception ex)
+            {
+                return StatusCode(500, $"Error logging in: ${ex.Message}");
             }
-            return Unauthorized();
+        }
+
+        [HttpPost("/logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await _userService.LogoutAsync();
+                return Ok();
+            } catch (Exception ex)
+            {
+                return StatusCode(500, $"Error logging out: {ex.Message}");
+            }
         }
     }
 }

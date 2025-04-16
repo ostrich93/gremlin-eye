@@ -12,6 +12,14 @@ namespace gremlin_eye.Server.Repositories
         {
             _context = context;
         }
+
+        public async Task<AppUser> CreateUserAsync(AppUser user)
+        {
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
+
         public async Task<AppUser?> GetUserByName(string username)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);

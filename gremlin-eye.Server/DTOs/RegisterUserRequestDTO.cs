@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using gremlin_eye.Server.Entity;
+using System.ComponentModel.DataAnnotations;
 
 namespace gremlin_eye.Server.DTOs
 {
@@ -21,5 +22,7 @@ namespace gremlin_eye.Server.DTOs
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "The password and confirmation do not match.")]
         public string? PasswordConfirmation { get; set; }
+
+        public UserRole Role { get; set; } = UserRole.User;
     }
 }

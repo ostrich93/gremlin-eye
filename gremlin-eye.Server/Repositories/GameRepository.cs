@@ -25,7 +25,7 @@ namespace gremlin_eye.Server.Repositories
 
         public async Task CreateAndSaveAsync(GameData game)
         {
-            _context.Add(game);
+            _context.Games.Add(game);
             await _context.SaveChangesAsync();
         }
 

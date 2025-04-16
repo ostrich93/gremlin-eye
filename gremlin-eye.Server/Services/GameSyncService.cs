@@ -1,5 +1,4 @@
-﻿
-using gremlin_eye.Server.Data;
+﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.Entity;
 using IGDB;
 using IGDB.Models;
@@ -9,8 +8,8 @@ namespace gremlin_eye.Server.Services
     public class GameSyncService : IGameSyncService
     {
         private UnitOfWork _unitOfWork;
-        private IIGDBService _igdbService;
-        private IGameService _gameService;
+        private readonly IIGDBService _igdbService;
+        private readonly IGameService _gameService;
 
         private int LIMIT = 500;
 

@@ -1,17 +1,16 @@
 ﻿using gremlin_eye.Server.Entity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace gremlin_eye.Server.Data
 {
-    public class DataContext : IdentityDbContext<AppUser>
+    public class DataContext : DbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
 
         }
 
-        //public DbSet<AppUser> Users { get; set; }
+        public DbSet<AppUser> Users { get; set; }
         public DbSet<GameLog> GameLogs { get; set; }
         public DbSet<Playthrough> Playthroughs { get; set; }
         public DbSet<PlayLog> PlayLogs { get; set; }
