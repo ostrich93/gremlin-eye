@@ -1,0 +1,54 @@
+import { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext, AuthDispatchContext } from '../contexts/AuthContext';
+import { login } from '../actions/authActions';
+
+const Login = () => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [authenticated, setAuthenticated] = useState(false);
+
+    const navigate = useNavigate();
+    const dispatch = useContext(AuthDispatchContext);
+    const { loading, error } = useContext(AuthContext);
+
+    useEffect(() => {
+        if (authenticated) {
+            navigate("/");
+        }
+    }, [authenticated, navigate]);
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+
+        try {
+            let loginResponse = await login(dispatch, { username: username, password: password });
+            if (loginResponse.token) {
+                setAuthenticated(true);
+            }
+        }
+        catch (error) {
+            console.error("Login failed", error);
+        }
+    };
+
+    return (
+        <div className="flew row justify-content-md center">
+            <h2 id="title">Log In</h2>
+            {error ? <p>{error}</p> : null}
+            <form onSubmit={handleLogin}>
+                <div className="form-group my-3">
+                    <input type='text' value={username} placeholder='Username' onChange={e => setUsername(e.target.value)} name="username" required disabled={loading} />
+                </div>
+                <div className="form-group my-3">
+                    <input type='password' value={password} placeholder='Password' onChange={e => setPassword(e.target.value)} name="password" required disabled={loading} />
+                </div>
+                <div>
+                    <button id="register-button" type='submit' disabled={loading || (!username.length || password.length)}>Log In</button>
+                </div>
+            </form>
+        </div>
+    );
+};
+
+export default Login;

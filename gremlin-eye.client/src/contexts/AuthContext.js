@@ -1,8 +1,17 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useReducer } from "react";
+import { initialState, AuthReducer } from '../reducers/authReducer';
 
-const AuthContext = createContext();
+export const AuthContext = createContext(null);
+export const AuthDispatchContext = createContext(null);
 
-const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [token, setToken] = useState(sessionStorage.getItem("GremlinToken") || "");
+export const AuthProvider = ({ children }) => {
+    const [user, dispatch] = useReducer(AuthReducer, initialState);
+
+    return (
+        <AuthContext.Provider value={user}>
+            <AuthDispatchContext.Provider value={dispatch}>
+                {children}
+            </AuthDispatchContext.Provider>
+        </AuthContext.Provider>
+    );
 };
