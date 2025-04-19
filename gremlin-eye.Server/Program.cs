@@ -48,7 +48,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+//builder.Services.AddCors(options => {});
+
 var app = builder.Build();
+//app.useCors("CorsPolicy");
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
@@ -65,7 +68,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.MapFallbackToFile("/index.html");
 
 app.Run();

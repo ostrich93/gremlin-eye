@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
-import { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { axios } from 'axios';
-import { AuthContext, AuthDispatchContext } from '../contexts/AuthContext';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { apiClient } from '../config/apiClient';
+import { useAuth, useAuthDispatch } from '../contexts/AuthContext';
 import { login } from '../actions/authActions';
 
 const Register = (props) => {
@@ -13,8 +13,8 @@ const Register = (props) => {
     const [authenticated, setAuthentication] = useState(false);
 
     const navigate = useNavigate();
-    const dispatch = useContext(AuthDispatchContext);
-    const { error } = useContext(AuthContext);
+    const dispatch = useAuthDispatch();
+    const { error } = useAuth();
 
     const roleType = props.roleType || 0; //This page is used for both normal user registration and admin registration.
 
@@ -27,7 +27,7 @@ const Register = (props) => {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            let registerResponse = await axios.post(`${process.env.API_URL}/user/register`, { username: username, email: email, password: password, passwordConfirmation: passwordConfirmation, role: roleType });
+            let registerResponse = await apiClient.post(`${process.env.API_URL}/user/register`, { username: username, email: email, password: password, passwordConfirmation: passwordConfirmation, role: roleType });
 
             if (registerResponse) {
                 try {

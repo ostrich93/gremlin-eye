@@ -31,7 +31,7 @@ namespace gremlin_eye.Server.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = signingCredentials,
                 Issuer = _config["Jwt:Issuer"],
                 Audience = _config["Jwt:Audience"]

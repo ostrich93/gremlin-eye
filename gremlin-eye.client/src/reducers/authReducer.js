@@ -1,5 +1,5 @@
 const getUser = () => {
-    return sessionStorage.getItem("currentUser") ? JSON.parse(sessionStorage.getItem("current_user")) : null;
+    return sessionStorage.getItem("current_user") ? JSON.parse(sessionStorage.getItem("current_user")) : null;
 };
 
 const getToken = () => {

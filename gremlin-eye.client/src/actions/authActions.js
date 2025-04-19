@@ -1,10 +1,10 @@
 /* eslint-disable no-undef */
-import axios from 'axios';
+import { apiClient } from '../config/apiClient';
 
 export async function login(dispatch, payload) {
     try {
         dispatch({ type: "LOGIN_REQUEST" });
-        const response = await axios.post(`${process.env.API_URL}/user/login`, payload, {
+        const response = await apiClient.post(`${process.env.API_URL}/user/login`, payload, {
             withCredentials: true
         });
 
@@ -12,8 +12,7 @@ export async function login(dispatch, payload) {
             const userData = {
                 userId: response.data.userId,
                 username: response.data.username,
-                role: response.data.role,
-                token: response.data.token
+                role: response.data.role
             };
             dispatch({
                 type: "LOGIN_SUCCESS", payload:
@@ -36,7 +35,7 @@ export async function login(dispatch, payload) {
 
 export async function logout(dispatch) {
     try {
-        const response = await axios.post(`${process.env.API_URL}/user/logout`);
+        const response = await apiClient.post(`${process.env.API_URL}/user/logout`);
         dispatch({ type: "LOGOUT" });
         sessionStorage.removeItem("current_user");
         sessionStorage.removeItem("GremlinToken");
