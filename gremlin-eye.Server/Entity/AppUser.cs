@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace gremlin_eye.Server.Entity
 {
@@ -47,5 +48,8 @@ namespace gremlin_eye.Server.Entity
         public virtual ICollection<GameLike> GameLikes { get; set; } = new List<GameLike>();
         public virtual ICollection<ReviewLike> ReviewLikes { get; set; } = new List<ReviewLike>();
         public virtual ICollection<ListingLike> ListingLikes { get; set; } = new List<ListingLike>();
+
+        [JsonIgnore]
+        public virtual List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }

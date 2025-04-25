@@ -19,7 +19,6 @@ namespace gremlin_eye.Server.Entity
         [Column("name")]
         public string Name { get; set; } = string.Empty;
 
-        [Key]
         [Column("slug")]
         public string Slug { get; set; } = string.Empty;
 

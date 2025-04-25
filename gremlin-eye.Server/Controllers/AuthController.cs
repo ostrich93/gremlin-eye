@@ -31,7 +31,6 @@ namespace gremlin_eye.Server.Controllers
             try
             {
                 var user = await _authService.LoginAsync(request);
-                var token = user.Token;
 
                 return Ok(user);
             }
@@ -46,12 +45,32 @@ namespace gremlin_eye.Server.Controllers
         {
             try
             {
+                
                 await _authService.LogoutAsync();
                 return Ok();
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error logging out: {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        [Route("refresh")]
+        public IActionResult Refresh(TokenDTO tokenRequest)
+        {
+            if (tokenRequest is null || string.IsNullOrWhiteSpace(tokenRequest.AccessToken) || string.IsNullOrWhiteSpace(tokenRequest.RefreshToken))
+            {
+                return BadRequest("Invalid client request");
+            }
+            
+            try
+            {
+                var refreshTokenResponse = _authService.RefreshToken(tokenRequest);
+                return Ok(refreshTokenResponse);
+            } catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

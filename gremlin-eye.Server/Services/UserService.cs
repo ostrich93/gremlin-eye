@@ -41,7 +41,7 @@ namespace gremlin_eye.Server.Services
         
         public async Task<AppUser?> GetUserByName(string username)
         {
-            return await _unitOfWork.Users.GetUserByName(username);
+            return await _unitOfWork.Users.GetUserByNameAsync(username);
         }
     }
 }

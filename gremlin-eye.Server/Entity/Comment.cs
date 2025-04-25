@@ -11,10 +11,12 @@ namespace gremlin_eye.Server.Entity
     public class ReviewComment
     {
         [Key]
+        [Column("comment_id")]
+        public long CommentId { get; set; }
+
         [Column("author_id")]
         public Guid AuthorId { get; set; }
 
-        [Key]
         [Column("review_id")]
         public long ReviewId { get; set; }
 
@@ -36,10 +38,12 @@ namespace gremlin_eye.Server.Entity
     public class ListingComment
     {
         [Key]
+        [Column("comment_id")]
+        public long CommentId { get; set; }
+
         [Column("author_id")]
         public Guid AuthorId { get; set; }
 
-        [Key]
         [Column("listing_id")]
         public long ListingId { get; set; }
 

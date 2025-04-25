@@ -6,6 +6,7 @@ namespace gremlin_eye.Server.DTOs
     {
         public string Username { get; set; } = default!;
         public string Token { get; set; } = default!;
+        public string RefreshToken { get; set; } = string.Empty;
         public Guid UserId { get; set; }
         public UserRole Role { get; set; }
         public string Email { get; set; } = default!;

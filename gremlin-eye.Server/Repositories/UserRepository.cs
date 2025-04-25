@@ -20,9 +20,20 @@ namespace gremlin_eye.Server.Repositories
             return user;
         }
 
-        public async Task<AppUser?> GetUserByName(string username)
+        public AppUser? GetUserByName(string username)
+        {
+            return _context.Users.Include(u => u.RefreshTokens).FirstOrDefault(u => u.UserName == username);
+        }
+
+        public async Task<AppUser?> GetUserByNameAsync(string username)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+        }
+
+        public AppUser? GetUserById(Guid userId)
+        {
+            return _context.Users.Include(u => u.RefreshTokens).FirstOrDefault(u => u.Id == userId);
+            
         }
     }
 }

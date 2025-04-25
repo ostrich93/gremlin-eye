@@ -1,6 +1,6 @@
 ﻿using gremlin_eye.Server.Entity;
 
-namespace gremlin_eye.Server.Interfaces.Services
+namespace gremlin_eye.Server.Services
 {
     public interface IListingService
     {

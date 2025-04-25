@@ -6,12 +6,13 @@ namespace gremlin_eye.Server.Entity
     [Table("review_likes")]
     public class ReviewLike
     {
-
         [Key]
+        [Column("like_id")]
+        public long LikeId { get; set; }
+
         [Column("review_id")]
         public long ReviewId { get; set; }
 
-        [Key]
         [Column("user_id")]
         public Guid UserId { get; set; }
         
@@ -29,10 +30,12 @@ namespace gremlin_eye.Server.Entity
     public class ListingLike
     {
         [Key]
+        [Column("like_id")]
+        public long LikeId { get; set; }
+
         [Column("listing_id")]
         public long ListingId { get; set; }
 
-        [Key]
         [Column("user_id")]
         public Guid UserId { get; set; }
 
@@ -50,17 +53,15 @@ namespace gremlin_eye.Server.Entity
     public class GameLike
     {
         [Key]
+        [Column("like_id")]
+        public long LikeId { get; set; }
+
         [Column("game_id")]
         public long GameId { get; set; }
-
-        [Key]
-        [Column("game_log_id")]
-        public long GameLogId { get; set; }
 
         [Column("game_slug")]
         public string GameSlug { get; set; } = string.Empty;
 
-        [Key]
         [Column("user_id")]
         public Guid UserId { get; set; }
 
@@ -71,7 +72,6 @@ namespace gremlin_eye.Server.Entity
         public DateTime UpdatedAt { get; set; }
 
         public AppUser User { get; set; } = null!;
-        public GameLog GameLog { get; set; } = null!;
         public GameData Game { get; set; } = null!;
     }
 }

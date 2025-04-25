@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/gremlin-eye.client/.env.local
+/gremlin-eye.Server/Properties/serviceDependencies.local.json

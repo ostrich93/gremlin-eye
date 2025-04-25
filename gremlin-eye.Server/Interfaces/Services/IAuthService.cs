@@ -6,5 +6,6 @@ namespace gremlin_eye.Server.Services
     {
         Task<UserResponseDTO> LoginAsync(LoginDTO request);
         Task LogoutAsync();
+        TokenDTO RefreshToken(TokenDTO request);
     }
 }

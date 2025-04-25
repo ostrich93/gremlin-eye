@@ -40,7 +40,6 @@ namespace gremlin_eye.Server.Entity
         //Navigation Properties
         public AppUser User { get; set; } = null!;
         public GameData Game { get; set; } = null!;
-        public GameLike? Like { get; set; }
         public virtual ICollection<Playthrough> Playthroughs { get; set; } = new List<Playthrough>();
 
     }

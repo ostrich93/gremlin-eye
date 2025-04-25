@@ -5,10 +5,19 @@ namespace gremlin_eye.Server.Services
 {
     public class IGDBService : IIGDBService
     {
-        readonly IGDBClient igdb = new IGDBClient(
-                Environment.GetEnvironmentVariable("IGDB_CLIENT_NAME"),
-                Environment.GetEnvironmentVariable("IGDB_CLIENT_NAME")
-            );
+        private readonly IConfiguration _configuration;
+        private readonly IGDBClient igdb;
+
+        private readonly string _clientId;
+        private readonly string _clientSecret;
+
+        public IGDBService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            _clientId = _configuration["Authentication:Igdb:ClientId"] ?? throw new InvalidOperationException("Igdb ClientId is required");
+            _clientSecret = _configuration["Authetication:Igdb:ClientSecret"] ?? throw new InvalidOperationException("Igdb Client Secret is required");
+            igdb = new IGDBClient(_clientId, _clientSecret);
+        }
 
         public async Task<Game[]> GetGames(int offset)
         {

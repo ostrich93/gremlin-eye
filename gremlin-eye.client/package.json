@@ -28,7 +28,6 @@
     "@rkristelijn/eslint-plugin-mui": "^1.2.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.0.4",
-    "@types/react-router": "^5.1.20",
     "@vitejs/plugin-react": "^4.4.1",
     "eslint": "^9.25.0",
     "eslint-plugin-react-dom": "^1.48.4",
