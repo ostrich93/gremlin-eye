@@ -1,8 +1,8 @@
-import { AppRoutes } from './Routes';
+import AppRoutes from './Routes';
 import './App.css';
 import NavBar from './components/NavBar/NavBar';
 
-function App() {
+const App = () => {
     return (
         <div>
             <header><NavBar /></header>

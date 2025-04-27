@@ -1,5 +1,6 @@
+import { env } from 'process';
 import { useState } from 'react';
-import { apiClient } from '../config/apiClient';
+import apiClient from '../config/apiClient';
 
 const SyncGames = () => {
     const [pageNum, setPageNum] = useState(1);
@@ -16,7 +17,7 @@ const SyncGames = () => {
             }
 
             setLoading(true);
-            let response = apiClient.get(`${process.env.API_URL}/admin/import`, {
+            let response = apiClient.get(`${env.API_URL}/admin/import`, {
                 params: { page: pageNum }
             });
 

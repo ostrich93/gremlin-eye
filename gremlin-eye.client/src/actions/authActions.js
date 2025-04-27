@@ -1,10 +1,10 @@
-/* eslint-disable no-undef */
-import { apiClient } from '../config/apiClient';
+import apiClient from '../config/apiClient';
+import { env } from 'process';
 
 export async function login(dispatch, payload) {
     try {
         dispatch({ type: "LOGIN_REQUEST" });
-        const response = await apiClient.post(`${process.env.API_URL}/user/login`, payload, {
+        const response = await apiClient.post(`${env.API_URL}/user/login`, payload, {
             withCredentials: true
         });
 
@@ -35,7 +35,7 @@ export async function login(dispatch, payload) {
 
 export async function logout(dispatch) {
     try {
-        const response = await apiClient.post(`${process.env.API_URL}/user/logout`);
+        const response = await apiClient.post(`${env.API_URL}/user/logout`);
         dispatch({ type: "LOGOUT" });
         sessionStorage.removeItem("current_user");
         sessionStorage.removeItem("GremlinToken");

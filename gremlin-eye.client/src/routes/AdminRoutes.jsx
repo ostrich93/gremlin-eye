@@ -1,8 +1,8 @@
-import { Route, Outlet } from 'react-router';
-import { SyncGames } from '../pages/SyncGames';
+import { Route, Outlet } from 'react-router-dom';
+import SyncGames from '../pages/SyncGames';
 import { useAuth } from "../contexts/AuthContext";
 
-const AdminRoutes = () => {
+export const AdminRoutes = () => {
     const { user } = useAuth();
     const token = sessionStorage.getItem('GremlinToken');
 

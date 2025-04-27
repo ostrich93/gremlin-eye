@@ -1,8 +1,8 @@
-/* eslint-disable no-undef */
 import axios from 'axios';
+import { env } from 'process';
 
 const apiClient = axios.create({
-    baseURL: `${process.env.API_URL}`,
+    baseURL: `${env.API_URL}`,
     headers: {
         "Content-Type": "application/json"
     }

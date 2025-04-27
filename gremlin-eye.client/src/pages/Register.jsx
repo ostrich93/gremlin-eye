@@ -1,8 +1,8 @@
-/* eslint-disable no-undef */
+import { env } from 'process';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { apiClient } from '../config/apiClient';
-import { useAuth, useAuthDispatch } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import apiClient from '../config/apiClient';
+import { useAuth, useAuthDispatch } from "../contexts/AuthContext";
 import { login } from '../actions/authActions';
 
 const Register = (props) => {
@@ -27,7 +27,7 @@ const Register = (props) => {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            let registerResponse = await apiClient.post(`${process.env.API_URL}/user/register`, { username: username, email: email, password: password, passwordConfirmation: passwordConfirmation, role: roleType });
+            let registerResponse = await apiClient.post(`${env.API_URL}/user/register`, { username: username, email: email, password: password, passwordConfirmation: passwordConfirmation, role: roleType });
 
             if (registerResponse) {
                 try {

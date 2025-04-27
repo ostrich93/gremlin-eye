@@ -1,7 +1,7 @@
 import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
-import { useAuth, useAuthDispatch } from '../../contexts/AuthContext';
-import { logout } from '../../actions/authActions';
-import { useNavigate, Link } from 'react-router';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth, useAuthDispatch } from "../../contexts/AuthContext";
+import { logout } from '../../actions/authActions.js';
 
 const NavBar = () => {
     //the search bar will be its own component with its own context and probably reducers and will be placed at the end of the navbar

@@ -1,7 +1,7 @@
-import { Routes, Route } from 'react-router';
-import { Home } from './pages/Home';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
 //import { useAuth } from './contexts/AuthContext';
 import AdminRoutes from './routes/AdminRoutes';
 
