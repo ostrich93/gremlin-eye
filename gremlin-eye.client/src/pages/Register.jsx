@@ -27,7 +27,7 @@ const Register = (props) => {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            let registerResponse = await apiClient.post(`${env.API_URL}/user/register`, { username: username, email: email, password: password, passwordConfirmation: passwordConfirmation, role: roleType });
+            let registerResponse = await apiClient.post(`${env.API_URL}/api/user/register`, { username: username, email: email, password: password, passwordConfirmation: passwordConfirmation, role: roleType });
 
             if (registerResponse) {
                 try {

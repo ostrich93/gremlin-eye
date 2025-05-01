@@ -1,7 +1,7 @@
 import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth, useAuthDispatch } from "../../contexts/AuthContext";
-import { logout } from '../../actions/authActions.js';
+import { logout } from '../../actions/authActions';
 
 const NavBar = () => {
     //the search bar will be its own component with its own context and probably reducers and will be placed at the end of the navbar
@@ -35,7 +35,7 @@ const NavBar = () => {
                         flexGrow: 1,
                         mt: 0
                     }}>
-                        {user && user.role === 1 && sessionStorage.getItem('GremlinToken') && (
+                        {user && user.role === 1 && sessionStorage.getItem('access_token') && (
                             <Link to="/admin/sync_games">Sync Games</Link>
                         )}
                         {user && (
@@ -45,7 +45,7 @@ const NavBar = () => {
                         )}
                         {!user && (
                             <>
-                                <Link to="/users/login">Log In</Link>
+                                <Link to="/login">Log In</Link>
                                 <Link to="/register">Register</Link>
                             </>
                         )}

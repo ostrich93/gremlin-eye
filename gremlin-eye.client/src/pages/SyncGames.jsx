@@ -17,7 +17,7 @@ const SyncGames = () => {
             }
 
             setLoading(true);
-            let response = apiClient.get(`${env.API_URL}/admin/import`, {
+            let response = apiClient.get(`${env.API_URL}api/admin/import`, {
                 params: { page: pageNum }
             });
 

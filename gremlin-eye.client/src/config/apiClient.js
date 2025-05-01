@@ -9,7 +9,7 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-    let token = sessionStorage.getItem('GremlinToken');
+    let token = sessionStorage.getItem('access_token');
     if (token) {
         config.headers.credentials = 'include';
         config.headers.Authorization = `Bearer ${token}`;

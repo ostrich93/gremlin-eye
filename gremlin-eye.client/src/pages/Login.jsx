@@ -23,7 +23,7 @@ const Login = () => {
 
         try {
             let loginResponse = await login(dispatch, { username: username, password: password });
-            if (loginResponse.token) {
+            if (loginResponse.accessToken) {
                 setAuthenticated(true);
             }
         }

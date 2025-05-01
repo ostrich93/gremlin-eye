@@ -45,7 +45,7 @@ namespace gremlin_eye.Server.Services
                     Username = foundUser.UserName,
                     Email = foundUser.Email,
                     Role = foundUser.Role,
-                    Token = token,
+                    AccessToken = token,
                     RefreshToken = refreshToken
                 };
             }
