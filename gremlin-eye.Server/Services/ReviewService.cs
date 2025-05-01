@@ -1,26 +1,26 @@
 ﻿using gremlin_eye.Server.Data;
-using gremlin_eye.Server.Interfaces.Services;
 using gremlin_eye.Server.Entity;
 
 namespace gremlin_eye.Server.Services
 {
     public class ReviewService : IReviewService
     {
-        private readonly DataContext _context;
+        private UnitOfWork _unitOfWork;
         
-        public ReviewService(DataContext context)
+        public ReviewService(UnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
-        public ICollection<Review> GetAllReviews()
+        /* public ICollection<Review> GetAllReviews()
         {
-            return _context.Reviews.ToList();
+            return _unitOfWork.Reviews.ToList();
         }
 
         public Review? GetReviewById(int reviewId)
         {
             return _context.Reviews.First(r => r.ReviewId == reviewId);
         }
+        */
     }
 }

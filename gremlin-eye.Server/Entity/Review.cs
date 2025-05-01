@@ -15,7 +15,7 @@ namespace gremlin_eye.Server.Entity
         public long GameId { get; set; }
 
         [Column("user_id")]
-        public long UserId { get; set; } //Required Foreign Key property
+        public Guid UserId { get; set; } //Required Foreign Key property
 
         [Column("playthrough_id")]
         public long PlaythroughId { get; set; } //Required Foreign Key property
@@ -30,7 +30,7 @@ namespace gremlin_eye.Server.Entity
         public bool CommentsLocked { get; set; } = false;
 
         //Navigation Properties
-        public User User { get; set; } = null!;
+        public AppUser User { get; set; } = null!;
         public GameData Game { get; set; } = null!;
         public Playthrough Playthrough { get; set; } = null!;
         public virtual ICollection<ReviewComment> Comments { get; set; } = new List<ReviewComment>();

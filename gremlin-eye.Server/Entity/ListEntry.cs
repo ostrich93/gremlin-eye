@@ -10,7 +10,6 @@ namespace gremlin_eye.Server.Entity
         [Column("entry_id")]
         public long EntryId { get; set; }
 
-        [Key]
         [Column("game_id")]
         public long GameId { get; set; } //We want to be able to search for lists that have a specific game in them.
 

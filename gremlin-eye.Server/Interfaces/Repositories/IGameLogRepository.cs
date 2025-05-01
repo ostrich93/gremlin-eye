@@ -5,18 +5,18 @@ namespace gremlin_eye.Server.Repositories
 {
     public interface IGameLogRepository
     {
-        public Task<List<GameLog>> GetAllGameLogs();
-        public Task<List<GameLog>> GetAllLogsByGameId(long gameId);
-        public Task<GameLog?> GetGameLogByUser(long gameId, long userId);
-        public Task<int> GetPlayedCount(long gameId);
-        public Task<int> GetPlayingCount(long gameId);
-        public Task<int> GetBackloggedCount(long gameId);
-        public Task<int> GetWishlistCount(long gameId);
-        public Task<GameStatsDTO> GetGameStats(long gameId);
-        public int[] GetReviewCounts(long gameId);
-        public double GetReviewAverage(long gameId);
-        //public Task<GameLog> CreateGameLog(GameLog gameLog);
-        //public Task<GameLog> UpdateGameLog(GameLog gameLog);
-        //public Task DeleteGameLog(GameLog gameLog);
+        Task<List<GameLog>> GetAllGameLogs();
+        Task<List<GameLog>> GetAllLogsByGameId(long gameId);
+        Task<GameLog?> GetGameLogByUser(long gameId, Guid userId);
+        Task<int> GetPlayedCount(long gameId);
+        Task<int> GetPlayingCount(long gameId);
+        Task<int> GetBackloggedCount(long gameId);
+        Task<int> GetWishlistCount(long gameId);
+        Task<GameStatsDTO> GetGameStats(long gameId);
+        int[] GetReviewCounts(long gameId);
+        double GetReviewAverage(long gameId);
+        //Task<GameLog> CreateGameLog(GameLog gameLog);
+        //Task<GameLog> UpdateGameLog(GameLog gameLog);
+        //Task DeleteGameLog(GameLog gameLog);
     }
 }

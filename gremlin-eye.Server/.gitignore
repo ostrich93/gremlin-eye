@@ -1,0 +1,9 @@
+﻿appsettings.json
+appsettings.*.json
+
+obj/
+bin/
+**/[Bb]in/
+**/[Oo]bj/
+
+.vs/

@@ -4,10 +4,12 @@ namespace gremlin_eye.Server.Repositories
 {
     public interface IUserRepository
     {
-        public Task<User?> GetUser(int id);
-        public Task<List<User>> GetAllUsers();
-        //public Task<User> CreateUser(User user);
-        //public Task<User> UpdateUser(User user);
-        //public Task DeleteUser(User user);
+        AppUser? GetUserByName(string username);
+        AppUser? GetUserById(Guid userId);
+        Task<AppUser?> GetUserByNameAsync(string username);
+        Task<AppUser> CreateUserAsync(AppUser user);
+        //Task<AppUser?> GetUser(Guid id);
+        //Task<List<AppUser>> GetAllUsers();
+        
     }
 }

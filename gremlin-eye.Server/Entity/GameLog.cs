@@ -16,7 +16,7 @@ namespace gremlin_eye.Server.Entity
         public long GameId { get; set; }
 
         [Column("user_id")]
-        public long UserId { get; set; } //required foreign key
+        public Guid UserId { get; set; } //required foreign key
 
         [Column("play_status")]
         public PlayState? PlayStatus { get; set; }
@@ -38,9 +38,8 @@ namespace gremlin_eye.Server.Entity
         public bool IsWishlist { get; set; } = false;
 
         //Navigation Properties
-        public User User { get; set; } = null!;
+        public AppUser User { get; set; } = null!;
         public GameData Game { get; set; } = null!;
-        public GameLike? Like { get; set; }
         public virtual ICollection<Playthrough> Playthroughs { get; set; } = new List<Playthrough>();
 
     }

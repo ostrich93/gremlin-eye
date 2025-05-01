@@ -2,26 +2,35 @@
 using gremlin_eye.Server.Repositories;
 using gremlin_eye.Server.Entity;
 using IGDB.Models;
+using gremlin_eye.Server.Data;
 
 namespace gremlin_eye.Server.Services
 {
     public class GameService : IGameService
     {
-        private readonly IGameRepository _gameRepository;
-        private readonly IReviewRepository _reviewRepository;
+        private UnitOfWork _unitOfWork;
 
-        public GameService(IGameRepository gameRepository, IReviewRepository reviewRepository)
+        public GameService(UnitOfWork unitOfWork)
         {
-            _gameRepository = gameRepository;
-            _reviewRepository = reviewRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<GameDetailsResponseDTO> GetGameDetailsBySlug(string slug, long? userId = null)
+        public async Task<GameData?> GetGameById(long id)
         {
-            GameData? data = await _gameRepository.GetGameBySlug(slug);
+            return await _unitOfWork.Games.GetGameById(id);
+        }
+
+        public async Task<GameData[]> GetGameData(int offset, int limit)
+        {
+            return await _unitOfWork.Games.GetGames(offset, limit);
+        }
+
+        public async Task<GameDetailsResponseDTO> GetGameDetailsBySlug(string slug, Guid? userId = null)
+        {
+            GameData? data = await _unitOfWork.Games.GetGameBySlug(slug);
             if (data != null)
             {
-                int reviewCount = await _reviewRepository.GetGameReviewCount(data.GameId);
+                int reviewCount = await _unitOfWork.Reviews.GetGameReviewCount(data.GameId);
                 return new GameDetailsResponseDTO
                 {
                     Id = data.GameId,

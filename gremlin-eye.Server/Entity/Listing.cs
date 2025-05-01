@@ -14,12 +14,11 @@ namespace gremlin_eye.Server.Entity
         public long ListingId { get; set; }
 
         [Column("user_id")]
-        public long UserId { get; set; } //required foreign key
+        public Guid UserId { get; set; } //required foreign key
 
         [Column("name")]
         public string Name { get; set; } = string.Empty;
 
-        [Key]
         [Column("slug")]
         public string Slug { get; set; } = string.Empty;
 
@@ -46,7 +45,7 @@ namespace gremlin_eye.Server.Entity
         public bool CommentsLocked { get; set; } = false;
 
         //Navigation Properties
-        public virtual User User { get; set; } = null!;
+        public virtual AppUser User { get; set; } = null!;
         public virtual ICollection<ListEntry> ListEntries { get; set; } = new List<ListEntry>();
         public virtual ICollection<ListingComment> Comments { get; set; } = new List<ListingComment>();
         public virtual ICollection<ListingLike> Likes { get; set; } = new List<ListingLike>();

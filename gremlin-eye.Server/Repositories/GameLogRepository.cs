@@ -16,17 +16,17 @@ namespace gremlin_eye.Server.Repositories
 
         public async Task<List<GameLog>> GetAllGameLogs()
         {
-            return await _context.GameLogs.Include(gl => gl.Like).Include(gl => gl.Playthroughs).ToListAsync();
+            return await _context.GameLogs.Include(gl => gl.Playthroughs).ToListAsync();
         }
 
         public async Task<List<GameLog>> GetAllLogsByGameId(long gameId)
         {
-            return await _context.GameLogs.Include(gl => gl.Like).Include(gl => gl.Playthroughs).ThenInclude(p => p.Review).Where(gl => gl.GameId == gameId).ToListAsync();
+            return await _context.GameLogs.Include(gl => gl.Playthroughs).ThenInclude(p => p.Review).Where(gl => gl.GameId == gameId).ToListAsync();
         }
 
-        public async Task<GameLog?> GetGameLogByUser(long gameId, long userId)
+        public async Task<GameLog?> GetGameLogByUser(long gameId, Guid userId)
         {
-            return await _context.GameLogs.Include(gl => gl.Like).Include(gl => gl.Playthroughs).ThenInclude(gl => gl.Review).FirstOrDefaultAsync(gl => gl.GameId == gameId && gl.UserId == userId);
+            return await _context.GameLogs.Include(gl => gl.Playthroughs).ThenInclude(gl => gl.Review).FirstOrDefaultAsync(gl => gl.GameId == gameId && gl.UserId == userId);
         }
 
         public async Task<int> GetPlayedCount(long gameId)

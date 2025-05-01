@@ -10,7 +10,7 @@ namespace gremlin_eye.Server.Data
 
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<AppUser> Users { get; set; }
         public DbSet<GameLog> GameLogs { get; set; }
         public DbSet<Playthrough> Playthroughs { get; set; }
         public DbSet<PlayLog> PlayLogs { get; set; }
@@ -64,7 +64,8 @@ namespace gremlin_eye.Server.Data
             modelBuilder.Entity<GameLog>()
                 .HasOne(gl => gl.Game)
                 .WithMany(g => g.GameLogs)
-                .HasForeignKey(gl => gl.GameId);
+                .HasForeignKey(gl => gl.GameId)
+                .OnDelete(DeleteBehavior.ClientCascade);
 
             modelBuilder.Entity<PlatformData>()
                 .HasMany(p => p.Playthroughs)
@@ -98,47 +99,55 @@ namespace gremlin_eye.Server.Data
                 .HasOne(r => r.User)
                 .WithMany(u => u.Reviews)
                 .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.ClientCascade);
 
             modelBuilder.Entity<ReviewComment>()
                 .HasOne(rc => rc.Review)
                 .WithMany(r => r.Comments)
                 .HasForeignKey(r => r.ReviewId)
+                .IsRequired(true)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ReviewComment>()
                 .HasOne(rc => rc.Author)
                 .WithMany(a => a.ReviewComments)
                 .HasForeignKey(r => r.AuthorId)
+                .IsRequired(true)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ReviewLike>()
                 .HasOne(rl => rl.Review)
                 .WithMany(r => r.Likes)
                 .HasForeignKey(rl => rl.ReviewId)
+                .IsRequired(true)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ReviewLike>()
                 .HasOne(rl => rl.User)
                 .WithMany(u => u.ReviewLikes)
                 .HasForeignKey(rl => rl.UserId)
+                .IsRequired(true)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GameLike>()
                 .HasOne(l => l.User)
                 .WithMany(u => u.GameLikes)
                 .HasForeignKey(l => l.UserId)
+                .IsRequired(true)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GameLike>()
                 .HasOne(l => l.Game)
                 .WithMany(g => g.Likes)
-                .HasForeignKey(l => l.GameId);
+                .HasForeignKey(l => l.GameId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(true);
 
             modelBuilder.Entity<GameLog>()
                 .HasOne(gl => gl.User)
                 .WithMany(u => u.GameLogs)
-                .HasForeignKey(gl => gl.UserId);
+                .HasForeignKey(gl => gl.UserId)
+                .IsRequired(true);
 
             modelBuilder.Entity<ListEntry>()
                 .HasOne(le => le.Listing)
@@ -150,7 +159,7 @@ namespace gremlin_eye.Server.Data
                 .HasOne(lc => lc.Listing)
                 .WithMany(l => l.Comments)
                 .HasForeignKey(lc => lc.ListingId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.ClientCascade);
 
             modelBuilder.Entity<ListingComment>()
                 .HasOne(lc => lc.Author)
@@ -162,7 +171,7 @@ namespace gremlin_eye.Server.Data
                 .HasOne(ll => ll.Listing)
                 .WithMany(l => l.Likes)
                 .HasForeignKey(ll => ll.ListingId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.ClientCascade);
 
             modelBuilder.Entity<ListingLike>()
                 .HasOne(l => l.User)
@@ -174,20 +183,14 @@ namespace gremlin_eye.Server.Data
                 .HasOne(l => l.User)
                 .WithMany(u => u.Listings)
                 .HasForeignKey(l => l.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.ClientCascade);
 
             //One to One Relationships
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.Playthrough)
                 .WithOne(p => p.Review)
                 .HasForeignKey<Review>(r => r.PlaythroughId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<GameLike>()
-                .HasOne(l => l.GameLog)
-                .WithOne(g => g.Like)
-                .HasForeignKey<GameLike>(l => l.GameLogId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

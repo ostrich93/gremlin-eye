@@ -4,7 +4,8 @@ namespace gremlin_eye.Server.Services
 {
     public interface IIGDBService
     {
-        public Task<Game?> QueryGameAsync(string slug);
-        public Task<ICollection<Game>> QuickSearchGamesAsync(string searchItem);
+        Task<Game[]> GetGames(int offset);
+        Task<Game?> QueryGameAsync(string slug);
+        Task<ICollection<Game>> QuickSearchGamesAsync(string searchItem);
     }
 }
