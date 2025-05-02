@@ -1,4 +1,3 @@
-import { env } from 'process';
 import { useState } from 'react';
 import apiClient from '../config/apiClient';
 
@@ -17,7 +16,7 @@ const SyncGames = () => {
             }
 
             setLoading(true);
-            let response = apiClient.get(`${env.API_URL}api/admin/import`, {
+            let response = apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/admin/import`, {
                 params: { page: pageNum }
             });
 

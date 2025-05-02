@@ -1,10 +1,9 @@
 import apiClient from '../config/apiClient';
-import { env } from 'process';
 
 export async function login(dispatch, payload) {
     try {
         dispatch({ type: "LOGIN_REQUEST" });
-        const response = await apiClient.post(`${env.API_URL}/auth/login`, payload, {
+        const response = await apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/auth/login`, payload, {
             withCredentials: true
         });
 
@@ -37,8 +36,9 @@ export async function login(dispatch, payload) {
 
 export async function logout(dispatch) {
     try {
-        const response = await apiClient.post(`${env.API_URL}/auth/logout`);
+        const response = await apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/auth/logout`);
         dispatch({ type: "LOGOUT" });
+        console.log("logout success");
         sessionStorage.removeItem("current_user");
         sessionStorage.removeItem("access_token");
         sessionStorage.removeItem("refresh_token");
@@ -51,7 +51,7 @@ export async function logout(dispatch) {
 export async function refreshAccessToken(dispatch, payload) {
     try {
         dispatch({ type: "REFRESH_REQUEST" });
-        const response = await apiClient.post(`${env.API_URL}/auth/refresh`, payload, {
+        const response = await apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/auth/refresh`, payload, {
             withCredentials: true
         });
 

@@ -1,55 +1,42 @@
-import { env } from 'process';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../config/apiClient';
-import { useAuth, useAuthDispatch } from "../contexts/AuthContext";
-import { login } from '../actions/authActions';
+import { useAuthState, useAuthDispatch } from "../contexts/AuthProvider";
 
 const Register = (props) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
-    const [authenticated, setAuthentication] = useState(false);
 
     const navigate = useNavigate();
     const dispatch = useAuthDispatch();
-    const { error } = useAuth();
+    const { loading, error } = useAuthState();
 
     const roleType = props.roleType || 0; //This page is used for both normal user registration and admin registration.
 
-    useEffect(() => {
-        if (authenticated) {
-            navigate("/");
-        }
-    }, [authenticated, navigate]);
-
-    const handleRegister = async (e) => {
+    const handleRegister = (e) => {
         e.preventDefault();
-        try {
-            let registerResponse = await apiClient.post(`${env.API_URL}/api/user/register`, { username: username, email: email, password: password, passwordConfirmation: passwordConfirmation, role: roleType });
+        dispatch({ type: "REGISTER_REQUEST" });
 
-            if (registerResponse) {
-                try {
-                    let loginResponse = await login(dispatch, { username: username, password: password });
-                    if (loginResponse.token) {
-                        setAuthentication(true);
-                    }
-                } catch (error) {
-                    throw new Error("Login failed", error);
-                }
-            } else {
-                throw new Error("Register failed");
-            }
-        } catch (error) {
-            console.error("Operation Failed", error);
-        }
+        apiClient.post(
+            `${import.meta.env.VITE_APP_BACKEND_URL}/api/user/register`, {
+            username: username, email: email, password: password, passwordConfirmation: passwordConfirmation, role: roleType
+        })
+            .then((res) => {
+                dispatch({ type: "REGISTER_SUCCESS" });
+                navigate("/login");
+            })
+            .catch((err) => {
+                console.log(err);
+                dispatch({ type: "REGISTER_ERROR", payload: err });
+            }); 
     };
 
     return (
         <div className="flex row justify-content-md center">
             <h2 id="title">Register</h2>
-            {error ? <p>{error}</p> : null}
+            {error ? (<><p>{error}</p></>) : null}
             <form onSubmit={handleRegister}>
                 <div className="form-group my-3">
                     <input type='text' value={username} placeholder='Username' onChange={e => setUsername(e.target.value)} maxLength='16' name="username" required />
@@ -66,7 +53,7 @@ const Register = (props) => {
                     <input type='password' value={passwordConfirmation} placeholder='Password Confirmation' onChange={e => setPasswordConfirmation(e.target.value)} name="passwordConfirmation" required />
                 </div>
                 <div>
-                    <button id="register-button" type='submit' disabled={password !== passwordConfirmation}>Register</button>
+                    <button id="register-button" type='submit' disabled={loading || password !== passwordConfirmation}>Register</button>
                 </div>
             </form>
         </div>

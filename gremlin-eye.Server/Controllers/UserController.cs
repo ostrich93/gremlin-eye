@@ -17,7 +17,7 @@ namespace gremlin_eye.Server.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("/register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserRequestDTO request)
         {
             //Validation

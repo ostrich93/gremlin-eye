@@ -1,14 +1,28 @@
 import axios from 'axios';
-import { env } from 'process';
 
-const apiClient = axios.create({
-    baseURL: `${env.API_URL}`,
-    headers: {
-        "Content-Type": "application/json"
-    }
-});
+const basicRequestInterceptor = (config) => {
+    config.headers["Content-Type"] = "application/json";
+    config.headers["Accept"] = "application/json";
+    return config;
+};
 
-apiClient.interceptors.request.use((config) => {
+const configureApiClient = (client) => {
+    client.interceptors.request.use(basicRequestInterceptor);
+    client.interceptors.response.use(
+        (response) => { return response; },
+        (error) => {
+            const errMessage = error.response?.data?.message || error.message;
+            console.error(errMessage);
+
+            return Promise.reject(error);
+        }
+    );
+    client.defaults.baseURL = import.meta.env.VITE_APP_BACKEND_URL;
+};
+
+const apiClient = axios.create();
+configureApiClient(apiClient);
+/*apiClient.interceptors.request.use((config) => {
     let token = sessionStorage.getItem('access_token');
     if (token) {
         config.headers.credentials = 'include';
@@ -16,6 +30,6 @@ apiClient.interceptors.request.use((config) => {
         config.headers['Access-Control-Allow-Origin'] = "*";
         config.headers['Content-Type'] = "application/json";
     }
-});
+});*/
 
 export default apiClient;

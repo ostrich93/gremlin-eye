@@ -1,11 +1,11 @@
 import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth, useAuthDispatch } from "../../contexts/AuthContext";
+import { useAuthState, useAuthDispatch } from "../../contexts/AuthProvider";
 import { logout } from '../../actions/authActions';
 
 const NavBar = () => {
     //the search bar will be its own component with its own context and probably reducers and will be placed at the end of the navbar
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const dispatch = useAuthDispatch();
     const navigate = useNavigate();
 
@@ -36,7 +36,7 @@ const NavBar = () => {
                         mt: 0
                     }}>
                         {user && user.role === 1 && sessionStorage.getItem('access_token') && (
-                            <Link to="/admin/sync_games">Sync Games</Link>
+                            <Link to="/admin/syncGames">Sync Games</Link>
                         )}
                         {user && (
                             <Button onClick={handleLogOut} sx={{
@@ -46,7 +46,7 @@ const NavBar = () => {
                         {!user && (
                             <>
                                 <Link to="/login">Log In</Link>
-                                <Link to="/register">Register</Link>
+                                <Link to="/users/register">Register</Link>
                             </>
                         )}
                         <Link to="/games/lib">Games</Link>
