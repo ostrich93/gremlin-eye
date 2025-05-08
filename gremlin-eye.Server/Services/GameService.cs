@@ -30,10 +30,10 @@ namespace gremlin_eye.Server.Services
             GameData? data = await _unitOfWork.Games.GetGameBySlug(slug);
             if (data != null)
             {
-                int reviewCount = await _unitOfWork.Reviews.GetGameReviewCount(data.GameId);
+                int reviewCount = await _unitOfWork.Reviews.GetGameReviewCount(data.Id);
                 return new GameDetailsResponseDTO
                 {
-                    Id = data.GameId,
+                    Id = data.Id,
                     Name = data.Name,
                     Slug = data.Slug,
                     CoverUrl = data.CoverUrl,
@@ -42,25 +42,25 @@ namespace gremlin_eye.Server.Services
                     Date = data.ReleaseDate,
                     Platforms = data.Platforms.Select(p => new PlatformDTO
                     {
-                        Id = p.PlatformId,
+                        Id = p.Id,
                         Name = p.Name,
                         Slug = p.Slug
                     }).ToList(),
                     Genres = data.Genres.Select(g => new GenreDTO
                     {
-                        Id = g.GenreId,
+                        Id = g.Id,
                         Name = g.Name,
                         Slug = g.Slug
                     }).ToList(),
                     Companies = data.Companies.Select(c => new CompanyDTO
                     {
-                        Id = c.CompanyId,
+                        Id = c.Id,
                         Name = c.Name,
                         Slug = c.Slug
                     }).ToList(),
                     Series = data.Series.Count > 0 ? new SeriesDTO
                     {
-                        Id = data.Series.First().SeriesId,
+                        Id = data.Series.First().Id,
                         Name = data.Series.First().Name,
                         Slug = data.Series.First().Slug
                     } : null,

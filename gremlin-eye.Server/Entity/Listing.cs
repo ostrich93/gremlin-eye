@@ -11,7 +11,7 @@ namespace gremlin_eye.Server.Entity
 
         [Key]
         [Column("listing_id")]
-        public long ListingId { get; set; }
+        public long Id { get; set; }
 
         [Column("user_id")]
         public Guid UserId { get; set; } //required foreign key

@@ -1,5 +1,6 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
+using gremlin_eye.Server.Entity;
 using System.Security.Claims;
 
 namespace gremlin_eye.Server.Services
@@ -31,7 +32,7 @@ namespace gremlin_eye.Server.Services
                 var token = _tokenService.GenerateAccessToken(foundUser);
                 var refreshToken = _tokenService.GenerateRefreshToken();
                 foundUser.RefreshTokens.RemoveAll(t => !t.IsActive); //remove expired tokens
-                foundUser.RefreshTokens.Add(new Entity.RefreshToken
+                foundUser.RefreshTokens.Add(new RefreshToken
                 {
                     User = foundUser,
                     UserId = foundUser.Id,

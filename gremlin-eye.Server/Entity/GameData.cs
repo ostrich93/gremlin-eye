@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using gremlin_eye.Server.Interfaces;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,11 +10,12 @@ namespace gremlin_eye.Server.Entity
      * This eases the load on IGDB so that we only call on the images for a game after the initial query, increases performance on our end, and makes it easier to define and organize relationships
      */
     [Table("games")]
-    public class GameData
+    public class GameData : IChecksum
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("game_id")]
-        public long GameId { get; set; }
+        public long Id { get; set; }
 
         [Column("cover_uri")]
         public string CoverUrl { get; set; } = string.Empty;
@@ -40,6 +42,9 @@ namespace gremlin_eye.Server.Entity
 
         [Column("release_date")]
         public DateTimeOffset? ReleaseDate { get; set; } //first release date
+
+        [Column("checksum")]
+        public string? Checksum { get; set; }
         //Navigation Properties
 
         //Non-IGDB relationships
@@ -51,7 +56,7 @@ namespace gremlin_eye.Server.Entity
 
         //IGDB Data Relationships
         public virtual ICollection<CompanyData> Companies { get; set; } = new List<CompanyData>();
-        public virtual ICollection<Series> Series { get; set; } = new List<Series>();
+        public virtual ICollection<SeriesData> Series { get; set; } = new List<SeriesData>();
         public virtual ICollection<PlatformData> Platforms { get; set; } = new List<PlatformData>();
         public virtual ICollection<GenreData> Genres { get; set; } = new List<GenreData>();
 

@@ -7,5 +7,9 @@ namespace gremlin_eye.Server.Services
         Task<Game[]> GetGames(int offset);
         Task<Game?> QueryGameAsync(string slug);
         Task<ICollection<Game>> QuickSearchGamesAsync(string searchItem);
+        Task<Genre[]> GetGenres();
+        Task<Collection[]> GetSeries(int offset);
+        Task<Platform[]> GetPlatforms();
+        Task<Company[]> GetCompanies(int offset);
     }
 }

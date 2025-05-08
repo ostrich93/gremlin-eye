@@ -10,7 +10,7 @@ namespace gremlin_eye.Server.Entity
         [Key]
         [Column("playthrough_id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long PlaythroughId { get; set; }
+        public long Id { get; set; }
 
         [Column("game_log_id")]
         public long GameLogId { get; set; } // Required foreign key property

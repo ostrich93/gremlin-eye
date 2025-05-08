@@ -16,7 +16,7 @@ const SyncGames = () => {
             }
 
             setLoading(true);
-            let response = apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/admin/import`, {
+            let response = apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/import/games`, {
                 params: { page: pageNum }
             });
 

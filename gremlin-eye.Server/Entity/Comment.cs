@@ -12,7 +12,7 @@ namespace gremlin_eye.Server.Entity
     {
         [Key]
         [Column("comment_id")]
-        public long CommentId { get; set; }
+        public long Id { get; set; }
 
         [Column("author_id")]
         public Guid AuthorId { get; set; }
@@ -39,7 +39,7 @@ namespace gremlin_eye.Server.Entity
     {
         [Key]
         [Column("comment_id")]
-        public long CommentId { get; set; }
+        public long Id { get; set; }
 
         [Column("author_id")]
         public Guid AuthorId { get; set; }

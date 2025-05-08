@@ -25,12 +25,12 @@ namespace gremlin_eye.Server.Repositories
 
         public async Task<List<PlayLog>> GetPlayLogs(int playthroughId)
         {
-            return await _context.PlayLogs.Include(l => l.Playthrough).Where(l => l.Playthrough.PlaythroughId == playthroughId).ToListAsync();
+            return await _context.PlayLogs.Include(l => l.Playthrough).Where(l => l.Playthrough.Id == playthroughId).ToListAsync();
         }
 
         public async Task<Review?> GetReview(int reviewId)
         {
-            return await _context.Reviews.Include(r => r.Playthrough).Include(r => r.Comments).Include(r => r.Likes).Where(r => r.ReviewId == reviewId).FirstOrDefaultAsync();
+            return await _context.Reviews.Include(r => r.Playthrough).Include(r => r.Comments).Include(r => r.Likes).Where(r => r.Id == reviewId).FirstOrDefaultAsync();
         }
 
         public async Task<List<Playthrough>> GetUserPlaythroughs(int gameId, Guid userId)

@@ -25,7 +25,7 @@ namespace gremlin_eye.Server.Services
 
             GameLogDTO logData = new GameLogDTO
             {
-                LogId = gameLog.GameLogId,
+                LogId = gameLog.Id,
                 GameId = gameId,
                 IsPlaying = gameLog.IsPlaying,
                 IsBacklog = gameLog.IsBacklog,
