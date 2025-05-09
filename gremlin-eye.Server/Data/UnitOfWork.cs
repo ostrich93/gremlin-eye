@@ -2,7 +2,7 @@
 
 namespace gremlin_eye.Server.Data
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork
     {
         private readonly DataContext _context;
 
@@ -95,6 +95,6 @@ namespace gremlin_eye.Server.Data
             await _context.SaveChangesAsync();
         }
 
-        public async ValueTask DisposeAsync() => await _context.DisposeAsync();
+        //public async ValueTask DisposeAsync() => await _context.DisposeAsync();
     }
 }

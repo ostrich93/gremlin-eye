@@ -33,5 +33,22 @@ namespace gremlin_eye.Server.Repositories
         {
             return await _context.Games.Include(g => g.Companies).Include(g => g.Genres).Include(g => g.Series).Include(g => g.Platforms).Where(g => g.Slug == slug).FirstOrDefaultAsync();
         }
+
+        public void Create(GameData data)
+        {
+            _context.Games.Add(data);
+        }
+
+        public async Task CreateRangeAndSaveAsync(IEnumerable<GameData> data)
+        {
+            _context.Games.AddRange(data);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateRangeAndSaveAsync(IEnumerable<GameData> data)
+        {
+            _context.Games.UpdateRange(data);
+            await _context.SaveChangesAsync();
+        }
     }
 }

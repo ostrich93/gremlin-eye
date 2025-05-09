@@ -36,7 +36,7 @@ const NavBar = () => {
                         mt: 0
                     }}>
                         {user && user.role === 1 && sessionStorage.getItem('access_token') && (
-                            <Link to="/admin/syncGames">Sync Games</Link>
+                            <Link to="/admin">Admin</Link>
                         )}
                         {user && (
                             <Button onClick={handleLogOut} sx={{

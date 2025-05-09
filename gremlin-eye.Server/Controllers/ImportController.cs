@@ -35,5 +35,29 @@ namespace gremlin_eye.Server.Controllers
             await _gameSyncService.ImportGenres();
             return Results.Ok();
         }
+
+        [HttpGet("platforms")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IResult> ImportPlatforms()
+        {
+            await _gameSyncService.ImportPlatforms();
+            return Results.Ok();
+        }
+
+        [HttpGet("series")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IResult> ImportSeries([FromQuery] int page)
+        {
+            await _gameSyncService.ImportSeries(page);
+            return Results.Ok();
+        }
+
+        [HttpGet("companies")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IResult> ImportCompanies([FromQuery] int page)
+        {
+            await _gameSyncService.ImportCompanies(page);
+            return Results.Ok();
+        }
     }
 }
