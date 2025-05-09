@@ -7,9 +7,9 @@ namespace gremlin_eye.Server.Services
     public class UserService : IUserService
     {
         private readonly IPasswordHasher _passwordHasher;
-        private UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(IPasswordHasher passwordHasher, UnitOfWork unitOfWork)
+        public UserService(IPasswordHasher passwordHasher, IUnitOfWork unitOfWork)
         {
             _passwordHasher = passwordHasher;
             _unitOfWork = unitOfWork;

@@ -9,9 +9,9 @@ namespace gremlin_eye.Server.Services
     {
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenService _tokenService;
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuthService(IPasswordHasher passwordHasher, ITokenService tokenService, UnitOfWork unitOfWork)
+        public AuthService(IPasswordHasher passwordHasher, ITokenService tokenService, IUnitOfWork unitOfWork)
         {
             _passwordHasher = passwordHasher;
             _tokenService = tokenService;

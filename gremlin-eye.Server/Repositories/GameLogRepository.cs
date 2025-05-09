@@ -1,7 +1,6 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
-using gremlin_eye.Server.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace gremlin_eye.Server.Repositories

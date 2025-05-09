@@ -11,17 +11,15 @@ namespace gremlin_eye.Server.Services
     {
         private const string imageUrlPrefix = "https:";
 
-        private UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IIGDBService _igdbService;
-        private readonly IGameService _gameService;
 
         private int LIMIT = 500;
 
-        public GameSyncService(UnitOfWork unitOfWork, IIGDBService igdbService, IGameService gameService)
+        public GameSyncService(IUnitOfWork unitOfWork, IIGDBService igdbService)
         {
             _unitOfWork = unitOfWork;
             _igdbService = igdbService;
-            _gameService = gameService;
         }
 
         public async Task ImportGenres()
@@ -129,10 +127,8 @@ namespace gremlin_eye.Server.Services
             var offset = (page - 1) * LIMIT;
 
             var sourceSeries = await _igdbService.GetSeries(offset);
-            SeriesData[] newSeries = new SeriesData[LIMIT];
-            SeriesData[] updatedSeries = new SeriesData[LIMIT];
-            int newSeriesCounter = 0;
-            int updatedSeriesCounter = 0;
+            HashSet<SeriesData> newSeries = new HashSet<SeriesData>();
+            HashSet<SeriesData> updatedSeries = new HashSet<SeriesData>();
 
             foreach(Collection source in sourceSeries)
             {
@@ -150,7 +146,7 @@ namespace gremlin_eye.Server.Services
                         internalSeries.Name = source.Name;
                         internalSeries.Slug = source.Slug;
 
-                        updatedSeries[updatedSeriesCounter++] = internalSeries;
+                        updatedSeries.Add(internalSeries);
                     }
                 }
                 else
@@ -162,15 +158,15 @@ namespace gremlin_eye.Server.Services
                         Name = source.Name,
                         Slug = source.Slug
                     };
-                    newSeries[newSeriesCounter++] = internalSeries;
+                    newSeries.Add(internalSeries);
                 }
             }
-            if (newSeriesCounter > 0)
+            if (newSeries.Count > 0)
             {
                 _unitOfWork.Context.Series.AddRange(newSeries);
                 await _unitOfWork.SaveChangesAsync();
             }
-            if (updatedSeriesCounter > 0)
+            if (updatedSeries.Count > 0)
             {
                 _unitOfWork.Context.Series.UpdateRange(updatedSeries);
                 await _unitOfWork.Context.SaveChangesAsync();
@@ -182,10 +178,8 @@ namespace gremlin_eye.Server.Services
             var offset = (page - 1) * LIMIT;
 
             var sourceCompanies = await _igdbService.GetCompanies(offset);
-            CompanyData[] newCompanies = new CompanyData[LIMIT];
-            CompanyData[] updatedCompanies = new CompanyData[LIMIT];
-            int newCompanyCount = 0;
-            int updatedCompanyCount = 0;
+            HashSet<CompanyData> newCompanies = new HashSet<CompanyData>();
+            HashSet<CompanyData> updatedCompanies = new HashSet<CompanyData>();
 
             foreach (Company source in sourceCompanies)
             {
@@ -204,7 +198,7 @@ namespace gremlin_eye.Server.Services
                         internalCompany.Slug = source.Slug;
                         internalCompany.Description = source.Description;
 
-                        updatedCompanies[updatedCompanyCount++] = internalCompany;
+                        updatedCompanies.Add(internalCompany);
                     }
                 }
                 else
@@ -218,15 +212,15 @@ namespace gremlin_eye.Server.Services
                         Description = source.Description
                     };
 
-                    newCompanies[newCompanyCount++] = internalCompany;
+                    newCompanies.Add(internalCompany);
                 }
             }
-            if (newCompanyCount > 0)
+            if (newCompanies.Count > 0)
             {
                 _unitOfWork.Context.AddRange(newCompanies);
                 await _unitOfWork.SaveChangesAsync();
             }
-            if (updatedCompanyCount > 0) {
+            if (updatedCompanies.Count > 0) {
                 _unitOfWork.Context.UpdateRange(updatedCompanies);
                 await _unitOfWork.SaveChangesAsync();
             }
@@ -238,12 +232,10 @@ namespace gremlin_eye.Server.Services
 
             var sourceGames = await _igdbService.GetGames(offset);
             //GameData[] gameDatas = new GameData[LIMIT];
-            GameData[] gamesToUpdate = new GameData[LIMIT];
-            GameData[] gamesToAdd = new GameData[LIMIT];
+            HashSet<GameData> gamesToUpdate = new HashSet<GameData>();
+            HashSet<GameData> gamesToAdd = new HashSet<GameData>(); ;
 
             //int counter = 0;
-            int updateCounter = 0;
-            int addCounter = 0;
 
             foreach(Game source in sourceGames)
             {
@@ -252,7 +244,7 @@ namespace gremlin_eye.Server.Services
 
                 bool shouldCreate = false;
                 int rowsToUpdate = 0;
-                GameData? internalGame = await _gameService.GetGameById((long)source.Id);
+                GameData? internalGame = await _unitOfWork.Games.GetGameById((long)source.Id);
                 if (internalGame != null)
                 {
                     if (internalGame.Checksum != source.Checksum)
@@ -293,19 +285,19 @@ namespace gremlin_eye.Server.Services
                     rowsToUpdate += HandleCompanies(internalGame, source);
 
                 if (shouldCreate)
-                    gamesToAdd[addCounter++] = internalGame;
+                    gamesToAdd.Add(internalGame);
                 else if (rowsToUpdate > 0 && !shouldCreate)
-                    gamesToUpdate[updateCounter++] = internalGame;
+                    gamesToUpdate.Add(internalGame);
 
                 /*gameDatas[counter] = internalGame;
                 await _unitOfWork.SaveChangesAsync();
                 counter++;*/
             }
-            if (gamesToUpdate.Length > 0)
+            if (gamesToUpdate.Count > 0)
             {
                 await _unitOfWork.Games.UpdateRangeAndSaveAsync(gamesToUpdate);
             }
-            if (gamesToAdd.Length > 0)
+            if (gamesToAdd.Count > 0)
             {
                 await _unitOfWork.Games.CreateRangeAndSaveAsync(gamesToAdd);
             }

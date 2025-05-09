@@ -2,7 +2,7 @@
 
 namespace gremlin_eye.Server.Data
 {
-    public interface IUnitOfWork : IAsyncDisposable
+    public interface IUnitOfWork : IDisposable
     {
         IUserRepository Users { get; }
         IGameLogRepository GameLogs { get; }
