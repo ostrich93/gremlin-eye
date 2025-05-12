@@ -217,11 +217,11 @@ namespace gremlin_eye.Server.Services
             }
             if (newCompanies.Count > 0)
             {
-                _unitOfWork.Context.AddRange(newCompanies);
+                _unitOfWork.Context.Companies.AddRange(newCompanies);
                 await _unitOfWork.SaveChangesAsync();
             }
             if (updatedCompanies.Count > 0) {
-                _unitOfWork.Context.UpdateRange(updatedCompanies);
+                _unitOfWork.Context.Companies.UpdateRange(updatedCompanies);
                 await _unitOfWork.SaveChangesAsync();
             }
         }
@@ -253,9 +253,9 @@ namespace gremlin_eye.Server.Services
                         internalGame.Name = source.Name;
                         internalGame.Slug = source.Slug;
                         internalGame.ReleaseDate = source.FirstReleaseDate;
-                        internalGame.Summary = source.Summary;
-                        internalGame.BannerUrl = source.Screenshots != null && source.Screenshots.Values.Length > 0 ? new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Screenshots.Values[0].ImageId, ImageSize.HD1080)).ToString() : "";
-                        internalGame.CoverUrl = new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Cover.Value.ImageId, ImageSize.CoverBig)).ToString();
+                        internalGame.Summary = source.Summary ?? string.Empty;
+                        internalGame.BannerUrl = source.Screenshots != null && source.Screenshots.Values.Length > 0 ? new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Screenshots.Values[0].ImageId, ImageSize.HD1080)).ToString() : string.Empty;
+                        internalGame.CoverUrl = source.Cover != null && source.Cover.Value != null ? new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Cover.Value.ImageId, ImageSize.CoverBig)).ToString() : string.Empty;
                     }
                 }
                 else if (internalGame == null)
@@ -265,9 +265,9 @@ namespace gremlin_eye.Server.Services
                         Id = (long)source.Id,
                         Slug = source.Slug,
                         Name = source.Name,
-                        CoverUrl = new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Cover.Value.ImageId, ImageSize.CoverBig)).ToString(),
-                        BannerUrl = source.Screenshots != null && source.Screenshots.Values.Length > 0 ? new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Screenshots.Values[0].ImageId, ImageSize.HD1080)).ToString() : "",
-                        Summary = source.Summary,
+                        CoverUrl = source.Cover != null && source.Cover.Value != null ? new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Cover.Value.ImageId, ImageSize.CoverBig)).ToString(): string.Empty,
+                        BannerUrl = source.Screenshots != null && source.Screenshots.Values.Length > 0 ? new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Screenshots.Values[0].ImageId, ImageSize.HD1080)).ToString() : string.Empty,
+                        Summary = source.Summary ?? string.Empty,
                         ReleaseDate = source.FirstReleaseDate,
                         Checksum = source.Checksum
                     };
@@ -528,7 +528,7 @@ namespace gremlin_eye.Server.Services
                 gameData.Series.Remove(s);
             if (seriesToUpdate.Count > 0)
             {
-                _unitOfWork.Context.UpdateRange(seriesToUpdate);
+                _unitOfWork.Context.Series.UpdateRange(seriesToUpdate);
                 _unitOfWork.Context.SaveChanges();
             }
 
