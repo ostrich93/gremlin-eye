@@ -1,5 +1,4 @@
 ﻿using gremlin_eye.Server.Entity;
-using IGDB.Models;
 
 namespace gremlin_eye.Server.Repositories
 {
@@ -12,5 +11,6 @@ namespace gremlin_eye.Server.Repositories
         void Create(GameData data);
         Task CreateRangeAndSaveAsync(IEnumerable<GameData> data);
         Task UpdateRangeAndSaveAsync(IEnumerable<GameData> data);
+        Task<GameData[]> SearchGames(string query);
     }
 }

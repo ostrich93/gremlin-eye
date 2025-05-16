@@ -50,5 +50,10 @@ namespace gremlin_eye.Server.Repositories
             _context.Games.UpdateRange(data);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<GameData[]> SearchGames(string query)
+        {
+            return await _context.Games.Where(g => g.Name.Contains(query)).Take(50).ToArrayAsync();
+        }
     }
 }

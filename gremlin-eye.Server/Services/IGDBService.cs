@@ -40,7 +40,7 @@ namespace gremlin_eye.Server.Services
 
         public async Task<ICollection<Game>> QuickSearchGamesAsync(string searchItem)
         {
-            return await igdb.QueryAsync<Game>(IGDBClient.Endpoints.Search,
+            return await igdb.QueryAsync<Game>(IGDBClient.Endpoints.Games,
                 $"""search "{searchItem}"; fields checksum, id, name, slug, first_release_date; limit 50;""");
         }
 

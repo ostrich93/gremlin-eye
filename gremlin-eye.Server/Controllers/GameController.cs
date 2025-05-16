@@ -1,6 +1,7 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
+using gremlin_eye.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -115,6 +116,25 @@ namespace gremlin_eye.Server.Controllers
             }
 
             return Ok(gameDetails);
+        }
+
+        [HttpGet("quick_search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetSuggestions([FromQuery] string query)
+        {
+            var searchResults = await _unitOfWork.Games.SearchGames(query);
+            var suggestions = new List<GameSuggestionDTO>();
+            foreach(GameData game in searchResults)
+            {
+                suggestions.Add(new GameSuggestionDTO
+                {
+                    Id = game.Id,
+                    Value = game.Name,
+                    Slug = game.Slug,
+                    Year = game.ReleaseDate != null ? game.ReleaseDate.Value.Year : -1
+                });
+            }
+            return Ok(suggestions);
         }
     }
 }

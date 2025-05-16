@@ -2,6 +2,7 @@ import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthState, useAuthDispatch } from "../../contexts/AuthProvider";
 import { logout } from '../../actions/authActions';
+import NavSearch from './NavSearch';
 
 const NavBar = () => {
     //the search bar will be its own component with its own context and probably reducers and will be placed at the end of the navbar
@@ -51,6 +52,7 @@ const NavBar = () => {
                         )}
                         <Link to="/games/lib">Games</Link>
                     </Box>
+                    <NavSearch />
                 </Toolbar>
             </AppBar>
         </>
