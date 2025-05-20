@@ -22,10 +22,10 @@ namespace gremlin_eye.Server.Services
         public async Task<Game[]> GetGames(int offset)
         {
             return await igdb.QueryAsync<Game>(IGDBClient.Endpoints.Games,
-                $"fields checksum, collections.checksum, collections.id, collections.name, collections.slug, cover.id," +
+                $"fields checksum, collections.checksum, collections.id, collections.name, collections.slug, cover.image_id," +
                 $"first_release_date, genres.checksum, genres.id, genres.slug, genres.name, involved_companies.company.checksum, involved_companies.company.id, involved_companies.company.name, " +
                 $"involved_companies.company.slug, involved_companies.company.description, name, parent_game.id, platforms.checksum, platforms.id, platforms.name, " +
-                $"platforms.slug, summary, slug, screenshots.url; limit 500; offset {offset}; sort id asc;");
+                $"platforms.slug, summary, slug, screenshots.image_id; limit 500; offset {offset}; sort id asc;");
         }
 
         public async Task<Game?> QueryGameAsync(string slug)

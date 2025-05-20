@@ -12,7 +12,7 @@ namespace gremlin_eye.Server.Data
         private IPlaythroughRepository? _playthroughRepository;
         private IReviewRepository? _reviewRepository;
         private IListingRepository? _listingRepository;
-
+        private ILikeRepository? _likeRepository;
         public DataContext Context { get { return _context; } }
 
         public UnitOfWork(DataContext context)
@@ -87,6 +87,18 @@ namespace gremlin_eye.Server.Data
                     _reviewRepository = new ReviewRepository(_context);
                 }
                 return _reviewRepository;
+            }
+        }
+
+        public ILikeRepository Likes
+        {
+            get
+            {
+                if (_likeRepository == null)
+                {
+                    _likeRepository = new LikeRepository(_context);
+                }
+                return _likeRepository;
             }
         }
 

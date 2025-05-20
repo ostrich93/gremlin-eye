@@ -9,7 +9,7 @@ namespace gremlin_eye.Server.Services
 {
     public class GameSyncService : IGameSyncService
     {
-        private const string imageUrlPrefix = "https:";
+        //private const string imageUrlPrefix = "https:";
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IIGDBService _igdbService;
@@ -254,8 +254,8 @@ namespace gremlin_eye.Server.Services
                         internalGame.Slug = source.Slug;
                         internalGame.ReleaseDate = source.FirstReleaseDate;
                         internalGame.Summary = source.Summary ?? string.Empty;
-                        internalGame.BannerUrl = source.Screenshots != null && source.Screenshots.Values.Length > 0 ? new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Screenshots.Values[0].ImageId, ImageSize.HD1080)).ToString() : string.Empty;
-                        internalGame.CoverUrl = source.Cover != null && source.Cover.Value != null ? new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Cover.Value.ImageId, ImageSize.CoverBig)).ToString() : string.Empty;
+                        internalGame.BannerUrl = source.Screenshots != null && source.Screenshots.Values.Length > 0 ? ImageHelper.GetImageUrl(source.Screenshots.Values[0].ImageId, ImageSize.HD1080) : string.Empty;
+                        internalGame.CoverUrl = source.Cover != null && source.Cover.Value != null ? ImageHelper.GetImageUrl(source.Cover.Value.ImageId, ImageSize.CoverBig, true) : string.Empty;
                     }
                 }
                 else if (internalGame == null)
@@ -265,8 +265,8 @@ namespace gremlin_eye.Server.Services
                         Id = (long)source.Id,
                         Slug = source.Slug,
                         Name = source.Name,
-                        CoverUrl = source.Cover != null && source.Cover.Value != null ? new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Cover.Value.ImageId, ImageSize.CoverBig)).ToString(): string.Empty,
-                        BannerUrl = source.Screenshots != null && source.Screenshots.Values.Length > 0 ? new StringBuilder(imageUrlPrefix).Append(ImageHelper.GetImageUrl(source.Screenshots.Values[0].ImageId, ImageSize.HD1080)).ToString() : string.Empty,
+                        CoverUrl = source.Cover != null && source.Cover.Value != null ? ImageHelper.GetImageUrl(source.Cover.Value.ImageId, ImageSize.CoverBig): string.Empty,
+                        BannerUrl = source.Screenshots != null && source.Screenshots.Values.Length > 0 ? ImageHelper.GetImageUrl(source.Screenshots.Values[0].ImageId, ImageSize.HD1080, true) : string.Empty,
                         Summary = source.Summary ?? string.Empty,
                         ReleaseDate = source.FirstReleaseDate,
                         Checksum = source.Checksum
@@ -314,7 +314,8 @@ namespace gremlin_eye.Server.Services
             //if there are more genres for the game locally than in IGDB, remove the excess genres from the game
             if (localGenres.Count > sourceData.Genres.Values.Length)
             {
-                IEnumerable<GenreData> localOnlyGenres = localGenres.ExceptBy(sourceData.Genres.Ids, s => s.Id);
+                IEnumerable<long> sourceIds = sourceData.Genres.Values.Where(g => g.Id != null).Select(g => (long)g.Id).ToArray();
+                IEnumerable<GenreData> localOnlyGenres = localGenres.ExceptBy(sourceIds, s => s.Id);
                 if (localOnlyGenres is not null)
                 {
                     foreach (GenreData lGenre in localOnlyGenres)
@@ -434,7 +435,8 @@ namespace gremlin_eye.Server.Services
             //remove excess platforms from the local data
             if (localPlatforms.Count > sourceData.Platforms.Values.Length)
             {
-                IEnumerable<PlatformData> localOnlyPlatforms = localPlatforms.ExceptBy(sourceData.Platforms.Ids, p => p.Id);
+                IEnumerable<long> sourceIds = sourceData.Platforms.Values.Where(g => g.Id != null).Select(p => (long)p.Id).ToArray();
+                IEnumerable<PlatformData> localOnlyPlatforms = localPlatforms.ExceptBy(sourceIds, p => p.Id);
                 if (localOnlyPlatforms is not null)
                 {
                     foreach (var localPlatform in localOnlyPlatforms)
@@ -490,7 +492,8 @@ namespace gremlin_eye.Server.Services
 
             if (localSeries.Count > sourceData.Collections.Values.Length)
             {
-                IEnumerable<SeriesData> localOnlySeries = localSeries.ExceptBy(sourceData.Collections.Ids, s => s.Id);
+                IEnumerable<long> sourceIds = sourceData.Collections.Values.Where(c => c.Id != null).Select(c => (long)c.Id).ToArray();
+                IEnumerable<SeriesData> localOnlySeries = localSeries.ExceptBy(sourceIds, s => s.Id);
                 if (localOnlySeries is not null)
                 {
                     foreach (var localS in localOnlySeries)

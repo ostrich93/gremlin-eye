@@ -10,6 +10,7 @@ namespace gremlin_eye.Server.Data
         IPlaythroughRepository Playthroughs { get; }
         IReviewRepository Reviews { get; }
         IListingRepository Lists { get; }
+        ILikeRepository Likes { get; }
         DataContext Context { get; }
         Task SaveChangesAsync();
 

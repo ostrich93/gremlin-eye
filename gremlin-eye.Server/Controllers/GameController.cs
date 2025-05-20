@@ -1,7 +1,6 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
-using gremlin_eye.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -27,7 +26,7 @@ namespace gremlin_eye.Server.Controllers
         public async Task<IActionResult> GetGameBySlug(string slug)
         {
             Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == "UserId");
-            Guid? userId = Guid.Parse(idClaim!.Value);
+            Guid? userId = idClaim != null ? Guid.Parse(idClaim!.Value): null;
 
             GameData? data = await _unitOfWork.Games.GetGameBySlug(slug);
             if (data == null)
@@ -36,6 +35,7 @@ namespace gremlin_eye.Server.Controllers
             }
 
             int reviewCount = await _unitOfWork.Reviews.GetGameReviewCount(data.Id);
+            int likeCount = _unitOfWork.Likes.GetGameLikeCount(data.Id);
             GameDetailsResponseDTO gameDetails = new GameDetailsResponseDTO
             {
                 Id = data.Id,
@@ -69,7 +69,8 @@ namespace gremlin_eye.Server.Controllers
                     Name = data.Series.First().Name,
                     Slug = data.Series.First().Slug
                 } : null,
-                ReviewCount = reviewCount
+                ReviewCount = reviewCount,
+                LikeCount = likeCount
             };
 
             //GameDetailsResponseDTO gameDetails = await _gameService.GetGameDetailsBySlug(slug, userId);
@@ -77,13 +78,28 @@ namespace gremlin_eye.Server.Controllers
             gameStats.AverageRating = _unitOfWork.GameLogs.GetReviewAverage(gameDetails.Id);
             gameStats.RatingCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);
             //GameStatsDTO gameStats = await _logService.GetGameStats(gameDetails.Id);
-            gameDetails.PlayedCount = gameStats.PlayedCount;
-            gameDetails.PlayingCount = gameStats.PlayingCount;
-            gameDetails.BacklogCount = gameStats.BacklogCount;
-            gameDetails.WishlistCount = gameStats.WishlistCount;
-            gameDetails.RatingCounts = gameStats.RatingCounts;
-            gameDetails.AverageRating = gameStats.AverageRating;
-            
+            gameDetails.Stats = gameStats;
+
+            long seriesId = gameDetails.Series != null ? gameDetails.Series.Id : -1;
+            if (seriesId > -1) {
+                List<GameData>? relatedGames = await _unitOfWork.Games.GetRelatedGames(seriesId, gameDetails.Id);
+                if (relatedGames != null)
+                {
+                    List<GameSummaryDTO> relatedSummaries = new List<GameSummaryDTO>();
+                    foreach(var relatedGame in relatedGames)
+                    {
+                        relatedSummaries.Add(new GameSummaryDTO
+                        {
+                            Id = relatedGame.Id,
+                            Slug = relatedGame.Slug,
+                            Name = relatedGame.Name,
+                            CoverUrl = relatedGame.CoverUrl,
+                            ReleaseDate = relatedGame.ReleaseDate
+                        });
+                    }
+                    gameDetails.RelatedGames = relatedSummaries;
+                }
+            }
             if (userId != null) //if requester is a logged in user, then retrieve their game log
             {
                 GameLog? gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(gameDetails.Id, (Guid)userId);

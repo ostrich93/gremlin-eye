@@ -12,5 +12,6 @@ namespace gremlin_eye.Server.Repositories
         Task CreateRangeAndSaveAsync(IEnumerable<GameData> data);
         Task UpdateRangeAndSaveAsync(IEnumerable<GameData> data);
         Task<GameData[]> SearchGames(string query);
+        Task<List<GameData>?> GetRelatedGames(long seriesId, long gameId);
     }
 }

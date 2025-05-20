@@ -55,5 +55,60 @@ namespace gremlin_eye.Server.Repositories
         {
             return await _context.Games.Where(g => g.Name.Contains(query)).Take(50).ToArrayAsync();
         }
+
+        public async Task<List<GameData>?> GetRelatedGames(long seriesId, long gameId)
+        {
+            var gs = await _context.Series.Where(s => s.Id == seriesId).SelectMany(s => s.Games).Distinct().OrderByDescending(g => g.ReleaseDate).ToListAsync();
+            if (gs == null)
+                return null;
+
+            List<GameData> relatedGames = new List<GameData>();
+            var idx = gs.FindIndex(g => g.Id == gameId);
+            if (idx < 3)
+            {
+                foreach(GameData gd in gs)
+                {
+                    if (gd.Id == gameId)
+                        continue;
+                    relatedGames.Add(gd);
+                }
+            }
+            else if (idx == gs.Count - 1) //last entry
+            {
+                int startIdx = Math.Max(idx - 6, 0);
+                int cIdx = startIdx;
+                while (cIdx < gs.Count)
+                {
+                    if (gs[cIdx].Id != gameId)
+                        relatedGames.Add(gs[cIdx]);
+                    cIdx++;
+                }
+            }
+            else if (idx == gs.Count - 2) //second to last entry
+            {
+                int startIdx = Math.Max(idx - 5, 0);
+                int cIdx = startIdx;
+                while (cIdx < gs.Count)
+                {
+                    if (gs[cIdx].Id != gameId)
+                        relatedGames.Add(gs[cIdx]);
+                    cIdx++;
+                }
+            }
+            else
+            {
+                int startIdx = Math.Max(idx - 3, 0);
+                int endIdx = Math.Min(idx + 1, gs.Count);
+                int currIdx = startIdx;
+                while (currIdx < endIdx)
+                {
+                    if (gs[currIdx].Id != gameId)
+                        relatedGames.Add(gs[currIdx]);
+                    currIdx++;
+                }
+            }
+
+            return relatedGames;
+        }
     }
 }

@@ -15,15 +15,11 @@
         public SeriesDTO? Series { get; set; }
         public GameSummaryDTO? ParentGame { get; set; }
         public GameLogDTO? GameLog { get; set; } //from user
-        public double AverageRating { get; set; }
-        public int[] RatingCounts { get; set; } = new int[10]; //contains the counts for the number of playthroughs that have each rating
-        public int PlayedCount { get; set; }
-        public int PlayingCount { get; set; }
-        public int BacklogCount { get; set; }
-        public int WishlistCount { get; set; }
+        public GameStatsDTO? Stats { get; set; }
         public int ListCount { get; set; }
         public int ReviewCount { get; set; }
         public int LikeCount { get; set; }
         public ICollection<ReviewDTO> TopReviews { get; set; } = new List<ReviewDTO>();
+        public ICollection<GameSummaryDTO> RelatedGames { get; set; } = new List<GameSummaryDTO>();
     }
 }

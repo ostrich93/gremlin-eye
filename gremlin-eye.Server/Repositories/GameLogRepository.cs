@@ -50,12 +50,28 @@ namespace gremlin_eye.Server.Repositories
 
         public async Task<GameStatsDTO> GetGameStats(long gameId)
         {
-            return await _context.GameLogs.Where(l => l.GameId == gameId).GroupBy(l => l.GameId).Select(g => new GameStatsDTO{ 
-                PlayedCount = g.Count(i => i.IsPlayed), 
-                PlayingCount = g.Count(i => i.IsPlaying),
-                BacklogCount = g.Count(i => i.IsBacklog),
-                WishlistCount = g.Count(i => i.IsWishlist)
-            }).FirstAsync();
+            var matchingLogs = await _context.GameLogs.Where(l => l.GameId == gameId).ToListAsync();
+            if (matchingLogs != null && matchingLogs.Count > 0)
+            {
+                return new GameStatsDTO
+                {
+                    PlayedCount = matchingLogs.Count(i => i.IsPlayed),
+                    PlayingCount = matchingLogs.Count(i => i.IsPlaying),
+                    BacklogCount = matchingLogs.Count(i => i.IsBacklog),
+                    WishlistCount = matchingLogs.Count(i => i.IsWishlist)
+                };
+            } else
+            {
+                return new GameStatsDTO
+                {
+                    PlayedCount = 0,
+                    PlayingCount = 0,
+                    BacklogCount = 0,
+                    WishlistCount = 0,
+                    AverageRating = 0,
+                    RatingCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                };
+            }
         }
 
         public int[] GetReviewCounts(long gameId)
@@ -66,7 +82,7 @@ namespace gremlin_eye.Server.Repositories
 
         public double GetReviewAverage(long gameId)
         {
-            return _context.Playthroughs.Where(p => p.GameId == gameId && p.Rating > 0).Average(p => p.Rating);
+            return _context.Playthroughs.Where(p => p.GameId == gameId && p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average();
         }
     }
 }
