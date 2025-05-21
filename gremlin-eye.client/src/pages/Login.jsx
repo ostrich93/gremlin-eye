@@ -42,7 +42,7 @@ const Login = () => {
     };
 
     return (
-        <div className="flew row justify-content-md center">
+        <div className="flex row justify-content-md center">
             <h2 id="title">Log In</h2>
             {error ? (<><p>{error}</p></>) : null}
             <form onSubmit={handleLogin}>

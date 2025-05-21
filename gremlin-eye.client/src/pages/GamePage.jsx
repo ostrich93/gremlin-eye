@@ -1,4 +1,6 @@
-import { Box, Button, Divider, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, CardMedia, Divider, Grid, Paper, Rating, Typography } from '@mui/material';
+import { faBook, faGamepad, faGift, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from '@emotion/styled';
@@ -17,6 +19,15 @@ const GradientDiv = styled.div`
     right: 0;
     z-index: 1;
 `;
+
+const StyledRating = styled(Rating)({
+    '& .MuiRating-iconFilled': {
+        color: '#ff6d75',
+    },
+    '& .MuiRating-iconHover': {
+        color: '#ff3d47',
+    },
+});
 
 const GamePage = () => {
     const { user } = useAuthState();
@@ -58,17 +69,8 @@ const GamePage = () => {
     }, [user, slug]);
 
     return (
-        <Grid container sx={
-            {
-                maxWidth: "1140px",
-                marginLeft: "auto",
-                marginRight: "auto",
-                paddingLeft: "15px",
-                paddingRight: "15px",
-                width: "100%"
-            }
-        }>
-            <Grid size={12} sx={
+        <div className="container">
+            <Grid id="game-banner-art" container sx={
                 {
                     alignItems: "center",
                     display: "flex",
@@ -85,25 +87,155 @@ const GamePage = () => {
                     zIndex: -2
                 }
             }>
-                <GradientDiv />
-                <div class="col px-0">
-                    {loading && !gameData && (
-                        <Loading />
-                    )}
-                    {!loading && gameData && gameData.bannerUrl && (
-                        <img src={gameData.bannerUrl} style={
-                            {
-                                height: "auto",
-                                transform: "translateY(-25%)",
-                                width: "100%",
-                                verticalAlign: "middle",
-                                borderStyle: "none"
-                            }
-                        } />
-                    )}
-                </div>
+                <Grid size={12}>
+                    <GradientDiv />
+                    <div className="col px-0">
+                        {loading && !gameData && (
+                            <Loading />
+                        )}
+                        {!loading && gameData && gameData.bannerUrl && (
+                            <img src={gameData.bannerUrl} style={
+                                {
+                                    height: "auto",
+                                    transform: "translateY(-25%)",
+                                    width: "100%",
+                                    verticalAlign: "middle",
+                                    borderStyle: "none"
+                                }
+                            } />
+                        )}
+                    </div>
+                </Grid>
+
             </Grid>
-        </Grid>
+            <Grid id="game-profile" container sx={
+                {
+                    display: "flex",
+                    flexWrap: "wrap",
+                    marginLeft: "-15px",
+                    marginRight: "-15px",
+                    paddingTop: "350px"
+                }
+            }>
+                <Box sx={{
+                    flex: '0 0 175px',
+                    maxWidth: '175px'
+
+                } }>
+                    <Grid sx={{
+                        paddingLeft: '15px',
+                        paddingRight: '15px',
+                        position: 'relative'
+                    } }>
+                        {loading && !gameData && (
+                            <Loading />
+                        )}
+                        {!loading && gameData && gameData.coverUrl && (
+                            <Card sx={
+                                {
+                                    alignItems: 'center',
+                                    backgroundColor: '#30394c',
+                                    border: '1px solid #30394c',
+                                    borderRadius: '5px',
+                                    boxShadow: '0 0 20px 10px rgba(36,40,50,.369)',
+                                    marginLeft: 'auto !important',
+                                    marginRight: 'auto !important',
+                                    marginTop: 'auto !important',
+                                    zIndex: '2'
+                                }
+                            }>
+                            
+                                <CardMedia
+                                    component="img"
+                                    image={gameData.coverUrl}
+                                />
+                            </Card>
+                        )}
+                    </Grid>
+                    <Grid>
+                        {!user && (
+                            <Paper sx={{
+                                textAlign: 'center !important'
+                            }}>
+                                <Box sx={{
+                                    flexBasis: 0,
+                                    flexGrow: 1,
+                                    maxWidth: '100%'
+                                }}>
+                                    <p className="mx-auto mb-0" style={{
+                                        marginTop: '35px'
+                                    }}>
+                                        <Link to="/login">Log in</Link> to access rating features
+                                    </p>
+                                </Box>
+                            </Paper>
+                        )}
+                        {user && sessionStorage.getItem('access_token') && (
+                            <Grid container columnSpacing={3} rowSpacing={2}>
+                                <Grid size={12}>
+                                    <Button
+                                        sx={{
+                                            backgroundColor: '#ea377a',
+                                            color: 'white',
+                                            borderStyle: 'none',
+                                            display: 'block',
+                                            height: '30px',
+                                            lineHeight: '0px',
+                                            marginTop: '35px',
+                                            padding: 0,
+                                            width: '100%'
+                                        } }
+                                    >Edit your Log</Button>
+                                </Grid>
+                                <Grid id="star-rating-game">
+                                    <StyledRating size="large" defaultValue={playLog?.rating ?? 0} precision={0.5} />
+                                </Grid>
+                                <Grid>
+                                    <Divider />
+                                </Grid>
+                                <Grid size={3}>
+                                    <FontAwesomeIcon
+                                        icon={faGamepad}
+                                    />
+                                    <p>Played</p>
+                                </Grid>
+                                <Grid size={3}>
+                                    <FontAwesomeIcon
+                                        icon={faPlay}
+                                    />
+                                    <p>Playing</p>
+                                </Grid>
+                                <Grid size={3}>
+                                    <FontAwesomeIcon
+                                        icon={faBook}
+                                    />
+                                    <p>Backlog</p>
+                                </Grid>
+                                <Grid size={3}>
+                                    <FontAwesomeIcon
+                                        icon={faGift}
+                                    />
+                                    <p>Wishlist</p>
+                                </Grid>
+                            </Grid>
+                        )}
+                        <Grid container>
+                            <Grid>
+                                <p style={
+                                    {
+                                        textAlign: 'center !important',
+                                        marginTop: '1rem !important',
+                                        color: 'hsla(0,0%,100%,.6)'
+                                    }
+                                }>Average Rating</p>
+                                <h1>{gameData?.averageRating ?? 'N/A'}</h1>
+                            </Grid>
+
+                        </Grid>
+                    </Grid>
+                </Box>
+            </Grid>
+        </div>
     );
 };
 
