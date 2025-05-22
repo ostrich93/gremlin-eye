@@ -1,4 +1,4 @@
-﻿namespace gremlin_eye.Server.Entity
+﻿namespace gremlin_eye.Server.Enums
 {
     public enum PlayState
     {

@@ -17,18 +17,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.EnableSensitiveDataLogging(true);
 });
-builder.Services.AddScoped<UnitOfWork>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IGameService, GameService>();
-builder.Services.AddScoped<IGameLogService, GameLogService>();
 builder.Services.AddScoped<IIGDBService, IGDBService>();
 builder.Services.AddScoped<IGameSyncService, GameSyncService>();
-builder.Services.AddScoped<IListingService, ListingService>();
-builder.Services.AddScoped<IReviewService, ReviewService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -60,6 +57,12 @@ builder.Services.AddCors(options => {
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+    context.Database.Migrate();
+}
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

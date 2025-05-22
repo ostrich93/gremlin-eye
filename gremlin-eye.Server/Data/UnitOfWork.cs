@@ -2,7 +2,7 @@
 
 namespace gremlin_eye.Server.Data
 {
-    public class UnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly DataContext _context;
 
@@ -12,7 +12,7 @@ namespace gremlin_eye.Server.Data
         private IPlaythroughRepository? _playthroughRepository;
         private IReviewRepository? _reviewRepository;
         private IListingRepository? _listingRepository;
-
+        private ILikeRepository? _likeRepository;
         public DataContext Context { get { return _context; } }
 
         public UnitOfWork(DataContext context)
@@ -90,9 +90,26 @@ namespace gremlin_eye.Server.Data
             }
         }
 
+        public ILikeRepository Likes
+        {
+            get
+            {
+                if (_likeRepository == null)
+                {
+                    _likeRepository = new LikeRepository(_context);
+                }
+                return _likeRepository;
+            }
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
         }
     }
 }

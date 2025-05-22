@@ -25,7 +25,7 @@ namespace gremlin_eye.Server.Services
                 new Claim(ClaimTypes.GivenName, user.UserName ?? string.Empty),
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString() ?? string.Empty),
-                new Claim(ClaimTypes.Role, user.Role.ToStringValue())
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             SigningCredentials signingCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);

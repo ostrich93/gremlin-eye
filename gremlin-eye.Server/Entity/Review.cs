@@ -9,7 +9,7 @@ namespace gremlin_eye.Server.Entity
 
         [Key]
         [Column("review_id")]
-        public long ReviewId { get; set; }
+        public long Id { get; set; }
 
         [Column("game_id")]
         public long GameId { get; set; }

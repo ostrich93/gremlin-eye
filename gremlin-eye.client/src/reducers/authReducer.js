@@ -18,43 +18,53 @@ export const initialState = {
     error: null
 };
 
-export const AuthReducer = (initialState, action) => {
+export const AuthReducer = (state, action) => {
     switch (action.type) {
         case "LOGIN_REQUEST":
         case "REFRESH_REQUEST":
-            return { ...initialState, loading: true };
+        case "REGISTER_REQUEST":
+            return { ...state, loading: true };
+        case "AUTH_FETCHED":
+            return { ...state, loading: false };
         case "LOGIN_SUCCESS":
             return {
-                ...initialState,
+                ...state,
                 user: action.payload.user,
                 accessToken: action.payload.accessToken,
                 refreshToken: action.payload.refreshToken,
-                loading: false
+                loading: false,
+                error: null
             };
         case "REFRESH_SUCCESS":
             return {
-                ...initialState,
+                ...state,
                 accessToken: action.payload.accessToken,
                 refreshToken: action.payload.refreshToken,
-                loading: false
+                loading: false,
+                error: null
             };
+        case "REGISTER_SUCCESS":
+            return initialState;
         case "LOGOUT":
             return {
-                ...initialState,
+                ...state,
                 user: null,
                 accessToken: '',
-                loading: false
+                refreshToken: '',
+                loading: false,
+                error: null
             };
         case "LOGIN_ERROR":
         case "LOGOUT_ERROR":
+        case "REGISTER_ERROR":
             return {
-                ...initialState,
+                ...state,
                 loading: false,
                 error: action.error
             };
         case "REFRESH_ERROR":
             return {
-                ...initialState,
+                ...state,
                 accessToken: '',
                 refreshToken: '',
                 loading: false,

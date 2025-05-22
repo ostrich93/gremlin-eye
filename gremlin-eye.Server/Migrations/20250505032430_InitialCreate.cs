@@ -15,8 +15,7 @@ namespace gremlin_eye.Server.Migrations
                 name: "companies",
                 columns: table => new
                 {
-                    company_id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    company_id = table.Column<long>(type: "bigint", nullable: false),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     slug = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -30,8 +29,7 @@ namespace gremlin_eye.Server.Migrations
                 name: "game_series",
                 columns: table => new
                 {
-                    series_id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    series_id = table.Column<long>(type: "bigint", nullable: false),
                     name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     slug = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -44,8 +42,7 @@ namespace gremlin_eye.Server.Migrations
                 name: "games",
                 columns: table => new
                 {
-                    game_id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    game_id = table.Column<long>(type: "bigint", nullable: false),
                     cover_uri = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     slug = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -70,8 +67,7 @@ namespace gremlin_eye.Server.Migrations
                 name: "genres",
                 columns: table => new
                 {
-                    genre_id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    genre_id = table.Column<long>(type: "bigint", nullable: false),
                     name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     slug = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -84,8 +80,7 @@ namespace gremlin_eye.Server.Migrations
                 name: "platforms",
                 columns: table => new
                 {
-                    platform_id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    platform_id = table.Column<long>(type: "bigint", nullable: false),
                     name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     slug = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },

@@ -16,7 +16,7 @@ namespace gremlin_eye.Server.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("/login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO request)
         {
             //Validation
@@ -40,7 +40,7 @@ namespace gremlin_eye.Server.Controllers
             }
         }
 
-        [HttpPost("/logout")]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             try

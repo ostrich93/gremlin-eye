@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using gremlin_eye.Server.Enums;
 
 namespace gremlin_eye.Server.Entity
 {
@@ -10,7 +11,7 @@ namespace gremlin_eye.Server.Entity
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("game_log_id")]
-        public long GameLogId { get; set; }
+        public long Id { get; set; }
 
         [Column("game_id")]
         public long GameId { get; set; }

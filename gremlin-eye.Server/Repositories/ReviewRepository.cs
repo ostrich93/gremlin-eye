@@ -1,5 +1,4 @@
 ﻿using gremlin_eye.Server.Data;
-using gremlin_eye.Server.Entity;
 using Microsoft.EntityFrameworkCore;
 
 namespace gremlin_eye.Server.Repositories

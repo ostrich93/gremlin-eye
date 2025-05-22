@@ -8,7 +8,7 @@ namespace gremlin_eye.Server.Entity
     {
         [Key]
         [Column("like_id")]
-        public long LikeId { get; set; }
+        public long Id { get; set; }
 
         [Column("review_id")]
         public long ReviewId { get; set; }
@@ -31,7 +31,7 @@ namespace gremlin_eye.Server.Entity
     {
         [Key]
         [Column("like_id")]
-        public long LikeId { get; set; }
+        public long Id { get; set; }
 
         [Column("listing_id")]
         public long ListingId { get; set; }
@@ -54,7 +54,7 @@ namespace gremlin_eye.Server.Entity
     {
         [Key]
         [Column("like_id")]
-        public long LikeId { get; set; }
+        public long Id { get; set; }
 
         [Column("game_id")]
         public long GameId { get; set; }

@@ -1,4 +1,4 @@
-﻿using gremlin_eye.Server.Entity;
+﻿using gremlin_eye.Server.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace gremlin_eye.Server.DTOs

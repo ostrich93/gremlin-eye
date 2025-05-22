@@ -1,4 +1,4 @@
-﻿using gremlin_eye.Server.Entity;
+﻿using gremlin_eye.Server.Enums;
 
 namespace gremlin_eye.Server.DTOs
 {

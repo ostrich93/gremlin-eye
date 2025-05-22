@@ -5,7 +5,7 @@
         public long Id { get; set; }
         public string Slug { get; set; } = default!;
         public string Name { get; set; } = default!;
-        public string CoverUrl { get; set; } = string.Empty;
-        public DateOnly ReleaseDate { get; set; }
+        public string? CoverUrl { get; set; } = string.Empty;
+        public DateTimeOffset? ReleaseDate { get; set; }
     }
 }

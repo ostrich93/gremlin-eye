@@ -12,7 +12,7 @@ using gremlin_eye.Server.Data;
 namespace gremlin_eye.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250425212010_InitialCreate")]
+    [Migration("20250505032430_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -130,11 +130,8 @@ namespace gremlin_eye.Server.Migrations
             modelBuilder.Entity("gremlin_eye.Server.Entity.CompanyData", b =>
                 {
                     b.Property<long>("CompanyId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("company_id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("CompanyId"));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -159,11 +156,8 @@ namespace gremlin_eye.Server.Migrations
             modelBuilder.Entity("gremlin_eye.Server.Entity.GameData", b =>
                 {
                     b.Property<long>("GameId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("game_id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("GameId"));
 
                     b.Property<string>("BannerUrl")
                         .IsRequired()
@@ -303,11 +297,8 @@ namespace gremlin_eye.Server.Migrations
             modelBuilder.Entity("gremlin_eye.Server.Entity.GenreData", b =>
                 {
                     b.Property<long>("GenreId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("genre_id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("GenreId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -484,11 +475,8 @@ namespace gremlin_eye.Server.Migrations
             modelBuilder.Entity("gremlin_eye.Server.Entity.PlatformData", b =>
                 {
                     b.Property<long>("PlatformId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("platform_id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("PlatformId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -759,11 +747,8 @@ namespace gremlin_eye.Server.Migrations
             modelBuilder.Entity("gremlin_eye.Server.Entity.Series", b =>
                 {
                     b.Property<long>("SeriesId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("series_id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("SeriesId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
