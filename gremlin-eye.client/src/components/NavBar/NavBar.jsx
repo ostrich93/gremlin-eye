@@ -1,21 +1,18 @@
-import { Box, Button, Divider, Grid, MenuItem, Typography } from '@mui/material';
-import KeyboardArrowDropdownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { useAuthState, useAuthDispatch } from "../../contexts/AuthProvider";
 import { logout } from '../../actions/authActions';
 import NavSearch from './NavSearch';
-import { DropdownMenu, NavbarContainer, NavbarContent } from './NavBar.styles';
 
 const NavBar = () => {
     //the search bar will be its own component with its own context and probably reducers and will be placed at the end of the navbar
     const { user } = useAuthState();
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [menuOpen, setMenuOpen] = useState(false);
+    //const [anchorEl, setAnchorEl] = useState(null);
+    //const [menuOpen, setMenuOpen] = useState(false);
     const dispatch = useAuthDispatch();
     const navigate = useNavigate();
 
-    const handleClick = (e) => {
+    /*const handleClick = (e) => {
         setAnchorEl(e.currentTarget);
         setMenuOpen(true);
     };
@@ -23,7 +20,7 @@ const NavBar = () => {
     const handleClose = () => {
         setAnchorEl(null);
         setMenuOpen(false);
-    };
+    };*/
 
     const handleLogOut = async () => {
         await logout(dispatch);
@@ -31,90 +28,45 @@ const NavBar = () => {
     };
 
     return (
-        <NavbarContainer>
-            <NavbarContent>
-                <Typography
-                    variant="h5" component="a" href="/" sx={{
-                        display: 'inline-block',
-                        mr: 2,
-                        my: 'auto',
-                        py: 0,
-                        fontWeight: 600,
-                        textDecoration: 'none'
-                    }}
-                >
-                    Gremlin-Eye
-                </Typography>
-                <Box sx={{
-                    alignItems: 'center',
-                    flexGrow: 1,
-                    mt: 0
-                }}>
-                    <Grid container spacing={1} columnSpacing={{ xs: 1, sm: 2, md: 2 }}>
-                        {user && user.role === 1 && sessionStorage.getItem('access_token') && (
-                            <Grid size={2}>
-                                <Link to="/admin">Admin</Link>
-                            </Grid>
+        <Navbar bg="dark" expand="md" id="primary-nav" className="hide-border">
+            <Container>
+                <Navbar.Brand as={Link} to='/' className="mr-2 my-auto py-0">Gremlin-Eye</Navbar.Brand>
+                <Navbar.Collapse id="navbarSupportedContent" className="mt-2 mt-md-0">
+                    <Nav className="ms-auto">
+                        {user && user.role == 1 && sessionStorage.getItem('access_token') && (
+                            <Nav.Link as={Link} to='/admin'>Admin</Nav.Link>
                         )}
-                        {user && (
-                            <Grid size={2}>
-                                <Button
-                                    id="navbar-dropdown-button"
-                                    aria-haspopup="true"
-                                    variant="contained"
-                                    disableElevation
-                                    onClick={handleClick}
-                                    endIcon={<KeyboardArrowDropdownIcon /> }
-                                >
-                                    {user.username}
-                                </Button>
-                                <DropdownMenu
-                                    id="navbar-dropdown-menu"
-                                    MenuListProps={{
-                                        'aria-labelledby': 'navbar-dropdown-button'
-                                    }}
-                                    anchorEl={anchorEl}
-                                    open={menuOpen}
-                                    onClose={handleClose}
-                                >
-                                    <MenuItem component={Link} to={`user/${user.username}`}>Profile</MenuItem>
-                                    <Divider sx={{ my: 0 }} />
-                                    <MenuItem component={Link} to={`user/${user.username}/games`}>Played</MenuItem>
-                                    <MenuItem component={Link} to={`user/${user.username}/playing`}>Playing</MenuItem>
-                                    <MenuItem component={Link} to={`user/${user.username}/backlog`}>Backlog</MenuItem>
-                                    <MenuItem component={Link} to={`user/${user.username}/wishlist`}>Wishlist</MenuItem>
-                                    <Divider sx={{ my: 0 }} />
-                                    <MenuItem component={Link} to={`user/${user.username}/journal`}>Journal</MenuItem>
-                                    <MenuItem component={Link} to={`user/${user.username}/reviews`}>Reviews</MenuItem>
-                                    <MenuItem component={Link} to={`user/${user.username}/lists`}>Lists</MenuItem>
-                                    <MenuItem component={Link} to={`user/${user.username}/likes`}>Likes</MenuItem>
-                                    <MenuItem component={Link} to={'settings'}>Profile</MenuItem>
-                                    <MenuItem component={Button} onClick={handleLogOut} sx={{
-                                        border: 0
-                                        }}>Log Out</MenuItem>
-                                </DropdownMenu>
-                            </Grid>
+                        {user && sessionStorage.getItem('access_token') && (
+                            <NavDropdown id="navDropdown" title={user.username} className="d-none d-md-block">
+                                <NavDropdown.Item as={Link} to={`user/${user.username}`} className="py-1">Profile</NavDropdown.Item>
+                                <NavDropdown.Divider className="my-0" />
+                                <NavDropdown.Item as={Link} to={`user/${user.username}/games`} className="py-1">Played</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to={`user/${user.username}/playing`} className="py-1">Playing</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to={`user/${user.username}/backlog`} className="py-1">Backlog</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to={`user/${user.username}/wishlist`} className="py-1">Wishlist</NavDropdown.Item>
+                                <NavDropdown.Divider className="my-0" />
+                                <NavDropdown.Item as={Link} to={`user/${user.username}/journal`} className="py-1">Journal</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to={`user/${user.username}/reviews`} className="py-1">Reviews</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to={`user/${user.username}/lists`} className="py-1">Lists</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to={`user/${user.username}/likes`} className="py-1">Likes</NavDropdown.Item>
+                                <NavDropdown.Divider className="my-0" />
+                                <NavDropdown.Item className="pt-1 pb-2" onClick={handleLogOut}>
+                                    Logout
+                                </NavDropdown.Item>
+                            </NavDropdown>
                         )}
-                        {!user && (
+                        {(!user || !sessionStorage.getItem('access_token')) && (
                             <>
-                                <Grid size={2}>
-                                    <Link to="/login">Log In</Link>
-                                </Grid>
-                                <Grid size={2}>
-                                    <Link to="/users/register">Register</Link>
-                                </Grid>
+                                <Nav.Link as={Link} to={`/login`}>Log In</Nav.Link>
+                                <Nav.Link as={Link} to={`users/register`}>Register </Nav.Link>
                             </>
                         )}
-                        <Grid size={2}>
-                            <Link to="/games/lib">Games</Link>
-                        </Grid>
-                        <Grid size={6}>
-                            <NavSearch />
-                        </Grid>
-                    </Grid>
-                </Box>
-            </NavbarContent>
-        </NavbarContainer>
+                        <Nav.Link as={Link} to='/games' className="d-none d-md-block mr-2">Games</Nav.Link>
+                    </Nav>
+                    <NavSearch />
+                </Navbar.Collapse>
+            </Container>
+        </Navbar>
     );
 };
 
