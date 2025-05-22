@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { useAuthState } from "../contexts/AuthProvider";
 import apiClient from '../config/apiClient';
 import Loading from '../components/Loading/Loading';
+import ReviewChart from '../components/Game/ReviewChart';
 
 const GradientDiv = styled.div`
     background: linear-gradient(to bottom, rgba(125,185,232,0) 0, rgba(22,24,28,1) 100%);
@@ -102,7 +103,7 @@ const GamePage = () => {
                                     verticalAlign: "middle",
                                     borderStyle: "none"
                                 }
-                            } />
+                            } loading='lazy' />
                         )}
                     </div>
                 </Grid>
@@ -148,6 +149,7 @@ const GamePage = () => {
                                 <CardMedia
                                     component="img"
                                     image={gameData.coverUrl}
+                                    sx={{loading: 'lazy'} }
                                 />
                             </Card>
                         )}
@@ -191,7 +193,14 @@ const GamePage = () => {
                                     <StyledRating size="large" defaultValue={playLog?.rating ?? 0} precision={0.5} />
                                 </Grid>
                                 <Grid>
-                                    <Divider />
+                                    <Divider component="hr" sx={
+                                        {
+                                            borderColor: 'rgba(162,177,229,.2)',
+                                            borderStyle: 'solid',
+                                            borderWidth: '0px 0px thin',
+                                            margin: '0px',
+                                            width: '100%'
+                                        }} />
                                 </Grid>
                                 <Grid size={3}>
                                     <FontAwesomeIcon
@@ -230,7 +239,9 @@ const GamePage = () => {
                                 }>Average Rating</p>
                                 <h1>{gameData?.averageRating ?? 'N/A'}</h1>
                             </Grid>
-
+                            <Grid>
+                                <ReviewChart reviewScores={gameStats?.reviewCounts ?? [0,0,0,0,0,0,0,0,0,0] } />
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Box>

@@ -8,9 +8,6 @@
     <!-- Folder where production build objects will be placed -->
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="src\components\Game\" />
-  </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties _1vscode_4launch_1json__JsonSchema="" />
