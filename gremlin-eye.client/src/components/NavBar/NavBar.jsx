@@ -62,8 +62,8 @@ const NavBar = () => {
                             </>
                         )}
                         <Nav.Link as={Link} to='/games' className="d-none d-md-block mr-2">Games</Nav.Link>
+                        <NavSearch />
                     </Nav>
-                    <NavSearch />
                 </Navbar.Collapse>
             </Container>
         </Navbar>

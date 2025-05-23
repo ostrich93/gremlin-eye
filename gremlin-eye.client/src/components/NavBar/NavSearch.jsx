@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import useDebounce from '../../hooks/useDebounce';
 import apiClient from '../../config/apiClient';
+import './NavSearch.css';
 
 const NavSearch = () => {
     const [searchValue, setSearchValue] = useState('');
@@ -46,13 +47,21 @@ const NavSearch = () => {
 
     return (
         <InputGroup className="nav-bar-search border-right-0">
-            <Form.Control type="text" autoComplete="off" onChange={(e) => setSearchValue(e.target.value)} onFocus={handleShowResults} onBlur={handleHideResults} placeholder="Search" value={searchValue} />
+            <Form.Control
+                type="search"
+                autoComplete="off"
+                onChange={(e) => setSearchValue(e.target.value)}
+                onFocus={handleShowResults}
+                onBlur={handleHideResults}
+                placeholder="Search"
+                value={searchValue}
+            />
             <Button className="border-left-0 pl-1 pr-2 search-btn" onClick={() => {
                 if (searchValue > 1) window.location.href = `/search?&q=${searchValue}`;
             } }>
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
             </Button>
-            <ListGroup className="autocomplete-suggestions">
+            <ListGroup className="autocomplete-suggestions" style={{ position: "absolute", top: "64px" }} >
                 {resultsVisibile && searchValue.length > 1 &&
                     suggestions.map((suggestion) => (
                         <ListGroup.Item
@@ -60,7 +69,7 @@ const NavSearch = () => {
                             className="autocomplete-suggestion"
                         >
                             <a href={`/games/${suggestion.slug}`}>
-                                {suggestion.value} ({suggestion.year} ?? 'TBA')
+                                {suggestion.value} ({suggestion.year ?? 'TBA'})
                             </a>
                         </ListGroup.Item>
                     ))
