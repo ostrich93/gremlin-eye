@@ -3,6 +3,7 @@ import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { useAuthState, useAuthDispatch } from "../../contexts/AuthProvider";
 import { logout } from '../../actions/authActions';
 import NavSearch from './NavSearch';
+import './NavBar.css';
 
 const NavBar = () => {
     //the search bar will be its own component with its own context and probably reducers and will be placed at the end of the navbar
@@ -28,9 +29,9 @@ const NavBar = () => {
     };
 
     return (
-        <Navbar bg="dark" expand="md" id="primary-nav" className="hide-border">
+        <Navbar expand="md" id="primary-nav" className="hide-border">
             <Container>
-                <Navbar.Brand as={Link} to='/' className="mr-2 my-auto py-0">Gremlin-Eye</Navbar.Brand>
+                <Navbar.Brand as={Link} to='/' className="me-2 my-auto py-0">Gremlin-Eye</Navbar.Brand>
                 <Navbar.Collapse id="navbarSupportedContent" className="mt-2 mt-md-0">
                     <Nav className="ms-auto">
                         {user && user.role == 1 && sessionStorage.getItem('access_token') && (
@@ -61,7 +62,7 @@ const NavBar = () => {
                                 <Nav.Link as={Link} to={`users/register`}>Register </Nav.Link>
                             </>
                         )}
-                        <Nav.Link as={Link} to='/games' className="d-none d-md-block mr-2">Games</Nav.Link>
+                        <Nav.Link as={Link} to='/games' className="d-none d-md-block me-2">Games</Nav.Link>
                         <NavSearch />
                     </Nav>
                 </Navbar.Collapse>

@@ -1,0 +1,79 @@
+
+#game-banner-art{
+    align-items: center;
+    display: flex;
+    flex-direction: unset;
+    flex-wrap: wrap;
+    justify-content: center;
+    left: 0;
+    margin: 0;
+    max-height: 450px;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -2;
+}
+
+#game-banner-art gradient {
+    bottom: 0;
+    max-height: 350px;
+    z-index: 1;
+}
+
+#game-banner-art img {
+    border-style: none;
+    height: auto;
+    transform: translateY(-25%);
+    width: 100%;
+    z-index: -1;
+}
+
+#game-profile #game-body {
+    padding-top: 350px;
+}
+
+#game-profile #game-body .game-rating {
+    color: #fff;
+}
+
+#game-profile #game-body .game-rating p {
+    color: #000;
+}
+
+#game-profile .col-cover .game-cover {
+    box-shadow: 0 0 20px 10px rgba(36,40,50,.369);
+    position: absolute;
+    top: 152px;
+    z-index: 2;
+}
+
+#game-profile #game-body #sign-in-text {
+    margin-top: 45px;
+    width: 100%;
+}
+
+#game-profile #game-body .journal-btn {
+    display: block;
+    height: 30px;
+    line-height: 0px;
+    margin-top: 55px;
+    width: 100%;
+}
+
+@media(min-width:1200px) {
+    #game-profile .col-cover {
+        flex: 0 0 175px;
+        max-width: 175px;
+    }
+    #game-profile .col-cover .game-cover {
+        top: -165px;
+    }
+}
+
+@media(min-width:992px) {
+    #game-profile .col-20-per {
+        flex: 0 0 20%;
+        max-width: 20%
+    }
+}

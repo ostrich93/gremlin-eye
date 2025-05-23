@@ -14,6 +14,13 @@ const Home = () => {
                         record your play sessions, and put games into your wishlist.</p>
                     </Col>
                 </Row>
+                <Row>
+                    <Col>
+                        <Row>
+                            <div class="gradient"></div>
+                        </Row>
+                    </Col>
+                </Row>
                 <Row id="landing-actions">
                     <Col md="auto" className="auto pr-0">
                         <Button href="/users/register" className="btn-main px-3 py-2">Create a Free Account</Button>
