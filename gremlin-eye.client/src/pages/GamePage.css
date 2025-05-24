@@ -15,7 +15,7 @@
     z-index: -2;
 }
 
-#game-banner-art gradient {
+#game-banner-art #gradient {
     bottom: 0;
     max-height: 350px;
     z-index: 1;
@@ -59,6 +59,12 @@
     line-height: 0px;
     margin-top: 55px;
     width: 100%;
+}
+
+#game-profile #game-body #title {
+    bottom: 0;
+    color: #fff;
+    font-weight: 500;
 }
 
 @media(min-width:1200px) {

@@ -46,6 +46,28 @@ th, td {
     max-width: 100%;
 }
 
+.navbar #nav-bar-search {
+    background-color: #272c37;
+    border-bottom-left-radius: .25rem;
+    border-top-left-radius: .25rem;
+    color: #fff;
+    height: 33px;
+    padding: 5px;
+    transition: max-width .4s;
+}
+
+.navbar .search-btn {
+    background-color: #272c37;
+    height: 33px;
+    border-width: 0;
+    padding: 0;
+}
+
+.form-control::placeholder {
+    color: #6c757d;
+    opacity: 1;
+}
+
 @media(min-width:1200px) {
     .container {
         max-width: 1140px

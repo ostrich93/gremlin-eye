@@ -35,7 +35,9 @@ const NavBar = () => {
                 <Navbar.Collapse id="navbarSupportedContent" className="mt-2 mt-md-0">
                     <Nav className="ms-auto">
                         {user && user.role == 1 && sessionStorage.getItem('access_token') && (
-                            <Nav.Link as={Link} to='/admin'>Admin</Nav.Link>
+                            <Nav.Item>
+                                <Nav.Link as={Link} to='/admin'>Admin</Nav.Link>
+                            </Nav.Item>
                         )}
                         {user && sessionStorage.getItem('access_token') && (
                             <NavDropdown id="navDropdown" title={user.username} className="d-none d-md-block">
@@ -58,11 +60,17 @@ const NavBar = () => {
                         )}
                         {(!user || !sessionStorage.getItem('access_token')) && (
                             <>
-                                <Nav.Link as={Link} to={`/login`}>Log In</Nav.Link>
-                                <Nav.Link as={Link} to={`users/register`}>Register </Nav.Link>
+                                <Nav.Item>
+                                    <Nav.Link as={Link} to={`/login`}>Log In</Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link as={Link} to={`users/register`}>Register </Nav.Link>
+                                </Nav.Item>
                             </>
                         )}
-                        <Nav.Link as={Link} to='/games' className="d-none d-md-block me-2">Games</Nav.Link>
+                        <Nav.Item>
+                            <Nav.Link as={Link} to='/games' className="d-none d-md-block me-2">Games</Nav.Link>
+                        </Nav.Item>
                         <NavSearch />
                     </Nav>
                 </Navbar.Collapse>

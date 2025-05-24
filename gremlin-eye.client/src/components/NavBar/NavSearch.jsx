@@ -19,7 +19,7 @@ const NavSearch = () => {
         }
 
         const cleanString = encodeURIComponent(searchValue.trim());
-        console.log(`cleanString: ${cleanString}`);
+        //console.log(`cleanString: ${cleanString}`);
         try {
             setResultVisibility(true);
             const params = new URLSearchParams([['query', cleanString]]);
@@ -46,8 +46,9 @@ const NavSearch = () => {
     const handleHideResults = () => setTimeout(() => setResultVisibility(false), 200);
 
     return (
-        <InputGroup className="nav-bar-search border-right-0">
+        <InputGroup className="search-bar border-right-0">
             <Form.Control
+                id="nav-bar-search"
                 type="search"
                 autoComplete="off"
                 onChange={(e) => setSearchValue(e.target.value)}
