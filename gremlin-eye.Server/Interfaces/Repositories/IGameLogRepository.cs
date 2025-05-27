@@ -12,7 +12,9 @@ namespace gremlin_eye.Server.Repositories
         Task<int> GetPlayingCount(long gameId);
         Task<int> GetBackloggedCount(long gameId);
         Task<int> GetWishlistCount(long gameId);
+        void Create(GameLog gameLog);
         Task<GameStatsDTO> GetGameStats(long gameId);
+        GameLog GetGameLog(long gameLogId);
         int[] GetReviewCounts(long gameId);
         double GetReviewAverage(long gameId);
         //Task<GameLog> CreateGameLog(GameLog gameLog);

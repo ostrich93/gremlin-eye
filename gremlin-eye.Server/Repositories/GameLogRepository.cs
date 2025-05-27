@@ -84,5 +84,15 @@ namespace gremlin_eye.Server.Repositories
         {
             return _context.Playthroughs.Where(p => p.GameId == gameId && p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average();
         }
+
+        public GameLog GetGameLog(long gameLogId)
+        {
+            return _context.GameLogs.Include(gl => gl.Playthroughs).Where(gl => gl.Id == gameLogId).First();
+        }
+
+        public void Create(GameLog gameLog)
+        {
+            _context.GameLogs.Add(gameLog);
+        }
     }
 }
