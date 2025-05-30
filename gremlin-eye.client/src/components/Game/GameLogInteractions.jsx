@@ -1,54 +1,66 @@
 import { Button, Col, Row } from 'react-bootstrap';
 import { faBook, faGamepad, faGift, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 const playStateColors = ['#ea377a', 'green', 'blue', 'orange', 'red'];
 const defaultPlayedStateColor = 'gray';
 
-const GameLogInteractions = ({ gameLog, onPlayedUpdate, onOtherUpdate }) => {
+const GameLogInteractions = memo(({ gameLog, onPlayedUpdate, onOtherUpdate }) => {
     const [playState, setPlayState] = useState(gameLog?.playState ?? null);
     const [played, setPlayed] = useState(gameLog?.isPlayed ?? false);
     const [playing, setPlaying] = useState(gameLog?.isPlaying ?? false);
     const [backlog, setBacklog] = useState(gameLog?.isBacklog ?? false);
     const [wishlist, setWishlist] = useState(gameLog?.isWishlist ?? false);
-    const [stateColor, setStateColor] = useState(gameLog?.playState ? playStateColors[gameLog?.playState] : defaultPlayedStateColor);
+
+    /*useEffect(() => {
+        if (gameLog != null) {
+            setPlayState(null);
+
+        }
+    },[gameLog]);*/
 
     const handlePlayed = () => {
         //console.log(played);
+        //e.preventDefault();
         if (played) {
-            setPlayed(!played);
             setPlayState(0);
-            setStateColor(playStateColors[0]);
         }
         else {
-            setPlayed(!played);
             setPlayState(null);
-            setStateColor(defaultPlayedStateColor);
         }
-        onPlayedUpdate(played);
+        const playedToggle = !played;
+        setPlayed(playedToggle);
+        onPlayedUpdate(playedToggle);
     }
 
     const handlePlaying = () => {
-        setPlaying(!playing);
-        onOtherUpdate('playing', playing);
+        //e.preventDefault();
+        console.log(typeof gameLog);
+        const playToggle = !playing;
+        setPlaying(playToggle);
+        onOtherUpdate('isPlaying', playToggle);
     };
 
     const handleBacklog = () => {
-        setBacklog(!backlog);
-        onOtherUpdate('backlog', backlog);
+        //e.preventDefault();
+        const backlogToggle = !backlog;
+        setBacklog(backlogToggle);
+        onOtherUpdate('isBacklog', backlogToggle);
     }
 
     const handleWishlist = () => {
-        setWishlist(!wishlist);
-        onOtherUpdate('wishlist', wishlist);
+        //e.preventDefault();
+        const wishlistToggle = !wishlist;
+        setWishlist(wishlistToggle);
+        onOtherUpdate('isWishlist', wishlistToggle);
     }
 
     return (
         <Row id="buttons" className="mx-0">
             <Col id="play" className="px-0 play-btn-container mt-auto">
                 <Button variant="link" className="mx-auto" onClick={handlePlayed}>
-                    <FontAwesomeIcon icon={faGamepad} size="2x" color={stateColor} />
+                    <FontAwesomeIcon icon={faGamepad} size="2x" color={(gameLog && played && playState) ? playStateColors[playState] : defaultPlayedStateColor} />
                     <br />
                     <p className="label">Played</p>
                 </Button>
@@ -76,6 +88,6 @@ const GameLogInteractions = ({ gameLog, onPlayedUpdate, onOtherUpdate }) => {
             </Col>
         </Row>
     );
-};
+});
 
 export default GameLogInteractions;

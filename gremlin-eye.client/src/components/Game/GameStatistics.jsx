@@ -1,10 +1,11 @@
+import { memo } from 'react'; 
 import { Col, Row } from 'react-bootstrap';
 import { faBook, faGamepad, faGift, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import ReviewChart from './ReviewChart';
 
-const GameStatistics = ({ gameData }) => {
+const GameStatistics = memo(({ gameData }) => {
     return (
         <>
             <Col className="col-ms-12 col-sm-12 d-none d-sm-flex">
@@ -90,6 +91,6 @@ const GameStatistics = ({ gameData }) => {
             </Col>
         </>
     );
-}
+});
 
 export default GameStatistics;

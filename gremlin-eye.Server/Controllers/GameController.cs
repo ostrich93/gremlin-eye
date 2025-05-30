@@ -121,16 +121,16 @@ namespace gremlin_eye.Server.Controllers
             return Ok(suggestions);
         }
 
-        [HttpPost("{id}/rate")]
+        [HttpPost("/rate/{id}")]
         [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> RateGame(long id, [FromBody] int rating)
         {
-            Claim idClaim = User.Claims.First(x => x.Type == "UserId");
+            Claim idClaim = User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier);
             Guid userId = Guid.Parse(idClaim!.Value);
 
             var user = _unitOfWork.Users.GetUserById(userId);
             if (user == null)
-                return NotFound("User not found");
+                return Unauthorized("User not found");
 
             var game = await _unitOfWork.Games.GetGameById(id);
             if (game == null)
@@ -195,9 +195,9 @@ namespace gremlin_eye.Server.Controllers
 
         [HttpPost("log")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<IActionResult> LogGame([FromBody] GameLogDTO gameLogState)
+        public async Task<IActionResult> LogGame(GameLogDTO gameLogState)
         {
-            Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == "UserId");
+            Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
             Guid? userId = Guid.Parse(idClaim!.Value);
 
             var user = _unitOfWork.Users.GetUserById((Guid)userId);
@@ -236,6 +236,20 @@ namespace gremlin_eye.Server.Controllers
                 };
 
                 _unitOfWork.GameLogs.Create(gameLog);
+                
+                if (gameLogState.Rating != null)
+                {
+                    await _unitOfWork.SaveChangesAsync();
+                    Playthrough playthrough = new Playthrough
+                    {
+                        Game = game,
+                        GameId = game.Id,
+                        GameLog = gameLog,
+                        GameLogId = gameLog.Id,
+                        Rating = (int)gameLogState.Rating
+                    };
+                    gameLog.Playthroughs.Add(playthrough);
+                }
             }
 
             await _unitOfWork.SaveChangesAsync();

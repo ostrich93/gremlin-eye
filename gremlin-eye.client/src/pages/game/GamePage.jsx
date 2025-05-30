@@ -1,13 +1,15 @@
 import { Card, Container, Col, Row, Spinner } from 'react-bootstrap';
 import { faAlignRight, faHeart, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useAuthState } from "../../contexts/AuthProvider";
 import apiClient from '../../config/apiClient';
+import useDebounce from '../../hooks/useDebounce';
 import './GamePage.css';
 import InteractionSidebar from '../../components/Game/InteractionSidebar';
+import GameStatistics from '../../components/Game/GameStatistics';
 
 const GamePage = () => {
     const { user } = useAuthState();
@@ -37,6 +39,7 @@ const GamePage = () => {
                         platforms: res.data.platforms,
                         companies: res.data.companies,
                         series: res.data.series,
+                        gameLog: res.data.gameLog,
                         stats: res.data.stats ?? {
                             playedCount: 0,
                             playingCount: 0,
@@ -63,25 +66,55 @@ const GamePage = () => {
 
     }, [user, slug]);
 
-    /*const getPlayStateColor = () => {
-        if (playLog == null || !playLog.isPlayed)
-            return 'gray';
-        switch (playLog.playStatus) {
-            case 0:
-                return '#ea377a';
-            case 1:
-                return 'green';
-            case 2:
-                return 'blue';
-            case 3:
-                return 'orange';
-            case 4:
-                return 'red';
-            default:
-                return 'gray';
-        }
-    };*/
+    const generateEmptyGameLog = useCallback(() => {
+        //console.log(gameData.id);
+        return {
+            logId: -1,
+            gameId: gameData.id,
+            rating: null,
+            playStatus: null,
+            isPlayed: false,
+            isPlaying: false,
+            isBacklog: false,
+            isWishList: false
+        };
+    }, [gameData]);
 
+    const handleGameLogUpdate = useCallback((action, value) => {
+        if (gameData?.gameLog == null) {
+            let updatedLog = generateEmptyGameLog();
+            updatedLog[action] = value;
+            setGameData({ ...gameData, gameLog: updatedLog });
+        }
+        else {
+            setGameData({ ...gameData, gameLog: { ...gameData.gameLog, [action]: value } });
+        }
+    }, [gameData, generateEmptyGameLog]);
+
+    const handlePlayedStatusUpdate = useCallback((value) => {
+        if (gameData?.gameLog == null) {
+            let updatedLog = generateEmptyGameLog();
+            updatedLog.playStatus = 0;
+            updatedLog.isPlayed = value;
+            setGameData({ ...gameData, gameLog: updatedLog });
+        }
+        else {
+            setGameData({ ...gameData, gameLog: { ...gameData.gameLog, playStatus: null, played: value } });
+        }
+    }, [gameData, generateEmptyGameLog]);
+
+    useDebounce(async () => {
+            try {
+                const res = await apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/api/games/log/${gameData?.id}`, gameData?.gameLog);
+                if (res.data) {
+                    console.log("updated GameLog: ", res.data);
+                }
+            } catch (err) {
+                console.error("Error updating game log: ", err);
+            }
+        },
+    300, [gameData?.gameLog, gameData?.id]);
+    
     return (
         <Container>
             <Row id="game-banner-art">
@@ -98,8 +131,34 @@ const GamePage = () => {
             <Row id="game-profile">
                 <Col>
                     <Row id="game-body">
-                        <InteractionSidebar gameData={gameData}
-                        />
+                        <div id="interactions-sidebar" className="col-12 col-sm-5 col-md-cus-30 col-lg-cus-23 col-xl-cus-21 me-sm-3">
+                            <Row>
+                                <Col className="col-cover px-sm-0 my-auto mx-auto mb-0 mb-sm-2 mb-lg-0">
+                                    <Card className="mx-auto game-cover">
+                                        <Card.Img src={gameData?.coverUrl} loading='lazy' />
+                                    </Card>
+                                </Col>
+                                <Col className="col col-sm-12 mt-3 mt-sm-3">
+                                    <Row>
+                                        <div>
+                                            <Row className="mb-3">
+                                                {!user && (
+                                                    <Col className="text-center">
+                                                        <p id="sign-in-text" className="mx-auto mb-0">
+                                                            <Link to="/login">Log in</Link> to access rating features
+                                                        </p>
+                                                    </Col>
+                                                )}
+                                                {user && (
+                                                    <InteractionSidebar slug={slug} />
+                                                )}
+                                            </Row>
+                                        </div>
+                                        <GameStatistics gameData={gameData} />
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </div>
                         <Col>
                             <Row id="title" className="d-none d-sm-flex mx-n1">
                                 <div className="col-12 px-1">

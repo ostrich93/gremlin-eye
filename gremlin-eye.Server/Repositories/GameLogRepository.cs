@@ -94,5 +94,10 @@ namespace gremlin_eye.Server.Repositories
         {
             _context.GameLogs.Add(gameLog);
         }
+
+        public async Task<GameLog?> GetGameLogByUser(string slug, Guid userId)
+        {
+            return await _context.Games.Where(g => g.Slug == slug).SelectMany(g => g.GameLogs).Where(l => l.UserId == userId).Include(l => l.Playthroughs).FirstOrDefaultAsync();
+        }
     }
 }

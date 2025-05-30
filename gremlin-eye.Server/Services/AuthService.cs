@@ -19,7 +19,7 @@ namespace gremlin_eye.Server.Services
         }
         public async Task<UserResponseDTO> LoginAsync(LoginDTO request)
         {
-            var foundUser = await _unitOfWork.Users.GetUserByNameAsync(request.Username);
+            var foundUser = await _unitOfWork.Users.GetUserWithTokensAsync(request.Username);
 
             if (foundUser == null)
             {
