@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthState, useAuthDispatch } from '../contexts/AuthProvider';
-import apiClient from '../config/apiClient';
+import { login } from '../actions/authActions';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -13,32 +13,8 @@ const Login = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        dispatch({ type: "LOGIN_REQUEST" });
-        apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/auth/login`, { username: username, password: password }, {
-            withCredentials: true
-        })
-            .then((res) => {
-                const userData = {
-                    userId: res.data.userId,
-                    username: res.data.username,
-                    role: res.data.role
-                };
-                sessionStorage.setItem("current_user", JSON.stringify(userData));
-                sessionStorage.setItem("access_token", res.data.accessToken);
-                sessionStorage.setItem("refresh_token", res.data.refreshToken);
-                dispatch({
-                    type: "LOGIN_SUCCESS", payload: {
-                        user: userData,
-                        accessToken: res.data.accessToken,
-                        refreshToken: res.data.refreshToken
-                    }
-                });
-                navigate("/");
-            })
-            .catch((err) => {
-                console.log(err);
-                dispatch({ type: "LOGIN_ERROR", error: err });
-            });
+        await login(dispatch, { username: username, password: password });
+        navigate("/");
     };
 
     return (

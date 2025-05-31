@@ -30,6 +30,34 @@ const InteractionSidebar = ({ slug }) => {
 
     const starCountRef = useRef(null);
 
+    useEffect(() => {
+        const fetchGameLog = async () => {
+            setLoading(true);
+            apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/logs/${slug}`)
+                .then((res) => {
+                    if (res.data) {
+                        setLogId(res.data.logId);
+                        setGameId(res.data.gameId);
+                        setRating(res.data.rating);
+                        setPlayStatus(res.data.playStatus);
+                        setPlayed(res.data.isPlayed);
+                        setPlaying(res.data.isPlaying);
+                        setBacklog(res.data.isBacklog);
+                        setWishlist(res.data.isWishList);
+                    }
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.error("Error fetching game log: ", err);
+                    setLoading(false);
+                });
+        }
+
+        if (user != null) {
+            fetchGameLog();
+        }
+    }, [slug, user]);
+
     const togglePlayed = (e) => {
         e.preventDefault();
         apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/api/logs`, { type: 0, gameId: gameId })
@@ -119,7 +147,7 @@ const InteractionSidebar = ({ slug }) => {
     const handleClosePlayedModal = () => setShowPlayStatusModal(false);
 
     const handleRating = (rateValue) => {
-        apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/api/rate/${gameId}`, { rating: 2 * rateValue })
+        apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/api/games/rate/${gameId}`, { rating: 2 * rateValue })
             .then((res) => {
                 if (res.data) {
                     if (logId <= -1) {
@@ -135,34 +163,6 @@ const InteractionSidebar = ({ slug }) => {
                 }
             });
     };
-
-    useEffect(() => {
-        const fetchGameLog = async () => {
-            setLoading(true);
-            apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/logs/${slug}`)
-                .then((res) => {
-                    if (res.data) {
-                        setLogId(res.data.logId);
-                        setGameId(res.data.gameId);
-                        setRating(res.data.rating);
-                        setPlayStatus(res.data.playStatus);
-                        setPlayed(res.data.isPlayed);
-                        setPlaying(res.data.isPlaying);
-                        setBacklog(res.data.isBacklog);
-                        setWishlist(res.data.isWishList);
-                    }
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    console.error("Error fetching game log: ", err);
-                    setLoading(false);
-                });
-        }
-
-        if (user != null) {
-            fetchGameLog();
-        }
-    }, [slug, user]);
 
     return (
         <>

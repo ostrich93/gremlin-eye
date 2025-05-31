@@ -34,6 +34,7 @@ namespace gremlin_eye.Server.Controllers
                     GameLogDTO logData = new GameLogDTO
                     {
                         LogId = gameLog.Id,
+                        GameId = gameLog.GameId,
                         PlayStatus = gameLog.PlayStatus,
                         IsPlayed = gameLog.IsPlayed,
                         IsPlaying = gameLog.IsPlaying,
@@ -52,20 +53,20 @@ namespace gremlin_eye.Server.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPost("status")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<IActionResult> UpdateGameLog([FromBody] PlayingType type, [FromBody] long gameId)
+        public async Task<IActionResult> UpdateGameLog([FromBody] UpdateGameLogTypeRequest request)
         {
             Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
             Guid? userId = idClaim != null ? Guid.Parse(idClaim!.Value) : null;
 
             if (userId == null) return Unauthorized();
 
-            GameLog? gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(gameId, (Guid)userId);
+            GameLog? gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(request.GameId, (Guid)userId);
             if (gameLog != null)
             {
                 bool changed = false;
-                switch (type)
+                switch (request.Type)
                 {
                     case PlayingType.Played:
                         gameLog.IsPlayed = !gameLog.IsPlayed;
@@ -102,14 +103,14 @@ namespace gremlin_eye.Server.Controllers
                 if (user != null) {
                     gameLog = new GameLog
                     {
-                        GameId = gameId,
+                        GameId = request.GameId,
                         User = user,
                         UserId = user.Id,
-                        PlayStatus = type == PlayingType.Played ? PlayState.Played : null,
-                        IsPlayed = type == PlayingType.Played,
-                        IsPlaying = type == PlayingType.Playing,
-                        IsBacklog = type == PlayingType.Backlog,
-                        IsWishlist = type == PlayingType.Wishlist
+                        PlayStatus = request.Type == PlayingType.Played ? PlayState.Played : null,
+                        IsPlayed = request.Type == PlayingType.Played,
+                        IsPlaying = request.Type == PlayingType.Playing,
+                        IsBacklog = request.Type == PlayingType.Backlog,
+                        IsWishlist = request.Type == PlayingType.Wishlist
                     };
                     _unitOfWork.GameLogs.Create(gameLog);
                     await _unitOfWork.SaveChangesAsync();
@@ -122,17 +123,17 @@ namespace gremlin_eye.Server.Controllers
 
         [HttpPatch("status")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<IActionResult> UpdatePlayStatus([FromBody] long gameId, PlayState status)
+        public async Task<IActionResult> UpdatePlayStatus([FromBody] UpdatePlayStatusRequest request)
         {
             Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
             Guid? userId = idClaim != null ? Guid.Parse(idClaim!.Value) : null;
 
             if (userId == null) return Unauthorized();
 
-            var gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(gameId, (Guid)userId);
+            var gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(request.GameId, (Guid)userId);
             if (gameLog == null) return NotFound();
 
-            gameLog.PlayStatus = status;
+            gameLog.PlayStatus = request.Status;
             _unitOfWork.Context.GameLogs.Update(gameLog);
             await _unitOfWork.SaveChangesAsync();
 

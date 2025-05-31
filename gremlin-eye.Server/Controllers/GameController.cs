@@ -121,7 +121,7 @@ namespace gremlin_eye.Server.Controllers
             return Ok(suggestions);
         }
 
-        [HttpPost("/rate/{id}")]
+        [HttpPost("rate/{id}")]
         [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> RateGame(long id, [FromBody] int rating)
         {

@@ -65,55 +65,6 @@ const GamePage = () => {
         fetchGame();
 
     }, [user, slug]);
-
-    const generateEmptyGameLog = useCallback(() => {
-        //console.log(gameData.id);
-        return {
-            logId: -1,
-            gameId: gameData.id,
-            rating: null,
-            playStatus: null,
-            isPlayed: false,
-            isPlaying: false,
-            isBacklog: false,
-            isWishList: false
-        };
-    }, [gameData]);
-
-    const handleGameLogUpdate = useCallback((action, value) => {
-        if (gameData?.gameLog == null) {
-            let updatedLog = generateEmptyGameLog();
-            updatedLog[action] = value;
-            setGameData({ ...gameData, gameLog: updatedLog });
-        }
-        else {
-            setGameData({ ...gameData, gameLog: { ...gameData.gameLog, [action]: value } });
-        }
-    }, [gameData, generateEmptyGameLog]);
-
-    const handlePlayedStatusUpdate = useCallback((value) => {
-        if (gameData?.gameLog == null) {
-            let updatedLog = generateEmptyGameLog();
-            updatedLog.playStatus = 0;
-            updatedLog.isPlayed = value;
-            setGameData({ ...gameData, gameLog: updatedLog });
-        }
-        else {
-            setGameData({ ...gameData, gameLog: { ...gameData.gameLog, playStatus: null, played: value } });
-        }
-    }, [gameData, generateEmptyGameLog]);
-
-    useDebounce(async () => {
-            try {
-                const res = await apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/api/games/log/${gameData?.id}`, gameData?.gameLog);
-                if (res.data) {
-                    console.log("updated GameLog: ", res.data);
-                }
-            } catch (err) {
-                console.error("Error updating game log: ", err);
-            }
-        },
-    300, [gameData?.gameLog, gameData?.id]);
     
     return (
         <Container>

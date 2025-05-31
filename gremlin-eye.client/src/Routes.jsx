@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminRoute from './routes/AdminRoute';
+import UserRoute from './routes/UserRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import SyncCompanies from './pages/admin/SyncCompanies';
 import SyncGames from './pages/admin/SyncGames';
@@ -11,6 +12,7 @@ import SyncGenres from './pages/admin/SyncGenres';
 import SyncPlatforms from './pages/admin/SyncPlatforms';
 import SyncSeries from './pages/admin/SyncSeries';
 import UserRole from './enums/Role';
+import LogPage from './pages/game/LogPage';
 
 const AppRoutes = () => {
     return (
@@ -27,7 +29,8 @@ const AppRoutes = () => {
             <Route path="admin/syncPlatforms" element={<AdminRoute><SyncPlatforms /></AdminRoute> } />
             <Route path="admin/syncSeries" element={<AdminRoute><SyncSeries /></AdminRoute>} />
 
-            <Route path="/games/:slug" element={<GamePage /> } />
+            <Route path="/games/:slug" element={<GamePage />} />
+            <Route path="/logs/:slug" element={<UserRoute><LogPage /></UserRoute>} />
         </Routes>
     );
 };
