@@ -57,11 +57,13 @@ const NavSearch = () => {
                 placeholder="Search"
                 value={searchValue}
             />
-            <Button className="border-left-0 pl-1 pr-2 search-btn" onClick={() => {
-                if (searchValue > 1) window.location.href = `/search?&q=${searchValue}`;
-            } }>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-            </Button>
+            <span className="input-group-append me-md-2">
+                <Button className="border-left-0 pl-1 pr-2 search-btn" onClick={() => {
+                    if (searchValue > 1) window.location.href = `/search?&q=${searchValue}`;
+                }}>
+                    <FontAwesomeIcon className="fas" icon={faMagnifyingGlass} />
+                </Button>
+            </span>
             <ListGroup className="autocomplete-suggestions" style={{ position: "absolute", top: "64px" }} >
                 {resultsVisibile && searchValue.length > 1 &&
                     suggestions.map((suggestion) => (

@@ -11,3 +11,17 @@
     font-size:.75rem;
     padding: 4px 6px;
 }
+
+.input-group-append {
+    margin-left: -1px;
+}
+.input-group-append {
+    display: flex;
+}
+
+.input-group {
+    position:relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}

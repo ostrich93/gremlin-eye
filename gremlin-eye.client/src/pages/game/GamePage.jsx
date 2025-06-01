@@ -88,7 +88,7 @@ const GamePage = () => {
                                         <Card.Img src={gameData?.coverUrl} loading='lazy' />
                                     </Card>
                                 </Col>
-                                <Col className="col col-sm-12 mt-3 mt-sm-5">
+                                <Col className="col-sm-12 mt-3 mt-sm-5">
                                     <Row>
                                         <div id="logging-sidebar-section" className="col-7 col-sm-12">
                                             <Row className="mb-3">
@@ -121,7 +121,7 @@ const GamePage = () => {
                                 <div className="col-auto mt-auto pe-0 ps-1">
                                     <span className="sub-title">
                                         <span className="filler-text">released on </span>
-                                        <Link to={`/games/lib/popular/release_year:${gameData?.date}`}>${gameData?.date}</Link>
+                                        <Link to={`/games/lib/popular/release_year:${gameData?.date}`}>{gameData?.date}</Link>
                                     </span>
                                 </div>
                                 <div className="col-auto mt-auto pe-0 ps-1">
@@ -245,7 +245,7 @@ const GamePage = () => {
                                         <Col>
                                             <h2 className="me-auto mb-0">
                                                 Reviews
-                                                <Link className="secondary-link smaller-font ml-2" to={`/reviews/everyone/week/recent/${gameData?.slug}`}>View More</Link>
+                                                <Link className="secondary-link smaller-font ms-2" to={`/reviews/everyone/week/recent/${gameData?.slug}`}>View More</Link>
                                             </h2>
                                         </Col>
                                         <Col className="my-auto">

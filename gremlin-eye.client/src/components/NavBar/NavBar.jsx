@@ -1,5 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
-import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { Button, Col, Container, Nav, Navbar, NavDropdown, Row } from 'react-bootstrap';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuthState, useAuthDispatch } from "../../contexts/AuthProvider";
 import { logout } from '../../actions/authActions';
 import NavSearch from './NavSearch';
@@ -29,53 +31,65 @@ const NavBar = () => {
     };
 
     return (
-        <Navbar expand="md" id="primary-nav" className="hide-border">
-            <Container>
-                <Navbar.Brand as={Link} to='/' className="me-2 my-auto py-0">Gremlin-Eye</Navbar.Brand>
-                <Navbar.Collapse id="navbarSupportedContent" className="mt-2 mt-md-0">
-                    <Nav className="ms-auto">
-                        {user && user.role == 1 && sessionStorage.getItem('access_token') && (
+        <header>
+            <Navbar expand="md" id="primary-nav" className="hide-border">
+                <Container>
+                    <Navbar.Brand as={Link} to='/' className="me-2 my-auto py-0">Gremlin-Eye</Navbar.Brand>
+                    <Navbar.Collapse id="navbarSupportedContent" className="mt-2 mt-md-0">
+                        <Nav className="ms-auto">
+                            {user && user.role == 1 && sessionStorage.getItem('access_token') && (
+                                <Nav.Item>
+                                    <Nav.Link as={Link} to='/admin'>Admin</Nav.Link>
+                                </Nav.Item>
+                            )}
+                            {user && sessionStorage.getItem('access_token') && (
+                                <NavDropdown id="navDropdown" title={user.username} className="d-none d-md-block">
+                                    <NavDropdown.Item as={Link} to={`user/${user.username}`} className="py-1">Profile</NavDropdown.Item>
+                                    <NavDropdown.Divider className="my-0" />
+                                    <NavDropdown.Item as={Link} to={`user/${user.username}/games`} className="py-1">Played</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`user/${user.username}/playing`} className="py-1">Playing</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`user/${user.username}/backlog`} className="py-1">Backlog</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`user/${user.username}/wishlist`} className="py-1">Wishlist</NavDropdown.Item>
+                                    <NavDropdown.Divider className="my-0" />
+                                    <NavDropdown.Item as={Link} to={`user/${user.username}/journal`} className="py-1">Journal</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`user/${user.username}/reviews`} className="py-1">Reviews</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`user/${user.username}/lists`} className="py-1">Lists</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`user/${user.username}/likes`} className="py-1">Likes</NavDropdown.Item>
+                                    <NavDropdown.Divider className="my-0" />
+                                    <NavDropdown.Item className="pt-1 pb-2" onClick={handleLogOut}>
+                                        Logout
+                                    </NavDropdown.Item>
+                                </NavDropdown>
+                            )}
+                            {(!user || !sessionStorage.getItem('access_token')) && (
+                                <>
+                                    <Nav.Item>
+                                        <Nav.Link as={Link} to={`/login`}>Log In</Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item>
+                                        <Nav.Link as={Link} to={`users/register`}>Register </Nav.Link>
+                                    </Nav.Item>
+                                </>
+                            )}
                             <Nav.Item>
-                                <Nav.Link as={Link} to='/admin'>Admin</Nav.Link>
+                                <Nav.Link as={Link} to='/games' className="d-none d-md-block me-2">Games</Nav.Link>
                             </Nav.Item>
-                        )}
-                        {user && sessionStorage.getItem('access_token') && (
-                            <NavDropdown id="navDropdown" title={user.username} className="d-none d-md-block">
-                                <NavDropdown.Item as={Link} to={`user/${user.username}`} className="py-1">Profile</NavDropdown.Item>
-                                <NavDropdown.Divider className="my-0" />
-                                <NavDropdown.Item as={Link} to={`user/${user.username}/games`} className="py-1">Played</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to={`user/${user.username}/playing`} className="py-1">Playing</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to={`user/${user.username}/backlog`} className="py-1">Backlog</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to={`user/${user.username}/wishlist`} className="py-1">Wishlist</NavDropdown.Item>
-                                <NavDropdown.Divider className="my-0" />
-                                <NavDropdown.Item as={Link} to={`user/${user.username}/journal`} className="py-1">Journal</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to={`user/${user.username}/reviews`} className="py-1">Reviews</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to={`user/${user.username}/lists`} className="py-1">Lists</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to={`user/${user.username}/likes`} className="py-1">Likes</NavDropdown.Item>
-                                <NavDropdown.Divider className="my-0" />
-                                <NavDropdown.Item className="pt-1 pb-2" onClick={handleLogOut}>
-                                    Logout
-                                </NavDropdown.Item>
-                            </NavDropdown>
-                        )}
-                        {(!user || !sessionStorage.getItem('access_token')) && (
-                            <>
-                                <Nav.Item>
-                                    <Nav.Link as={Link} to={`/login`}>Log In</Nav.Link>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Nav.Link as={Link} to={`users/register`}>Register </Nav.Link>
-                                </Nav.Item>
-                            </>
-                        )}
-                        <Nav.Item>
-                            <Nav.Link as={Link} to='/games' className="d-none d-md-block me-2">Games</Nav.Link>
-                        </Nav.Item>
-                        <NavSearch />
-                    </Nav>
-                </Navbar.Collapse>
-            </Container>
-        </Navbar>
+                            <NavSearch />
+                            {user && (
+                                <Row className="mx-0 mb-2 mb-md-0">
+                                    <Col className="my-auto px-0 mx-3 mx-md-0">
+                                        <Button id="add-a-game" className="mb-2 my-sm-0 py-0" variant="primary">
+                                            <FontAwesomeIcon icon={faPlus} />
+                                            Log a Game
+                                        </Button>
+                                    </Col>
+                                </Row>
+                            )}
+                        </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>
+        </header>
     );
 };
 

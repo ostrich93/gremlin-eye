@@ -282,8 +282,7 @@ const InteractionSidebar = ({ slug }) => {
                                 <Col className="auto ps-1">
                                     <ButtonGroup>
                                         <ToggleButton
-                                            id="like-game-btn"
-                                            className="px-0"
+                                            className="like-game-btn px-0"
                                             type="checkbox"
                                             variant="outline-secondary"
                                             checked={liked}

@@ -3,7 +3,7 @@
     z-index: 15;
 }
 
-.navbar .hide-border {
+.navbar.hide-border {
     border: none;
 }
 
@@ -22,6 +22,10 @@
 .navbar .navbar-brand {
     font-size: 1.6rem;
     font-weight: 600;
+}
+
+.navbar #add-a-game {
+    height: 33px;
 }
 
 .navbar-brand {
