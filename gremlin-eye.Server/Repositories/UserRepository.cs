@@ -35,5 +35,10 @@ namespace gremlin_eye.Server.Repositories
             return _context.Users.Include(u => u.RefreshTokens).FirstOrDefault(u => u.Id == userId);
             
         }
+
+        public Task<AppUser?> GetUserWithTokensAsync(string username)
+        {
+            return _context.Users.Include(u => u.RefreshTokens).FirstOrDefaultAsync(u => u.UserName == username);
+        }
     }
 }

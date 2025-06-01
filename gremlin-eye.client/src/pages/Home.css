@@ -1,0 +1,48 @@
+#welcoming-banner {
+    margin-bottom: 4rem;
+    margin-top: 9vw;
+}
+#welcoming-banner h2 {
+    color: #badefc;
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: normal;
+    margin-bottom: 0;
+}
+#welcoming-banner p {
+    color: #8f9ca7;
+    font-size: 1.25rem;
+    font-weight: 300;
+    margin-bottom: 0;
+}
+#welcoming-banner #landing-actions .btn-main {
+    font-weight: 500;
+}
+#welcoming-banner #landing-actions .subtitle-text {
+    font-size: 1rem;
+}
+
+#home-about {
+    margin-top: 4rem;
+}
+#home-about h2 {
+    color: #fff;
+    font-size: 2.3rem;
+}
+#home-about p {
+    color: #8f9ca7;
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 25px;
+}
+
+.feature-showcase {
+    margin-bottom: 5rem;
+}
+.feature-showcase h2 {
+    color: #fff;
+}
+.feature-showcase p {
+    font-size: 1.2rem;
+    font-weight: 400;
+}

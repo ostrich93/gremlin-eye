@@ -1,0 +1,195 @@
+
+#game-banner-art{
+    align-items: center;
+    display: flex;
+    flex-direction: unset;
+    flex-wrap: wrap;
+    justify-content: center;
+    left: 0;
+    margin: 0;
+    max-height: 450px;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -2;
+}
+
+#game-banner-art #gradient {
+    bottom: 0;
+    max-height: 350px;
+    z-index: 1;
+}
+
+#game-banner-art img {
+    border-style: none;
+    height: auto;
+    transform: translateY(-25%);
+    width: 100%;
+    z-index: -1;
+}
+
+#game-profile #game-body {
+    padding-top: 350px;
+}
+
+#game-profile #game-body .game-rating {
+    color: #fff;
+}
+
+#game-profile #game-body .game-rating p {
+    color: hsla(0,0%,100%,0.6);
+}
+
+#game-profile .col-cover .game-cover {
+    box-shadow: 0 0 20px 10px rgba(36,40,50,.369);
+    position: absolute;
+    top: 152px;
+    z-index: 2;
+}
+
+#game-profile #game-body #sign-in-text {
+    margin-top: 45px;
+    width: 100%;
+}
+
+#game-profile #game-body .journal-btn {
+    display: block;
+    height: 30px;
+    line-height: 0px;
+    margin-top: 35px;
+    width: 100%;
+}
+
+#game-profile #game-body #title {
+    bottom: 0;
+    color: #fff;
+    font-weight: 500;
+}
+
+#game-profile #game-body .sub-title {
+    color: hsla(0,0%,100%,.58);
+    font-size: 20px;
+}
+
+#game-profile #game-body .sub-title a {
+    color: #cbd4dc;
+}
+
+#game-profile #game-body .side-section {
+    background-color: #242832;
+    border-radius: 7px;
+    padding: 1px 12px 10px;
+}
+
+#game-profile .sub-title {
+    font-weight: 500;
+}
+
+#game-profile #game-body .star-rating {
+    color: #525a73;
+}
+
+#game-profile #title .filler-text {
+    font-weight: 200;
+}
+
+#game-profile .game-page-sidecard {
+    border: 1px solid #30394c;
+    border-radius: 4px;
+    color: #cbd4dc;
+    margin-bottom: 0;
+    padding: 3px 6px;
+}
+#game-profile .game-page-sidecard svg {
+    font-size: 1.2rem;
+    line-height: normal
+}
+
+#game-profile .game-page-sidecard .title {
+    font-weight: 500
+}
+
+#game-profile .game-page-sidecard .subtitle {
+    font-size: .9rem;
+    font-weight: 300
+}
+
+.game-page-platform {
+    border: 1px solid #8f9ca7;
+    border-radius: 4px;
+    color: #cbd4dc;
+    display: inline-block;
+    font-size: .9rem;
+    font-weight: 400;
+    margin-bottom: .5rem;
+    margin-right: .25rem;
+    padding: 1px 5px;
+    white-space: nowrap;
+}
+
+#game-profile #collapseSummary {
+    font-family: Noto Sans,sans-serif;
+    font-weight: 400;
+}
+
+#game-profile h2 {
+    color: #8f9ca7;
+}
+
+#center-content #collapseSummary.collapse:not(.show){
+    display: -webkit-box;
+    height: 120px!important;
+    overflow: hidden;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+}
+
+#game-profile #game-body #buttons {
+    background-color: transparent;
+    border-radius: 10px;
+}
+
+#logging-sidebar-section #buttons {
+    margin-top: 12px;
+}
+
+#logging-sidebar-section .like-game-btn {
+    width: 33px;
+}
+
+#rating-bars-height {
+    min-height: 70px;
+    text-align: center;
+}
+
+#game-profile .log-counters p {
+    color: #8f9ca7;
+    font-size: .9rem;
+    font-weight: 200;
+    margin-bottom: 0;
+}
+
+#game-profile .log-counters svg {
+    font-size: 1rem;
+    margin-right: 5px;
+    text-align: center;
+    width: 18px;
+}
+
+@media(min-width:1200px) {
+    #game-profile .col-cover {
+        flex: 0 0 175px;
+        max-width: 175px;
+    }
+    #game-profile .col-cover .game-cover {
+        top: -165px;
+    }
+}
+
+@media(min-width:992px) {
+    #game-profile .col-20-per {
+        flex: 0 0 20%;
+        max-width: 20%
+    }
+}

@@ -1,5 +1,6 @@
 ﻿import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { Row } from 'react-bootstrap';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
@@ -27,7 +28,6 @@ const ReviewChart = ({ reviewScores }) => {
                 grid: {
                     display: false
                 },
-                max: 5,
                 ticks: {
                     autoSkip: true
                 }
@@ -46,9 +46,9 @@ const ReviewChart = ({ reviewScores }) => {
     };
 
     return (
-        <div className="graph-container">
+        <Row id="rating-bars-height" className="mx-0">
             <Bar data={data} options={options} />
-        </div>
+        </Row>
     );
 };
 

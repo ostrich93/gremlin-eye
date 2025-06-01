@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { useAuthState, useAuthDispatch } from '../contexts/AuthProvider';
-import apiClient from '../config/apiClient';
+import { login } from '../actions/authActions';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -13,50 +14,30 @@ const Login = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        dispatch({ type: "LOGIN_REQUEST" });
-        apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/auth/login`, { username: username, password: password }, {
-            withCredentials: true
-        })
-            .then((res) => {
-                const userData = {
-                    userId: res.data.userId,
-                    username: res.data.username,
-                    role: res.data.role
-                };
-                sessionStorage.setItem("current_user", JSON.stringify(userData));
-                sessionStorage.setItem("access_token", res.data.accessToken);
-                sessionStorage.setItem("refresh_token", res.data.refreshToken);
-                dispatch({
-                    type: "LOGIN_SUCCESS", payload: {
-                        user: userData,
-                        accessToken: res.data.accessToken,
-                        refreshToken: res.data.refreshToken
-                    }
-                });
-                navigate("/");
-            })
-            .catch((err) => {
-                console.log(err);
-                dispatch({ type: "LOGIN_ERROR", error: err });
-            });
+        await login(dispatch, { username: username, password: password });
+        navigate("/");
     };
 
     return (
-        <div className="flex row justify-content-md center">
-            <h2 id="title">Log In</h2>
-            {error ? (<><p>{error}</p></>) : null}
-            <form onSubmit={handleLogin}>
-                <div className="form-group my-3">
-                    <input type='text' value={username} placeholder='Username' onChange={e => setUsername(e.target.value)} name="username" required disabled={loading} />
+        <Container>
+            <Row id="log-in" className="justify-content-md-center mt-3 mx-2">
+                <div className="col-md-5 mt-2 mx-2 p-3">
+                    <h2 id="title" className="text-center">Log In</h2>
+                    {error ? (<><p>{error}</p></>) : null}
+                    <Form onSubmit={handleLogin}>
+                        <Form.Group className="my-3">
+                            <Form.Control type='text' value={username} placeholder='Username' onChange={e => setUsername(e.target.value)} name="username" required disabled={loading} />
+                        </Form.Group>
+                        <Form.Group className="my-3">
+                            <Form.Control type='password' value={password} placeholder='Password' onChange={e => setPassword(e.target.value)} name="password" required disabled={loading} />
+                        </Form.Group>
+                        <div>
+                            <Button id="register-button" type='submit' disabled={loading || (!username.length || !password.length)}>Log In</Button>
+                        </div>
+                    </Form>
                 </div>
-                <div className="form-group my-3">
-                    <input type='password' value={password} placeholder='Password' onChange={e => setPassword(e.target.value)} name="password" required disabled={loading} />
-                </div>
-                <div>
-                    <button id="register-button" type='submit' disabled={loading || (!username.length || !password.length)}>Log In</button>
-                </div>
-            </form>
-        </div>
+            </Row>
+        </Container>
     );
 };
 

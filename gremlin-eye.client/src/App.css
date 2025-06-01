@@ -1,6 +1,25 @@
-﻿#root {
-    margin: 0 auto;
-    text-align: center;
+﻿body {
+    background-color: var(--bs-body-bg-rgb);
+    background-size: 400px;
+    color: #badefc;
+    font-family: Roboto, sans-serif !important;
+    font-weight: 500;
+    min-height: 100vh;
+    padding-bottom: calc(3.5rem + 30px);
+    position: relative;
+}
+
+#gradient,
+.gradient {
+    background: -moz-linear-gradient(top,rgba(125,185,232,0) 0, rgba(22,24,28,1) 100%);
+    background: -webkit-linear-gradient(top,rgba(125,185,232,0) 0, rgba(22,24,28,1) 100%);
+    background: linear-gradient(to bottom,rgba(125,185,232,0) 0, rgba(22,24,28,1) 100%);
+    bottom: -1px;
+    height: 80%;
+    left: 0;
+    position: absolute;
+    right: 0;
+    z-index: 0;
 }
 
 th, td {
@@ -13,6 +32,144 @@ th, td {
     margin-right: auto;
     padding-left: 15px;
     padding-right: 15px;
+    width: 100%;
+}
+.col {
+    padding-left: 15px;
+    padding-right: 15px;
+    position:relative;
+    width: 100%;
+}
+
+.col {
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 100%;
+}
+
+.navbar #nav-bar-search {
+    background-color: #272c37;
+    border-bottom-left-radius: .25rem;
+    border-top-left-radius: .25rem;
+    color: #fff;
+    height: 33px;
+    padding: 5px;
+    transition: max-width .4s;
+}
+
+.navbar .search-btn {
+    background-color: #272c37;
+    height: 33px;
+    border-width: 0;
+    padding: 0;
+}
+
+.navbar-brand {
+    display: inline-block;
+    font-size: 1.25rem;
+    line-height: inherit;
+    margin-right: 1rem;
+    padding-bottom: .3125rem;
+    padding-top: .3125rem;
+    white-space: nowrap;
+
+}
+
+.form-control::placeholder {
+    color: #6c757d;
+    opacity: 1;
+}
+
+.subtitle-text {
+    font-weight: 300;
+}
+.subtitle-text {
+    line-height: normal;
+}
+.smaller-font,
+.subtitle-text {
+    font-size: .9rem;
+}
+
+.rate {
+    border: 0;
+    display: block;
+    position: relative;
+}
+
+.rate>input[type=radio] {
+    display: none;
+}
+
+.btn-play {
+    background-color: transparent;
+    border: none;
+    display: block;
+    padding: 0;
+    position: relative;
+    text-align: center;
+}
+
+.btn-play p {
+    color: hsla(0,0%,100%,.6);
+    font-size: .67rem;
+    font-weight: 300;
+    margin-bottom: 0;
+}
+
+#display-filters .sort-heading,
+#nav-interactables .sort-heading {
+    line-height: 1px;
+}
+
+#review-header h2 {
+    font-size: 1.3rem;
+    font-weight: 400;
+}
+
+#review-header p {
+    color: hsla(0,0%,100%,.471);
+}
+
+.category-tag p,
+.genre-tag {
+    font-weight: 300;
+    margin-bottom: 0;
+}
+
+.genre-tag {
+    display: inline-block;
+}
+
+.game-cover {
+    align-items: center;
+    background-color: #30394c;
+    border: 1px solid #30394c;
+    border-radius: 5px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    display: flex;
+    flex-direction: unset;
+    justify-content: center;
+    padding-bottom: 133.3333333333%;
+    transition: opacity .2s;
+    transition: filter .2s;
+    width: 100%;
+}
+
+.game-cover>img {
+    bottom: 0;
+    position: absolute;
+}
+
+#log-in #title {
+    color: #8f9ca7;
+    font-size: 3rem;
+    font-weight: 200;
+}
+
+#register-btn {
     width: 100%;
 }
 

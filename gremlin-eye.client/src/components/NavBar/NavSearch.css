@@ -1,0 +1,27 @@
+.autocomplete-suggestions {
+    border: 1px solid var(--bs-gray-dark);
+    border-bottom:unset;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-left: 0;
+    z-index: 5000;
+}
+.autocomplete-suggestions .autocomplete-suggestion {
+    border-bottom: 1px solid var(--bs-gray-dark);
+    font-size:.75rem;
+    padding: 4px 6px;
+}
+
+.input-group-append {
+    margin-left: -1px;
+}
+.input-group-append {
+    display: flex;
+}
+
+.input-group {
+    position:relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}

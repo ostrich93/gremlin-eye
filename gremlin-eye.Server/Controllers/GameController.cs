@@ -1,6 +1,7 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
+using gremlin_eye.Server.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -25,9 +26,6 @@ namespace gremlin_eye.Server.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetGameBySlug(string slug)
         {
-            Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == "UserId");
-            Guid? userId = idClaim != null ? Guid.Parse(idClaim!.Value): null;
-
             GameData? data = await _unitOfWork.Games.GetGameBySlug(slug);
             if (data == null)
             {
@@ -100,36 +98,6 @@ namespace gremlin_eye.Server.Controllers
                     gameDetails.RelatedGames = relatedSummaries;
                 }
             }
-            if (userId != null) //if requester is a logged in user, then retrieve their game log
-            {
-                GameLog? gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(gameDetails.Id, (Guid)userId);
-
-                if (gameLog != null)
-                {
-
-                    GameLogDTO logData = new GameLogDTO
-                    {
-                        LogId = gameLog.Id,
-                        GameId = gameDetails.Id,
-                        IsPlaying = gameLog.IsPlaying,
-                        IsBacklog = gameLog.IsBacklog,
-                        IsWishlist = gameLog.IsWishlist
-                    };
-
-                    if (gameLog.Playthroughs.Any())
-                    {
-                        Playthrough playthrough = gameLog.Playthroughs.Last();
-                        logData.Rating = playthrough.Rating;
-                        logData.IsPlayed = gameLog.IsPlayed;
-                        logData.PlayStatus = gameLog.PlayStatus;
-                    }
-                    if (gameLog != null)
-                    {
-
-                        gameDetails.GameLog = logData;
-                    }
-                }
-            }
 
             return Ok(gameDetails);
         }
@@ -151,6 +119,141 @@ namespace gremlin_eye.Server.Controllers
                 });
             }
             return Ok(suggestions);
+        }
+
+        [HttpPost("rate/{id}")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<IActionResult> RateGame(long id, [FromBody] RatingRequestDTO rating)
+        {
+            Claim idClaim = User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier);
+            Guid userId = Guid.Parse(idClaim!.Value);
+
+            var user = _unitOfWork.Users.GetUserById(userId);
+            if (user == null)
+                return Unauthorized("User not found");
+
+            var game = await _unitOfWork.Games.GetGameById(id);
+            if (game == null)
+                return NotFound("Game not found");
+
+            var gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(id, userId);
+
+            if (gameLog != null)
+            {
+                var playthrough = gameLog.Playthroughs.LastOrDefault();
+                if (playthrough != null)
+                {
+                    playthrough.Rating = rating.Rating;
+                    if (!gameLog.IsPlayed)
+                    {
+                        gameLog.IsPlayed = true;
+                        gameLog.PlayStatus = PlayState.Played;
+                    }
+                }
+                else
+                {
+                    gameLog.Playthroughs.Add(new Playthrough
+                    {
+                        Game = game,
+                        GameId = id,
+                        GameLog = gameLog,
+                        GameLogId = gameLog.Id,
+                        Rating = rating.Rating
+                    });
+                }
+                _unitOfWork.Context.GameLogs.Update(gameLog);
+            }
+            else
+            {
+                gameLog = new GameLog
+                {
+                    UserId = userId,
+                    User = user,
+                    GameId = id,
+                    Game = game,
+                    IsPlayed = true,
+                    PlayStatus = PlayState.Played
+                };
+
+                _unitOfWork.GameLogs.Create(gameLog);
+
+                var playthrough = new Playthrough
+                {
+                    GameLogId = gameLog.Id,
+                    GameLog = gameLog,
+                    GameId = id,
+                    Game = game,
+                    Rating = rating.Rating
+                };
+
+                gameLog.Playthroughs.Add(playthrough);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(gameLog.Id);
+        }
+
+        [HttpPost("log")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<IActionResult> LogGame(GameLogDTO gameLogState)
+        {
+            Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            Guid? userId = Guid.Parse(idClaim!.Value);
+
+            var user = _unitOfWork.Users.GetUserById((Guid)userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            var game = await _unitOfWork.Games.GetGameById(gameLogState.GameId);
+            if (game == null)
+                return NotFound("Game not found");
+
+            var gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(gameLogState.GameId, (Guid)userId);
+
+            if (gameLog != null)
+            {
+                gameLog.PlayStatus = gameLogState.PlayStatus;
+                gameLog.IsPlayed = gameLogState.IsPlayed;
+                gameLog.IsPlaying = gameLogState.IsPlaying;
+                gameLog.IsBacklog = gameLogState.IsBacklog;
+                gameLog.IsWishlist = gameLogState.IsWishlist;
+
+                _unitOfWork.Context.GameLogs.Update(gameLog);
+            }
+            else
+            {
+                gameLog = new GameLog
+                {
+                    User = user,
+                    UserId = (Guid)userId,
+                    Game = game,
+                    GameId = gameLogState.GameId,
+                    PlayStatus = gameLogState.PlayStatus,
+                    IsPlayed = gameLogState.IsPlayed,
+                    IsPlaying = gameLogState.IsPlaying,
+                    IsBacklog = gameLogState.IsBacklog,
+                    IsWishlist = gameLogState.IsWishlist
+                };
+
+                _unitOfWork.GameLogs.Create(gameLog);
+                
+                if (gameLogState.Rating != null)
+                {
+                    await _unitOfWork.SaveChangesAsync();
+                    Playthrough playthrough = new Playthrough
+                    {
+                        Game = game,
+                        GameId = game.Id,
+                        GameLog = gameLog,
+                        GameLogId = gameLog.Id,
+                        Rating = (int)gameLogState.Rating
+                    };
+                    gameLog.Playthroughs.Add(playthrough);
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(gameLog.Id);
         }
     }
 }

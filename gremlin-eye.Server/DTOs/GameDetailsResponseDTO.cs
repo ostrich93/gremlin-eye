@@ -14,7 +14,6 @@
         public ICollection<CompanyDTO> Companies { get; set; } = new List<CompanyDTO>();
         public SeriesDTO? Series { get; set; }
         public GameSummaryDTO? ParentGame { get; set; }
-        public GameLogDTO? GameLog { get; set; } //from user
         public GameStatsDTO? Stats { get; set; }
         public int ListCount { get; set; }
         public int ReviewCount { get; set; }

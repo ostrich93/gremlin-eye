@@ -1,0 +1,39 @@
+.navbar {
+    background-color: transparent;
+    z-index: 15;
+}
+
+.navbar.hide-border {
+    border: none;
+}
+
+.navbar .nav-item {
+    font-size: 11pt;
+}
+
+.navbar .nav-item .nav-link {
+    color: var(--back-link);
+}
+
+.navbar .nav-item .nav-link:hover {
+    color: #fff
+}
+
+.navbar .navbar-brand {
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.navbar #add-a-game {
+    height: 33px;
+}
+
+.navbar-brand {
+    color: #fff;
+}
+
+#primary-nav.hide-border #nav-bar-search,
+#primary-nav.hide-border .search-btn {
+    border-color: #3b414e;
+    border-width: 1px;
+}
