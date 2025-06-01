@@ -8,7 +8,7 @@ import ReviewChart from './ReviewChart';
 const GameStatistics = memo(({ gameData }) => {
     return (
         <>
-            <Col className="col-ms-12 col-sm-12 d-none d-sm-flex">
+            <div className="col-ms-12 col-sm-12 d-none d-sm-flex">
                 <Row>
                     <Col>
                         <div className="side-section">
@@ -18,9 +18,8 @@ const GameStatistics = memo(({ gameData }) => {
                                     <h1 className="text-center">{gameData?.stats && gameData?.stats?.averageRating ? gameData?.stats?.averageRating : 'N/A'}</h1>
                                 </Col>
                             </Row>
-                            <Row id="rating-bars-height" className="mx-0">
-                                <ReviewChart reviewScores={gameData?.stats?.ratingCounts ?? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]} />
-                            </Row>
+                            
+                            <ReviewChart reviewScores={gameData?.stats?.ratingCounts ?? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]} />
                             <hr className="my-2" />
                             <Row className="mt-1 log-counters">
                                 <div className="col-12 mb-1">
@@ -88,7 +87,7 @@ const GameStatistics = memo(({ gameData }) => {
                         </div>
                     </Col>
                 </Row>
-            </Col>
+            </div>
         </>
     );
 });

@@ -123,7 +123,7 @@ namespace gremlin_eye.Server.Controllers
 
         [HttpPost("rate/{id}")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<IActionResult> RateGame(long id, [FromBody] int rating)
+        public async Task<IActionResult> RateGame(long id, [FromBody] RatingRequestDTO rating)
         {
             Claim idClaim = User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier);
             Guid userId = Guid.Parse(idClaim!.Value);
@@ -143,7 +143,7 @@ namespace gremlin_eye.Server.Controllers
                 var playthrough = gameLog.Playthroughs.LastOrDefault();
                 if (playthrough != null)
                 {
-                    playthrough.Rating = rating;
+                    playthrough.Rating = rating.Rating;
                     if (!gameLog.IsPlayed)
                     {
                         gameLog.IsPlayed = true;
@@ -158,7 +158,7 @@ namespace gremlin_eye.Server.Controllers
                         GameId = id,
                         GameLog = gameLog,
                         GameLogId = gameLog.Id,
-                        Rating = rating
+                        Rating = rating.Rating
                     });
                 }
                 _unitOfWork.Context.GameLogs.Update(gameLog);
@@ -183,7 +183,7 @@ namespace gremlin_eye.Server.Controllers
                     GameLog = gameLog,
                     GameId = id,
                     Game = game,
-                    Rating = rating
+                    Rating = rating.Rating
                 };
 
                 gameLog.Playthroughs.Add(playthrough);

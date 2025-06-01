@@ -53,7 +53,7 @@ namespace gremlin_eye.Server.Controllers
             return Ok();
         }
 
-        [HttpPost("status")]
+        [HttpPost]
         [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> UpdateGameLog([FromBody] UpdateGameLogTypeRequest request)
         {

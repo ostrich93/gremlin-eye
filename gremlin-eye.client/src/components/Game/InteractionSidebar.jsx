@@ -38,7 +38,7 @@ const InteractionSidebar = ({ slug }) => {
                     if (res.data) {
                         setLogId(res.data.logId);
                         setGameId(res.data.gameId);
-                        setRating(res.data.rating);
+                        setRating(res.data.rating ? res.data.rating/2 : 0);
                         setPlayStatus(res.data.playStatus);
                         setPlayed(res.data.isPlayed);
                         setPlaying(res.data.isPlaying);
@@ -123,7 +123,7 @@ const InteractionSidebar = ({ slug }) => {
 
     const handleStatusChange = (e, statusValue) => {
         e.preventDefault();
-        apiClient.patch(`${import.meta.env.VITE_APP_BACKEND_URL}/api/logs/status`, { gameId: gameId, status: { statusValue } })
+        apiClient.patch(`${import.meta.env.VITE_APP_BACKEND_URL}/api/logs/status`, { gameId: gameId, status: statusValue })
             .then((res) => {
                 setPlayStatus(statusValue);
                 setShowPlayStatusModal(false);
@@ -228,14 +228,16 @@ const InteractionSidebar = ({ slug }) => {
                             </Row>
 
                             <Row id={`rating${gameId}`} className="my-2 star-rating star-rating-game">
-                                <Rate
-                                    defaultValue={rating ?? 0}
-                                    value={rating ?? 0}
-                                    ref={starCountRef}
-                                    allowHalf
-                                    allowClear
-                                    onChange={(value) => handleRating(value)}
-                                />
+                                <Col className="col-auto mx-auto px-0 star-rating-field rate">
+                                    <Rate
+                                        defaultValue={rating ?? 0}
+                                        value={rating ?? 0}
+                                        ref={starCountRef}
+                                        allowHalf
+                                        allowClear
+                                        onChange={(value) => handleRating(value)}
+                                    />
+                                </Col>
                             </Row>
 
                             <hr className="my-1" />
@@ -243,7 +245,7 @@ const InteractionSidebar = ({ slug }) => {
                             <Row id="buttons" className="mx-0">
                                 <Col id="play" className="px-0 mt-auto btn-play-fill">
                                     <Button variant="link" className="btn-play-fill btn-play btn-played mx-auto" onClick={handlePlayedClick}>
-                                        <FontAwesomeIcon icon={faGamepad} size="2x" color={(played && playStatus) ? playStateColors[playStatus] : defaultPlayedStateColor} />
+                                        <FontAwesomeIcon icon={faGamepad} size="2x" color={(played && playStatus != null) ? playStateColors[playStatus] : defaultPlayedStateColor} />
                                         <br />
                                         <p className="label">Played</p>
                                     </Button>
@@ -280,8 +282,8 @@ const InteractionSidebar = ({ slug }) => {
                                 <Col className="auto ps-1">
                                     <ButtonGroup>
                                         <ToggleButton
-                                            id="add-to-list"
-                                            className="w-100"
+                                            id="like-game-btn"
+                                            className="px-0"
                                             type="checkbox"
                                             variant="outline-secondary"
                                             checked={liked}
@@ -296,6 +298,15 @@ const InteractionSidebar = ({ slug }) => {
                         </>
                     )}
                 </div>
+                {logId > -1 && (
+                    <Row className="my-2 none d-none d-sm-flex">
+                        <Col id="log-again-btn">
+                            <Button id="open-new-game-log-modal-btn" className="w-100" variant="outline-secondary">
+                                <p className="mb-0">Log or review again</p>
+                            </Button>
+                        </Col>
+                    </Row>
+                ) }
             </Col>
         </>
     );

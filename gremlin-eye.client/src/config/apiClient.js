@@ -3,6 +3,11 @@ import axios from 'axios';
 const basicRequestInterceptor = (config) => {
     config.headers["Content-Type"] = "application/json";
     config.headers["Accept"] = "application/json";
+
+    const authToken = sessionStorage.getItem('access_token');
+    if (authToken) {
+        config.headers.Authorization = `Bearer ${authToken}`;
+    }
     return config;
 };
 

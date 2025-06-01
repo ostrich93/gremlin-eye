@@ -1,12 +1,11 @@
 import { Card, Container, Col, Row, Spinner } from 'react-bootstrap';
 import { faAlignRight, faHeart, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useAuthState } from "../../contexts/AuthProvider";
 import apiClient from '../../config/apiClient';
-import useDebounce from '../../hooks/useDebounce';
 import './GamePage.css';
 import InteractionSidebar from '../../components/Game/InteractionSidebar';
 import GameStatistics from '../../components/Game/GameStatistics';
@@ -89,9 +88,9 @@ const GamePage = () => {
                                         <Card.Img src={gameData?.coverUrl} loading='lazy' />
                                     </Card>
                                 </Col>
-                                <Col className="col col-sm-12 mt-3 mt-sm-3">
+                                <Col className="col col-sm-12 mt-3 mt-sm-5">
                                     <Row>
-                                        <div>
+                                        <div id="logging-sidebar-section" className="col-7 col-sm-12">
                                             <Row className="mb-3">
                                                 {!user && (
                                                     <Col className="text-center">
@@ -126,7 +125,9 @@ const GamePage = () => {
                                     </span>
                                 </div>
                                 <div className="col-auto mt-auto pe-0 ps-1">
-                                    <span className="filler-text">by</span>
+                                    <span className="sub-title">
+                                        <span className="filler-text">by</span>
+                                    </span>
                                 </div>
                                 {gameData?.companies.map((company) => (
                                     <div key={company.id} className="col-auto sub-title ps-1 pe-0">
@@ -153,7 +154,7 @@ const GamePage = () => {
                                             <Link to={`/lists/${slug}`}>
                                                 <p className="game-page-sidecard">
                                                     <FontAwesomeIcon icon={faLayerGroup} />
-                                                    {gameData?.listCount} Lists
+                                                    {`${gameData?.listCount} Lists`}
                                                 </p>
                                             </Link>
                                         </div>
@@ -161,7 +162,7 @@ const GamePage = () => {
                                             <Link to={`/reviews/everyone/eternity/recent/${slug}`}>
                                                 <p className="game-page-sidecard">
                                                     <FontAwesomeIcon icon={faAlignRight} />
-                                                    {gameData?.reviewCount} Reviews
+                                                    {`${gameData?.reviewCount} Reviews`}
                                                 </p>
                                             </Link>
                                         </div>
@@ -169,7 +170,7 @@ const GamePage = () => {
                                             <Link to={`/games/${slug}/likes`}>
                                                 <p className="game-page-sidecard">
                                                     <FontAwesomeIcon icon={faHeart} />
-                                                    {gameData?.likeCount} Likes
+                                                    {`${gameData?.likeCount} Likes`}
                                                 </p>
                                             </Link>
                                         </div>
