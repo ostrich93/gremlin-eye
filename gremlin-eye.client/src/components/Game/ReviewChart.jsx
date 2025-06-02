@@ -45,6 +45,7 @@ const ReviewChart = ({ reviewScores }) => {
         }
     };
 
+    console.log("review scores: ", reviewScores);
     return (
         <Row id="rating-bars-height" className="mx-0">
             <Bar data={data} options={options} />
