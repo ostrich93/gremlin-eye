@@ -9,6 +9,7 @@ import apiClient from '../../config/apiClient';
 import './GamePage.css';
 import InteractionSidebar from '../../components/Game/InteractionSidebar';
 import GameStatistics from '../../components/Game/GameStatistics';
+import formatDate from '../../services/formatDate';
 
 const GamePage = () => {
     const { user } = useAuthState();
@@ -34,7 +35,7 @@ const GamePage = () => {
                         coverUrl: res.data.coverUrl,
                         bannerUrl: res.data.bannerUrl,
                         summary: res.data.summary,
-                        date: res.data.date,
+                        date: new Date(res.data.date),
                         platforms: res.data.platforms,
                         companies: res.data.companies,
                         series: res.data.series,
@@ -121,7 +122,7 @@ const GamePage = () => {
                                 <div className="col-auto mt-auto pe-0 ps-1">
                                     <span className="sub-title">
                                         <span className="filler-text">released on </span>
-                                        <Link to={`/games/lib/popular/release_year:${gameData?.date}`}>{gameData?.date}</Link>
+                                        <Link to={`/games/lib/popular/release_year:${gameData && gameData?.date ? gameData?.date?.getUTCFullYear() : 'upcoming'}`}>{formatDate(gameData?.date)}</Link>
                                     </span>
                                 </div>
                                 <div className="col-auto mt-auto pe-0 ps-1">

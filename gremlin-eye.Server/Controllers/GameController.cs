@@ -74,7 +74,15 @@ namespace gremlin_eye.Server.Controllers
             //GameDetailsResponseDTO gameDetails = await _gameService.GetGameDetailsBySlug(slug, userId);
             GameStatsDTO gameStats = await _unitOfWork.GameLogs.GetGameStats(gameDetails.Id);
             gameStats.AverageRating = _unitOfWork.GameLogs.GetReviewAverage(gameDetails.Id);
-            gameStats.RatingCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);
+            RatingCount[] rCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);
+            if (rCounts.Any())
+            {
+                foreach (RatingCount rCount in rCounts)
+                {
+                    gameStats.RatingCounts[rCount.Rating] = rCount.Count;
+                }
+            }
+            //gameStats.RatingCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);
             //GameStatsDTO gameStats = await _logService.GetGameStats(gameDetails.Id);
             gameDetails.Stats = gameStats;
 
