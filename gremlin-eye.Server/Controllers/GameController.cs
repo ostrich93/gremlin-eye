@@ -2,8 +2,10 @@
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
 using gremlin_eye.Server.Enums;
+using LinqKit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.Entity;
 using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -262,6 +264,84 @@ namespace gremlin_eye.Server.Controllers
 
             await _unitOfWork.SaveChangesAsync();
             return Ok(gameLog.Id);
+        }
+
+        [HttpGet("lib")]
+        [AllowAnonymous]
+        public IActionResult GetGameList(
+            [FromQuery] string? releaseYear, [FromQuery] string? genre, [FromQuery] string? category, [FromQuery] string? platform,
+            [FromQuery] int min = 0, [FromQuery] int max = 10,
+            [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
+            [FromQuery] int page = 1)
+        {
+            var predicate = PredicateBuilder.New<GameData>();
+
+            if (releaseYear != null)
+            {
+                switch (releaseYear)
+                {
+                    case Constants.UPCOMING:
+                        predicate = predicate.And(g => g.ReleaseDate == null || g.ReleaseDate > DateTimeOffset.UtcNow);
+                        break;
+                    case Constants.RELEASED:
+                        predicate = predicate.And(g => g.ReleaseDate != null && g.ReleaseDate <= DateTimeOffset.UtcNow);
+                        break;
+                    default:
+                        if (releaseYear.Trim().Length == 0)
+                            break;
+                        int yearStr;
+                        if (int.TryParse(releaseYear, out yearStr))
+                        {
+                            predicate.And(g => g.ReleaseDate.HasValue && g.ReleaseDate.Value.Year == yearStr);
+                        }
+                        break;
+                }
+            }
+            if (genre != null)
+                predicate.And(g => g.Genres.Any(gen => gen.Slug == genre));
+
+            if (category != null)
+                predicate.And(g => g.GameType == category);
+
+            if (platform != null)
+                predicate.And(g => g.Platforms.Any(p => p.Slug == platform));
+
+            predicate.And(g => g.Playthroughs.Any(p => p.Rating >= 2 * min && p.Rating <= 2 * max));
+
+            List<GameData> games;
+            switch (orderBy)
+            {
+                case Constants.ORDER_RELEASE_DATE:
+                    games = sortOrder == Constants.ASC ? _unitOfWork.Context.Games.Where(predicate).OrderBy(g => g.ReleaseDate).ToList() : _unitOfWork.Context.Games.Where(predicate).OrderByDescending(g => g.ReleaseDate).ToList();
+                    break;
+                case Constants.ORDER_GAME_RATING:
+                    games = sortOrder == Constants.ASC ? _unitOfWork.Context.Games.Where(predicate).OrderBy(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).ToList()
+                        : _unitOfWork.Context.Games.Where(predicate).OrderByDescending(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).ToList();
+                    break;
+                case Constants.ORDER_GAME_TITLE:
+                    games = sortOrder == Constants.ASC ? _unitOfWork.Context.Games.Where(predicate).OrderBy(g => g.Slug).ToList() : _unitOfWork.Context.Games.Where(predicate).OrderByDescending(g => g.Slug).ToList();
+                    break;
+                default:
+                    games = sortOrder == Constants.ASC ? _unitOfWork.Context.Games.Where(predicate).OrderBy(g => g.Id).ToList() : _unitOfWork.Context.Games.Where(predicate).OrderByDescending(g => g.Id).ToList();
+                    break;
+            }
+
+            PaginatedList<GameSummaryDTO> paginatedList = new PaginatedList<GameSummaryDTO>();
+            paginatedList.TotalItems = games.Count();
+            games = [.. games.Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A)];
+            foreach (GameData game in games)
+            {
+                paginatedList.Items.Add(new GameSummaryDTO
+                {
+                    Id = game.Id,
+                    Name = game.Name,
+                    Slug = game.Slug,
+                    ReleaseDate = game.ReleaseDate,
+                    CoverUrl = game.CoverUrl
+
+                });
+            }
+            return Ok(paginatedList);
         }
     }
 }

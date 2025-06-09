@@ -7,5 +7,6 @@
         public string Name { get; set; } = default!;
         public string? CoverUrl { get; set; } = string.Empty;
         public DateTimeOffset? ReleaseDate { get; set; }
+        public double? AverageRating { get; set; }
     }
 }

@@ -72,7 +72,7 @@ const NavBar = () => {
                                 </>
                             )}
                             <Nav.Item>
-                                <Nav.Link as={Link} to='/games' className="d-none d-md-block me-2">Games</Nav.Link>
+                                <Nav.Link as={Link} to='/games/lib' className="d-none d-md-block me-2">Games</Nav.Link>
                             </Nav.Item>
                             <NavSearch />
                             {user && (

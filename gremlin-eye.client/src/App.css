@@ -163,6 +163,15 @@ th, td {
     position: absolute;
 }
 
+.game-cover .overlay {
+    background-color: rgba(0,0,0,0.7);
+    height: 100%;
+    opacity: 0;
+    transition: .2s;
+    width: 100%;
+    z-index: 1;
+}
+
 #log-in #title {
     color: #8f9ca7;
     font-size: 3rem;
