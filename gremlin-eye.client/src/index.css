@@ -140,7 +140,92 @@ input {
     position: relative;
     /*width: 100%*/
 }
+.col-cus-3 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%
+}
 
+.col-cus-4 {
+    flex: 0 0 25%;
+    max-width: 25%
+}
+
+.col-cus-5 {
+    flex: 0 0 20%;
+    max-width: 20%
+}
+
+.col-cus-6 {
+    flex: 0 0 16.6666666667%;
+    max-width: 16.6666666667%
+}
+
+.col-cus-7 {
+    flex: 0 0 14.2857142857%;
+    max-width: 14.2857142857%
+}
+
+.col-cus-8 {
+    flex: 0 0 12.5%;
+    max-width: 12.5%
+}
+
+.col-cus-10 {
+    flex: 0 0 10%;
+    max-width: 10%
+}
+
+.col-cus-11 {
+    flex: 0 0 9.0909090909%;
+    max-width: 9.0909090909%
+}
+
+.col-cus-12 {
+    flex: 0 0 8.3333333333%;
+    max-width: 8.3333333333%
+}
+
+.col-cus-13 {
+    flex: 0 0 7.6923076923%;
+    max-width: 7.6923076923%
+}
+
+.col-cus-15 {
+    flex: 0 0 15%;
+    max-width: 15%
+}
+
+.col-cus-23 {
+    flex: 0 0 4.333333%;
+    max-width: 4.333333%
+}
+
+.col-cus-33 {
+    flex: 0 0 3%;
+    max-width: 3%
+}
+
+.col-cus-53 {
+    flex: 0 0 53%;
+    max-width: 53%
+}
+
+@media(min-width:576px) {
+    .col-sm-cus-4 {
+        flex: 0 0 25%;
+        max-width: 25%
+    }
+
+    .col-sm-cus-5 {
+        flex: 0 0 20%;
+        max-width: 20%
+    }
+
+    .col-sm-cus-10 {
+        flex: 0 0 10%;
+        max-width: 10%
+    }
+}
 @media(min-width:768px) {
     .col-md {
         flex-basis: 0;
@@ -242,6 +327,56 @@ input {
     .col-md-12 {
         flex: 0 0 100%;
         max-width: 100%
+    }
+
+    .col-md-cus-3 {
+        flex: 0 0 3%;
+        max-width: 3%
+    }
+
+    .col-md-cus-5 {
+        flex: 0 0 20%;
+        max-width: 20%
+    }
+
+    .col-md-cus-6 {
+        flex: 0 0 16.6666666667%;
+        max-width: 16.6666666667%
+    }
+
+    .col-md-cus-7 {
+        flex: 0 0 14.2857142857%;
+        max-width: 14.2857142857%
+    }
+
+    .col-md-cus-8 {
+        flex: 0 0 12.5%;
+        max-width: 12.5%
+    }
+
+    .col-md-cus-10 {
+        flex: 0 0 10%;
+        max-width: 10%
+    }
+
+    .col-md-cus-12 {
+        flex: 0 0 8.3333333333%;
+        max-width: 8.3333333333%
+    }
+
+    .col-md-cus-20 {
+        flex: 0 0 20%;
+        max-width: 20%
+    }
+
+    .col-md-cus-21 {
+        flex: 0 0 21%;
+        max-width: 21%
+    }
+
+    .col-md-cus-30 {
+        flex: 0 0 30%;
+        max-width: 30%
     }
 
     .order-md-first {

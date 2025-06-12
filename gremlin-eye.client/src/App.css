@@ -163,6 +163,16 @@ th, td {
     position: absolute;
 }
 
+.card-img {
+    border-radius: 0;
+    flex-shrink: 0;
+    z-index: 1;
+}
+.height {
+    width: 100%;
+    height: 100%;
+}
+
 .game-cover .overlay {
     background-color: rgba(0,0,0,0.7);
     height: 100%;
@@ -170,6 +180,44 @@ th, td {
     transition: .2s;
     width: 100%;
     z-index: 1;
+}
+
+.game-cover .cover-link {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 5;
+}
+
+.game-cover .overflow-wrapper {
+    border-radius: 4px;
+    bottom: 0;
+    display: flex;
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.game-text-centered {
+    align-items: center;
+    bottom: 0;
+    color: #fff;
+    display: flex;
+    font-size: .9rem;
+    justify-content: center;
+    line-height: normal;
+    opacity: 0;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    transition: .2s;
+    width: 95%;
+    z-index: 1;
+    overflow: hidden;
 }
 
 #log-in #title {

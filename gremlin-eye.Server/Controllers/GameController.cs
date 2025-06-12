@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.Entity;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -268,9 +269,9 @@ namespace gremlin_eye.Server.Controllers
 
         [HttpGet("lib")]
         [AllowAnonymous]
-        public IActionResult GetGameList(
+        public async Task<IActionResult> GetGameList(
             [FromQuery] string? releaseYear, [FromQuery] string? genre, [FromQuery] string? category, [FromQuery] string? platform,
-            [FromQuery] int min = 0, [FromQuery] int max = 10,
+            [FromQuery] double min = 0, [FromQuery] double max = 10,
             [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
             [FromQuery] int page = 1)
         {
@@ -306,41 +307,9 @@ namespace gremlin_eye.Server.Controllers
             if (platform != null)
                 predicate.And(g => g.Platforms.Any(p => p.Slug == platform));
 
-            predicate.And(g => g.Playthroughs.Any(p => p.Rating >= 2 * min && p.Rating <= 2 * max));
+            predicate.And(g => g.Playthroughs.Any(p => p.Rating >= 2 * min && p.Rating <= 2 * max) || g.Playthroughs.Count == 0);
 
-            List<GameData> games;
-            switch (orderBy)
-            {
-                case Constants.ORDER_RELEASE_DATE:
-                    games = sortOrder == Constants.ASC ? _unitOfWork.Context.Games.Where(predicate).OrderBy(g => g.ReleaseDate).ToList() : _unitOfWork.Context.Games.Where(predicate).OrderByDescending(g => g.ReleaseDate).ToList();
-                    break;
-                case Constants.ORDER_GAME_RATING:
-                    games = sortOrder == Constants.ASC ? _unitOfWork.Context.Games.Where(predicate).OrderBy(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).ToList()
-                        : _unitOfWork.Context.Games.Where(predicate).OrderByDescending(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).ToList();
-                    break;
-                case Constants.ORDER_GAME_TITLE:
-                    games = sortOrder == Constants.ASC ? _unitOfWork.Context.Games.Where(predicate).OrderBy(g => g.Slug).ToList() : _unitOfWork.Context.Games.Where(predicate).OrderByDescending(g => g.Slug).ToList();
-                    break;
-                default:
-                    games = sortOrder == Constants.ASC ? _unitOfWork.Context.Games.Where(predicate).OrderBy(g => g.Id).ToList() : _unitOfWork.Context.Games.Where(predicate).OrderByDescending(g => g.Id).ToList();
-                    break;
-            }
-
-            PaginatedList<GameSummaryDTO> paginatedList = new PaginatedList<GameSummaryDTO>();
-            paginatedList.TotalItems = games.Count();
-            games = [.. games.Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A)];
-            foreach (GameData game in games)
-            {
-                paginatedList.Items.Add(new GameSummaryDTO
-                {
-                    Id = game.Id,
-                    Name = game.Name,
-                    Slug = game.Slug,
-                    ReleaseDate = game.ReleaseDate,
-                    CoverUrl = game.CoverUrl
-
-                });
-            }
+            var paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, orderBy, sortOrder, page);
             return Ok(paginatedList);
         }
     }

@@ -1,6 +1,9 @@
 ﻿using gremlin_eye.Server.Data;
+using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace gremlin_eye.Server.Repositories
 {
@@ -109,6 +112,46 @@ namespace gremlin_eye.Server.Repositories
             }
 
             return relatedGames;
+        }
+
+        public async Task<PaginatedList<GameSummaryDTO>> GetPaginatedList(ExpressionStarter<GameData> predicate, string orderBy, string sortOrder, int page = 1 )
+        {
+            var totalItems = await _context.Games.AsNoTracking().CountAsync(predicate);
+
+            List<GameData> games;
+            switch (orderBy)
+            {
+                case Constants.ORDER_RELEASE_DATE:
+                    games = sortOrder == Constants.ASC ? await _context.Games.AsNoTracking().Where(predicate).OrderBy(g => g.ReleaseDate).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await _context.Games.AsNoTracking().Where(predicate).OrderByDescending(g => g.ReleaseDate).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
+                    break;
+                case Constants.ORDER_GAME_RATING:
+                    games = sortOrder == Constants.ASC ? await _context.Games.AsNoTracking().Where(predicate).OrderBy(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync()
+                        : await _context.Games.AsNoTracking().Where(predicate).OrderByDescending(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
+                    break;
+                case Constants.ORDER_GAME_TITLE:
+                    games = sortOrder == Constants.ASC ? await _context.Games.AsNoTracking().Where(predicate).OrderBy(g => g.Slug).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await _context.Games.AsNoTracking().Where(predicate).OrderByDescending(g => g.Slug).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
+                    break;
+                default:
+                    games = sortOrder == Constants.ASC ? await _context.Games.AsNoTracking().Where(predicate).OrderBy(g => g.Id).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await _context.Games.AsNoTracking().Where(predicate).OrderByDescending(g => g.Id).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
+                    break;
+            }
+
+            PaginatedList<GameSummaryDTO> paginatedList = new PaginatedList<GameSummaryDTO>
+            {
+                Items = games.Select(g => new GameSummaryDTO
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    Slug = g.Slug,
+                    ReleaseDate = g.ReleaseDate,
+                    CoverUrl = g.CoverUrl
+                }).ToList(),
+                TotalItems = totalItems,
+                PageNumber = page,
+                PageLimit = Constants.PAGE_LIMIT_A
+            };
+
+            return paginatedList;
         }
     }
 }

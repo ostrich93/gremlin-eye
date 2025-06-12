@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Button, Col, Container, Pagination, Row } from 'react-bootstrap';
+import { Button, Col, Container, Pagination, Row, Spinner } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 //import { faTimesCircle, faSort } from '@fortawesome/free-solid-svg-icons';
@@ -11,9 +11,9 @@ import apiClient from '../../config/apiClient';
 //import useGetGamesForLibrary from '../../hooks/queries/getGames';
 
 const GameLibrary = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [params, setSearchParams] = useSearchParams();
     //const [totalCount, setTotalCount] = useState(0);
-    const [page, setPage] = useState(searchParams.get('page') || 1);
+    const [page, setPage] = useState(parseInt(params.get('page')) || 1);
     const [showFilters, setShowFilters] = useState(false);
 
     const itemsPerPage = 60;
@@ -36,20 +36,21 @@ const GameLibrary = () => {
         }
     ];
 
-    const currentYear = searchParams.get('releaseYear');
-    const currentGenre = searchParams.get('genre');
-    const currentPlatform = searchParams.get('platform');
-    const min = parseInt(searchParams.get('min')) || 0;
-    const max = searchParams.get('max') || 5;
-    const orderBy = searchParams.get('orderBy') || 'trending';
-    const sortOrder = searchParams.get('sortOrder') || 'desc';
-    
-    const { data } = useQuery({
+    const currentYear = params.get('releaseYear');
+    const currentGenre = params.get('genre');
+    const currentPlatform = params.get('platform');
+    const min = parseInt(params.get('min')) || 0;
+    const max = parseInt(params.get('max')) || 5;
+    const orderBy = params.get('orderBy') || 'trending';
+    const sortOrder = params.get('sortOrder') || 'desc';
+
+    const { data, isLoading } = useQuery({
         retry: true,
-        queryKey: ["games", "search", page],
+        queryKey: ["games", ...params],
         queryFn: async () => {
             try {
-                const response = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/games/lib`, searchParams);
+                //console.log(params);
+                const response = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/games/lib`, {params});
                 return response.data;
             } catch (error) {
                 console.error(error);
@@ -58,16 +59,25 @@ const GameLibrary = () => {
             }
         },
         placeholderData: keepPreviousData,
-        cacheTime: 1000 * 60 * 5
+        cacheTime: 1000 * 60 * 5,
+        staleTime: 1000
     });
 
     const updateQueryParameters = useCallback((params) => {
         const updatedParams = new URLSearchParams(location.search);
         params.forEach(item => {
-            updatedParams.set(item.params, item.value)
+            if (item.value == null) {
+                updatedParams.delete(item.params);
+            }
+            else {
+                updatedParams.set(item.params, item.value);
+                if (item.params === "page") {
+                    setPage(item.value);
+                }
+            }
         });
         setSearchParams(updatedParams);
-    }, [setSearchParams]);
+    }, [setSearchParams, setPage]);
 
     const deleteQueryParameter = (param) => {
         const updatedParams = new URLSearchParams(location.search);
@@ -89,7 +99,7 @@ const GameLibrary = () => {
 
     const handleShow = () => setShowFilters(true);
     const handleClose = () => setShowFilters(false);
-    
+
     return (
         <Container>
             <FilterSidebar show={showFilters} onHide={handleClose} update={updateQueryParameters} clear={clearQueryParameters} releaseYear={currentYear} genre={currentGenre} platform={currentPlatform} min={min} max={max} />
@@ -109,36 +119,38 @@ const GameLibrary = () => {
                 <Sorting orderOptions={orderOptions} sortOrder={sortOrder} orderBy={orderBy} update={updateQueryParameters} />
             </Row>
             <Row className="mx-n1">
-                {data?.items.map((game) =>{
+                {isLoading && (<Spinner animation="border" />) }
+                {data?.items.map((game) => {
+                    return (
                     <GameCard key={game.id} id={game.id} game={game} />
-                })}
+                    )})}
             </Row>
             <Row className="mx-0 mt-2">
                 <Pagination>
                     <Pagination.Prev disabled={page <= 1} onClick={() => updateQueryParameters([{ params: "page", value: page - 1 }])} />
-                    <Pagination.Item active={page === 1} onClick={() => updateQueryParameters([{ params: "page", value: 1 }])}>1</Pagination.Item>
+                    {page > 1 && (<Pagination.Item onClick={() => updateQueryParameters([{ params: "page", value: 1 }])}>1</Pagination.Item>)}
                     {page - 3 > 1 && (
                         <Pagination.Ellipsis />
                     )}
                     {page > 2 && (
                         Array.from({ length: page - Math.max(page - 3, 2) }, (v, idx) => (
-                            <Pagination.Item key={Math.max(page - 3, 2) + idx} active={(Math.max(page - 3, 2) + idx) === page}>{Math.max(page - 3, 2) + idx}</Pagination.Item>
+                            <Pagination.Item key={Math.max(page - 3, 2) + idx} onClick={() => updateQueryParameters([{ params: "page", value: Math.max(page - 3, 2) + idx }])}>{Math.max(page - 3, 2) + idx}</Pagination.Item>
                         )))
                     }
                     {page < Math.ceil(data?.totalItems / itemsPerPage) && (
                         Array.from({ length: Math.min(page + 3, Math.ceil(data?.totalItems / itemsPerPage)) - page }, (v, idx) => (
-                            <Pagination.Item key={page + idx} active={idx === 0}>{page + idx}</Pagination.Item>
+                            <Pagination.Item key={page + idx + 1} active={idx === 0} onClick={() => updateQueryParameters([{ params: "page", value: page + idx }])}>{page + idx}</Pagination.Item>
                         )))
                     }
                     {page < Math.ceil(data?.totalItems / itemsPerPage) - 3 && (
                         <Pagination.Ellipsis />
                     )}
                     <Pagination.Item active={page === Math.ceil(data?.totalItems / itemsPerPage)} onClick={() => updateQueryParameters([{ params: "page", value: Math.ceil(data?.totalItems / itemsPerPage) }])}>{Math.ceil(data?.totalItems / itemsPerPage)}</Pagination.Item>
-                    <Pagination.Next disabled={page === Math.ceil(data?.totalItems / itemsPerPage)} onClick={() => updateQueryParameters([{params: "page", value: page + 1}])} />
+                    <Pagination.Next disabled={page === Math.ceil(data?.totalItems / itemsPerPage)} onClick={() => updateQueryParameters([{ params: "page", value: page + 1 }])} />
                 </Pagination>
             </Row>
         </Container>
     );
-}
+};
 
 export default GameLibrary;

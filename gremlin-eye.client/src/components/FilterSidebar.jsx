@@ -25,7 +25,7 @@ export default function FilterSidebar({ show, onHide, update, clear, releaseYear
                 queryFn: async () => {
                     try {
                         const response = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/genre`);
-                        await response.data;
+                        return response.data;
                     } catch (error) {
                         console.error(error);
                         //import data
@@ -40,7 +40,7 @@ export default function FilterSidebar({ show, onHide, update, clear, releaseYear
                 queryFn: async () => {
                     try {
                         const response = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/platform`);
-                        await response.data;
+                        return response.data;
                     } catch (error) {
                         console.error(error);
                         //import data
@@ -64,6 +64,8 @@ export default function FilterSidebar({ show, onHide, update, clear, releaseYear
             { params: "releaseYear", value: currentReleaseDate },
             { params: "genre", value: currentGenre },
             { params: "platform", value: currentPlatform },
+            { params: "min", value: ratingMin },
+            { params: "max", value: ratingMax },
             { params: "page", value: 1 }
         ]);
     }
