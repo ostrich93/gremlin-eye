@@ -26,7 +26,7 @@ namespace gremlin_eye.Server.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetCompanyDetails (string slug,
             [FromQuery] string? releaseYear, [FromQuery] string? genre, [FromQuery] string? category, [FromQuery] string? platform,
-            [FromQuery] int min = 0, [FromQuery] int max = 10,
+            [FromQuery] double min = 0, [FromQuery] double max = 10,
             [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
             [FromQuery] int page = 1)
         {
@@ -35,10 +35,6 @@ namespace gremlin_eye.Server.Controllers
                 return NotFound();
 
             var query = company.Games.AsQueryable();
-
-            PaginatedList<GameSummaryDTO> paginatedList = new PaginatedList<GameSummaryDTO>();
-            paginatedList.PageNumber = page;
-            paginatedList.PageLimit = Constants.PAGE_LIMIT_A;
 
             var predicate = PredicateBuilder.New<GameData>();
 
@@ -75,37 +71,38 @@ namespace gremlin_eye.Server.Controllers
             predicate.And(g => g.Playthroughs.Any(p => p.Rating >= min && p.Rating <= max));
 
             List<GameData> games;
+            int totalItems = company.Games.Count(predicate);
             switch (orderBy)
             {
                 case Constants.ORDER_RELEASE_DATE:
-                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.ReleaseDate).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.ReleaseDate).ToListAsync();
+                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.ReleaseDate).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.ReleaseDate).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
                     break;
                 case Constants.ORDER_GAME_RATING:
-                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).ToListAsync()
-                        : await query.Where(predicate).OrderByDescending(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).ToListAsync();
+                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync()
+                        : await query.Where(predicate).OrderByDescending(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
                     break;
                 case Constants.ORDER_GAME_TITLE:
-                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Slug).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.Slug).ToListAsync();
+                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Slug).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.Slug).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
                     break;
                 default:
-                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Id).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.Id).ToListAsync();
+                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Id).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.Id).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
                     break;
             }
 
-            paginatedList.TotalItems = query.Where(predicate).Count();
-            games = [.. games.Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A)];
-            foreach (GameData game in games)
+            PaginatedList<GameSummaryDTO> paginatedList = new PaginatedList<GameSummaryDTO>
             {
-                paginatedList.Items.Add(new GameSummaryDTO
+                TotalItems = totalItems,
+                Items = games.Select(g => new GameSummaryDTO
                 {
-                    Id = game.Id,
-                    Name = game.Name,
-                    Slug = game.Slug,
-                    ReleaseDate = game.ReleaseDate,
-                    CoverUrl = game.CoverUrl
-                    
-                }); //efficient way of getting average rating needed
-            }
+                    Id = g.Id,
+                    Name = g.Name,
+                    Slug = g.Slug,
+                    ReleaseDate = g.ReleaseDate,
+                    CoverUrl = g.CoverUrl
+                }).ToList(),
+                PageNumber = page,
+                PageLimit = Constants.PAGE_LIMIT_A
+            };
 
             return Ok(new CompanyDTO
             {

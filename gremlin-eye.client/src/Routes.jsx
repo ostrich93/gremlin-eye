@@ -12,6 +12,7 @@ import SyncPlatforms from './pages/admin/SyncPlatforms';
 import SyncSeries from './pages/admin/SyncSeries';
 import UserRole from './enums/Role';
 import GameLibrary from './pages/game/GameLibrary';
+import CompanyPage from './pages/CompanyPage';
 
 const AppRoutes = () => {
     return (
@@ -29,11 +30,11 @@ const AppRoutes = () => {
             <Route path="admin/syncSeries" element={<AdminRoute><SyncSeries /></AdminRoute>} />
 
             <Route path="/games/:slug" element={<GamePage />} />
-            {<Route path="/games/lib" element={<GameLibrary />} />
+            <Route path="/games/lib" element={<GameLibrary />} />
 
-            /*<Route path="/company/:slug" element={<CompanyPage />} />
+            <Route path="/company/:slug" element={<CompanyPage />} />
 
-            <Route path="/series/:slug" element={<SeriesPage />} />*/}
+            {/*<Route path="/series/:slug" element={<SeriesPage />} />*/}
         </Routes>
     );
 };
