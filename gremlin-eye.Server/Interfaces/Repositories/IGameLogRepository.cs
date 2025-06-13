@@ -16,7 +16,7 @@ namespace gremlin_eye.Server.Repositories
         void Create(GameLog gameLog);
         Task<GameStatsDTO> GetGameStats(long gameId);
         GameLog GetGameLog(long gameLogId);
-        int[] GetReviewCounts(long gameId);
+        RatingCount[] GetReviewCounts(long gameId);
         double GetReviewAverage(long gameId);
         //Task<GameLog> CreateGameLog(GameLog gameLog);
         //Task<GameLog> UpdateGameLog(GameLog gameLog);

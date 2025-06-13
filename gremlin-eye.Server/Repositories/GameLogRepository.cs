@@ -74,10 +74,15 @@ namespace gremlin_eye.Server.Repositories
             }
         }
 
-        public int[] GetReviewCounts(long gameId)
+        public RatingCount[] GetReviewCounts(long gameId)
         {
             return _context.Playthroughs.Where(p => p.GameId == gameId && p.Rating > 0)
-                .GroupBy(p => p.Rating).Select(g => g.Count()).ToArray();
+                .GroupBy(p => p.Rating).Select(g => 
+                    new RatingCount { 
+                        Rating = g.Key,
+                        Count = g.Count()
+                    })
+                .ToArray();
         }
 
         public double GetReviewAverage(long gameId)

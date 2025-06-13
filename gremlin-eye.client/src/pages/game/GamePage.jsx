@@ -2,25 +2,19 @@ import { Card, Container, Col, Row, Spinner } from 'react-bootstrap';
 import { faAlignRight, faHeart, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useAuthState } from "../../contexts/AuthProvider";
 import apiClient from '../../config/apiClient';
 import './GamePage.css';
 import InteractionSidebar from '../../components/Game/InteractionSidebar';
 import GameStatistics from '../../components/Game/GameStatistics';
+import formatDate from '../../services/formatDate';
 
 const GamePage = () => {
     const { user } = useAuthState();
     const { slug } = useParams();
     const [gameData, setGameData] = useState(null);
-    /*const [gameStats, setStats] = useState(null);
-    const [gameId, setGameId] = useState(-1);
-    const [playLog, setPlayLog] = useState(null);*/
     const [loading, setLoading] = useState(false);
-    //const [rating, setRating] = useState(0);
-    /*const [liked, setLike] = useState(false);
-    const [coverUrl, setCover] = useState(null);*/
 
     useEffect(() => {
         const fetchGame = async () => {
@@ -34,7 +28,7 @@ const GamePage = () => {
                         coverUrl: res.data.coverUrl,
                         bannerUrl: res.data.bannerUrl,
                         summary: res.data.summary,
-                        date: res.data.date,
+                        date: new Date(res.data.date),
                         platforms: res.data.platforms,
                         companies: res.data.companies,
                         series: res.data.series,
@@ -87,6 +81,7 @@ const GamePage = () => {
                                     <Card className="mx-auto game-cover">
                                         <Card.Img src={gameData?.coverUrl} loading='lazy' />
                                     </Card>
+                                    <div className="overlay"></div>
                                 </Col>
                                 <Col className="col-sm-12 mt-3 mt-sm-5">
                                     <Row>
@@ -121,7 +116,7 @@ const GamePage = () => {
                                 <div className="col-auto mt-auto pe-0 ps-1">
                                     <span className="sub-title">
                                         <span className="filler-text">released on </span>
-                                        <Link to={`/games/lib/popular/release_year:${gameData?.date}`}>{gameData?.date}</Link>
+                                        <Link to={`/games/lib/popular?release_year=${gameData && gameData?.date ? gameData?.date?.getUTCFullYear() : 'upcoming'}`}>{formatDate(gameData?.date)}</Link>
                                     </span>
                                 </div>
                                 <div className="col-auto mt-auto pe-0 ps-1">

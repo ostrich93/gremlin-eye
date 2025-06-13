@@ -2,6 +2,7 @@
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
 using gremlin_eye.Server.Enums;
+using LinqKit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -74,7 +75,15 @@ namespace gremlin_eye.Server.Controllers
             //GameDetailsResponseDTO gameDetails = await _gameService.GetGameDetailsBySlug(slug, userId);
             GameStatsDTO gameStats = await _unitOfWork.GameLogs.GetGameStats(gameDetails.Id);
             gameStats.AverageRating = _unitOfWork.GameLogs.GetReviewAverage(gameDetails.Id);
-            gameStats.RatingCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);
+            RatingCount[] rCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);
+            if (rCounts.Any())
+            {
+                foreach (RatingCount rCount in rCounts)
+                {
+                    gameStats.RatingCounts[rCount.Rating] = rCount.Count;
+                }
+            }
+            //gameStats.RatingCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);
             //GameStatsDTO gameStats = await _logService.GetGameStats(gameDetails.Id);
             gameDetails.Stats = gameStats;
 
@@ -254,6 +263,52 @@ namespace gremlin_eye.Server.Controllers
 
             await _unitOfWork.SaveChangesAsync();
             return Ok(gameLog.Id);
+        }
+
+        [HttpGet("lib")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetGameList(
+            [FromQuery] string? releaseYear, [FromQuery] string? genre, [FromQuery] string? category, [FromQuery] string? platform,
+            [FromQuery] double min = 0, [FromQuery] double max = 10,
+            [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
+            [FromQuery] int page = 1)
+        {
+            var predicate = PredicateBuilder.New<GameData>();
+
+            if (releaseYear != null)
+            {
+                switch (releaseYear)
+                {
+                    case Constants.UPCOMING:
+                        predicate = predicate.And(g => g.ReleaseDate == null || g.ReleaseDate > DateTimeOffset.UtcNow);
+                        break;
+                    case Constants.RELEASED:
+                        predicate = predicate.And(g => g.ReleaseDate != null && g.ReleaseDate <= DateTimeOffset.UtcNow);
+                        break;
+                    default:
+                        if (releaseYear.Trim().Length == 0)
+                            break;
+                        int yearStr;
+                        if (int.TryParse(releaseYear, out yearStr))
+                        {
+                            predicate.And(g => g.ReleaseDate.HasValue && g.ReleaseDate.Value.Year == yearStr);
+                        }
+                        break;
+                }
+            }
+            if (genre != null)
+                predicate.And(g => g.Genres.Any(gen => gen.Slug == genre));
+
+            if (category != null)
+                predicate.And(g => g.GameType == category);
+
+            if (platform != null)
+                predicate.And(g => g.Platforms.Any(p => p.Slug == platform));
+
+            predicate.And(g => g.Playthroughs.Any(p => p.Rating >= 2 * min && p.Rating <= 2 * max) || g.Playthroughs.Count == 0);
+
+            var paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, orderBy, sortOrder, page);
+            return Ok(paginatedList);
         }
     }
 }

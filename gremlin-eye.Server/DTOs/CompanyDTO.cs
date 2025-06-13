@@ -7,6 +7,6 @@
         public string Slug { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
 
-        public ICollection<GameSummaryDTO>? Published { get; set; } //nullable list of games published
+        public PaginatedList<GameSummaryDTO>? Published { get; set; } //nullable list of games published
     }
 }

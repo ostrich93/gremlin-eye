@@ -279,7 +279,7 @@ const InteractionSidebar = ({ slug }) => {
                                         Add to Lists
                                     </Button>
                                 </Col>
-                                <Col className="auto ps-1">
+                                <div className="col-auto ps-1">
                                     <ButtonGroup>
                                         <ToggleButton
                                             className="like-game-btn px-0"
@@ -292,7 +292,7 @@ const InteractionSidebar = ({ slug }) => {
                                             <FontAwesomeIcon icon={faHeart} />
                                         </ToggleButton>
                                     </ButtonGroup>
-                                </Col>
+                                </div>
                             </Row>
                         </>
                     )}
