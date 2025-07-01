@@ -13,7 +13,8 @@ namespace gremlin_eye.Server.Repositories
         }
         public async Task<int> GetGameReviewCount(long gameId)
         {
-            return await _context.Reviews.CountAsync(r => r.GameId == gameId);
+            return await _context.GameLogs.Where(g => g.GameId == gameId).Include(g => g.Playthroughs.Where(p => p.Review != null)).CountAsync();
+            //return await _context.Reviews.CountAsync(r => r.GameId == gameId);
         }
     }
 }

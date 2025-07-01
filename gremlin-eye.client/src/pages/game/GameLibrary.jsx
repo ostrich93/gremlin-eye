@@ -29,10 +29,6 @@ const GameLibrary = () => {
         {
             type: "release_date",
             name: "Release Date"
-        },
-        {
-            type: "game_rating",
-            name: "Game Rating"
         }
     ];
 

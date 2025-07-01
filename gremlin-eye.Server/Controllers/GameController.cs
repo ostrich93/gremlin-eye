@@ -179,7 +179,6 @@ namespace gremlin_eye.Server.Controllers
                     UserId = userId,
                     User = user,
                     GameId = id,
-                    Game = game,
                     IsPlayed = true,
                     PlayStatus = PlayState.Played
                 };
@@ -213,9 +212,6 @@ namespace gremlin_eye.Server.Controllers
             if (user == null)
                 return NotFound("User not found");
 
-            var game = await _unitOfWork.Games.GetGameById(gameLogState.GameId);
-            if (game == null)
-                return NotFound("Game not found");
 
             var gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(gameLogState.GameId, (Guid)userId);
 
@@ -235,7 +231,6 @@ namespace gremlin_eye.Server.Controllers
                 {
                     User = user,
                     UserId = (Guid)userId,
-                    Game = game,
                     GameId = gameLogState.GameId,
                     PlayStatus = gameLogState.PlayStatus,
                     IsPlayed = gameLogState.IsPlayed,
@@ -251,8 +246,7 @@ namespace gremlin_eye.Server.Controllers
                     await _unitOfWork.SaveChangesAsync();
                     Playthrough playthrough = new Playthrough
                     {
-                        Game = game,
-                        GameId = game.Id,
+                        GameId = gameLog.GameId,
                         GameLog = gameLog,
                         GameLogId = gameLog.Id,
                         Rating = (int)gameLogState.Rating
@@ -269,7 +263,7 @@ namespace gremlin_eye.Server.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetGameList(
             [FromQuery] string? releaseYear, [FromQuery] string? genre, [FromQuery] string? category, [FromQuery] string? platform,
-            [FromQuery] double min = 0, [FromQuery] double max = 10,
+            [FromQuery] double min = 0, [FromQuery] double max = 5,
             [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
             [FromQuery] int page = 1)
         {
@@ -306,7 +300,7 @@ namespace gremlin_eye.Server.Controllers
                 predicate.And(g => g.Platforms.Any(p => p.Slug == platform));
 
             predicate.And(g => g.Playthroughs.Any(p => p.Rating >= 2 * min && p.Rating <= 2 * max) || g.Playthroughs.Count == 0);
-
+            
             var paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, orderBy, sortOrder, page);
             return Ok(paginatedList);
         }

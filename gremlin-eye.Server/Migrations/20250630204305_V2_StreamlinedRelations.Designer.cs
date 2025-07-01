@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using gremlin_eye.Server.Data;
 
@@ -11,9 +12,11 @@ using gremlin_eye.Server.Data;
 namespace gremlin_eye.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250630204305_V2_StreamlinedRelations")]
+    partial class V2_StreamlinedRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -568,10 +571,6 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
-                    b.Property<long>("GameId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("game_id");
-
                     b.Property<long>("GameLogId")
                         .HasColumnType("bigint")
                         .HasColumnName("game_log_id");
@@ -618,8 +617,6 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GameId");
 
                     b.HasIndex("GameLogId");
 
@@ -974,12 +971,6 @@ namespace gremlin_eye.Server.Migrations
 
             modelBuilder.Entity("gremlin_eye.Server.Entity.Playthrough", b =>
                 {
-                    b.HasOne("gremlin_eye.Server.Entity.GameData", "Game")
-                        .WithMany("Playthroughs")
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("gremlin_eye.Server.Entity.GameLog", "GameLog")
                         .WithMany("Playthroughs")
                         .HasForeignKey("GameLogId")
@@ -989,8 +980,6 @@ namespace gremlin_eye.Server.Migrations
                     b.HasOne("gremlin_eye.Server.Entity.PlatformData", "Platform")
                         .WithMany("Playthroughs")
                         .HasForeignKey("PlatformId");
-
-                    b.Navigation("Game");
 
                     b.Navigation("GameLog");
 
@@ -1093,8 +1082,6 @@ namespace gremlin_eye.Server.Migrations
                     b.Navigation("Likes");
 
                     b.Navigation("ListEntries");
-
-                    b.Navigation("Playthroughs");
                 });
 
             modelBuilder.Entity("gremlin_eye.Server.Entity.GameLog", b =>

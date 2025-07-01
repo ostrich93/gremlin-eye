@@ -13,6 +13,7 @@ import SyncSeries from './pages/admin/SyncSeries';
 import UserRole from './enums/Role';
 import GameLibrary from './pages/game/GameLibrary';
 import CompanyPage from './pages/CompanyPage';
+import UserLayout from './layouts/User/UserLayout';
 
 const AppRoutes = () => {
     return (
@@ -33,6 +34,10 @@ const AppRoutes = () => {
             <Route path="/games/lib" element={<GameLibrary />} />
 
             <Route path="/company/:slug" element={<CompanyPage />} />
+
+            <Route path="/user/:slug" element={<UserLayout />}>
+                
+            </Route>
 
             {/*<Route path="/series/:slug" element={<SeriesPage />} />*/}
         </Routes>

@@ -152,5 +152,37 @@ namespace gremlin_eye.Server.Repositories
 
             return paginatedList;
         }
+
+        public async Task<PaginatedList<GameSummaryDTO>> GetPaginatedList(IQueryable<GameData> query, ExpressionStarter<GameData> predicate, string orderBy, string sortOrder, int totalItems, double min, double max, int page = 1)
+        {
+            List<GameData> games;
+            switch (orderBy)
+            {
+                case Constants.ORDER_RELEASE_DATE:
+                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.ReleaseDate).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.ReleaseDate).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
+                    break;
+                case Constants.ORDER_GAME_TITLE:
+                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Slug).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.Slug).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
+                    break;
+                default:
+                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Id).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.Id).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
+                    break;
+            }
+
+            return new PaginatedList<GameSummaryDTO>
+            {
+                TotalItems = totalItems,
+                Items = games.Select(g => new GameSummaryDTO
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    Slug = g.Slug,
+                    ReleaseDate = g.ReleaseDate,
+                    CoverUrl = g.CoverUrl
+                }).ToList(),
+                PageNumber = page,
+                PageLimit = Constants.PAGE_LIMIT_A
+            };
+        }
     }
 }

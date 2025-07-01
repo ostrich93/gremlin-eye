@@ -76,7 +76,8 @@ namespace gremlin_eye.Server.Repositories
 
         public RatingCount[] GetReviewCounts(long gameId)
         {
-            return _context.Playthroughs.Where(p => p.GameId == gameId && p.Rating > 0)
+            var candidates = _context.GameLogs.Where(g => g.GameId == gameId).SelectMany(g => g.Playthroughs);
+            return candidates.Where(p => p.Rating > 0)
                 .GroupBy(p => p.Rating).Select(g => 
                     new RatingCount { 
                         Rating = g.Key,
@@ -87,7 +88,8 @@ namespace gremlin_eye.Server.Repositories
 
         public double GetReviewAverage(long gameId)
         {
-            return _context.Playthroughs.Where(p => p.GameId == gameId && p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average();
+            return _context.GameLogs.Where(g => g.GameId == gameId).SelectMany(p => p.Playthroughs).Select(p => p.Rating).DefaultIfEmpty().Average();
+            //return _context.Playthroughs.Where(p => p.GameId == gameId && p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average();
         }
 
         public GameLog GetGameLog(long gameLogId)
@@ -104,5 +106,11 @@ namespace gremlin_eye.Server.Repositories
         {
             return await _context.Games.Where(g => g.Slug == slug).SelectMany(g => g.GameLogs).Where(l => l.UserId == userId).Include(l => l.Playthroughs).FirstOrDefaultAsync();
         }
+
+        public void UpdateGameLog(GameLog gameLog)
+        {
+            _context.GameLogs.Update(gameLog);
+        }
+
     }
 }

@@ -1,18 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, ButtonGroup, Col, Container, Modal, Row, Spinner, ToggleButton } from 'react-bootstrap';
+import { Button, ButtonGroup, Col, Row, Spinner, ToggleButton } from 'react-bootstrap';
+import ReactModal from 'react-modal';
 //import { Link } from 'react-router-dom';
 import Rate from 'rc-rate';
 import "rc-rate/assets/index.css";
-import { faBook, faGamepad, faGift, faHeart, faLayerGroup, faPlay, faSquare } from '@fortawesome/free-solid-svg-icons';
+import { faBook, faGamepad, faGift, faHeart, faLayerGroup, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuthState } from '../../contexts/AuthProvider';
+import { useJournalDispatch, useJournalState } from '../../contexts/JournalProvider';
 import apiClient from '../../config/apiClient';
+import JournalModalContent from './JournalModal';
+import PlayStatusModalContent from './PlayStatusModal';
 
 const playStateColors = ['#ea377a', 'green', 'blue', 'orange', 'red'];
 const defaultPlayedStateColor = 'gray';
 
 //InteractionSidebar contains GameRatings component and 
 const InteractionSidebar = ({ slug }) => {
+
     const [logId, setLogId] = useState(-1);
     const [gameId, setGameId] = useState(-1);
     const [rating, setRating] = useState(0);
@@ -23,12 +28,18 @@ const InteractionSidebar = ({ slug }) => {
     const [wishlist, setWishlist] = useState(false);
     const [liked, setLike] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [playthroughs, setPlaythroughs] = useState([]);
 
     const [showPlayStatusModal, setShowPlayStatusModal] = useState(false);
+    //const [showJournalModal, setShowJournalModal] = useState(false);
 
     const { user } = useAuthState();
+    const { showJournalModal } = useJournalState();
+    const dispatch = useJournalDispatch();
 
     const starCountRef = useRef(null);
+
+    //include JournalModal here
 
     useEffect(() => {
         const fetchGameLog = async () => {
@@ -38,12 +49,13 @@ const InteractionSidebar = ({ slug }) => {
                     if (res.data) {
                         setLogId(res.data.logId);
                         setGameId(res.data.gameId);
-                        setRating(res.data.rating ? res.data.rating/2 : 0);
+                        setRating(res.data.rating ? res.data.rating / 2 : 0);
                         setPlayStatus(res.data.playStatus);
                         setPlayed(res.data.isPlayed);
                         setPlaying(res.data.isPlaying);
                         setBacklog(res.data.isBacklog);
                         setWishlist(res.data.isWishList);
+                        setPlaythroughs(res.data.playthroughs)
                     }
                     setLoading(false);
                 })
@@ -60,6 +72,7 @@ const InteractionSidebar = ({ slug }) => {
 
     const togglePlayed = (e) => {
         e.preventDefault();
+        console.log("gameId: ", gameId);
         apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/api/logs`, { type: 0, gameId: gameId })
             .then((res) => {
                 if (res.data) {
@@ -144,7 +157,8 @@ const InteractionSidebar = ({ slug }) => {
         }
     };
 
-    const handleClosePlayedModal = () => setShowPlayStatusModal(false);
+    const handleClosePlayStatusModal = () => setShowPlayStatusModal(false);
+    const handleCloseJournalModal = () => dispatch({ type: "CLOSE_JOURNAL_MODAL" });
 
     const handleRating = (rateValue) => {
         apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/api/games/rate/${gameId}`, { rating: 2 * rateValue })
@@ -164,54 +178,23 @@ const InteractionSidebar = ({ slug }) => {
             });
     };
 
+    const handleOpenJournal = () => dispatch({ type: "OPEN_JOURNAL_MODAL", payload: { gameId: gameId } });
+
     return (
         <>
-            <Modal show={showPlayStatusModal} onHide={handleClosePlayedModal} centered>
-                <Modal.Header>
-                    <Modal.Title>
-                        <h5>Set your played status</h5>
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body as={Container} fluid>
-                    <Row id="played" onClick={(e) => handleStatusChange(e, 0)}>
-                        <Col className="col-12 my-auto">
-                            <h3 className="mb-0"><FontAwesomeIcon icon={faSquare} color='#ea377a' /> Played</h3>
-                            <p className="subtitle-text mb-0">You have played this game with no specifics.</p>
-                        </Col>
-                    </Row>
-                    <Row id="playing" onClick={(e) => handleStatusChange(e, 1)}>
-                        <Col className="col-12 my-auto">
-                            <h3 className="mb-0"><FontAwesomeIcon icon={faSquare} color='green' /> Completed</h3>
-                            <p className="subtitle-text mb-0">You have beaten the game.</p>
-                        </Col>
-                    </Row>
-                    <Row id="playing" onClick={(e) => handleStatusChange(e, 2)}>
-                        <Col className="col-12 my-auto">
-                            <h3 className="mb-0"><FontAwesomeIcon icon={faSquare} color='blue' /> Retired</h3>
-                            <p className="subtitle-text mb-0">You are finished with a game that lacks an ending (like e-sports titles).</p>
-                        </Col>
-                    </Row>
-                    <Row id="playing" onClick={(e) => handleStatusChange(e, 3)}>
-                        <Col className="col-12 my-auto">
-                            <h3 className="mb-0"><FontAwesomeIcon icon={faSquare} color='orange' /> Shelved</h3>
-                            <p className="subtitle-text mb-0">You have not finished the game, but may pick it up later.</p>
-                        </Col>
-                    </Row>
-                    <Row id="playing" onClick={(e) => handleStatusChange(e, 4)}>
-                        <Col className="col-12 my-auto">
-                            <h3 className="mb-0"><FontAwesomeIcon icon={faSquare} color='red' /> Abandoned</h3>
-                            <p className="subtitle-text mb-0">You have not finished the game and don't plan to change that.</p>
-                        </Col>
-                    </Row>
-                    <Row className="mt-4">
-                        <Col>
-                            <Button id="unset-played-button" className="btn-general w-100" onClick={togglePlayed}>
-                                <FontAwesomeIcon icon={faGamepad} />Mark as unplayed
-                            </Button>
-                        </Col>
-                    </Row>
-                </Modal.Body>
-            </Modal>
+            <ReactModal
+                isOpen={showJournalModal}
+                onRequestClose={handleCloseJournalModal}
+            >
+                <JournalModalContent />
+            </ReactModal>
+            <ReactModal
+                isOpen={showPlayStatusModal}
+                onRequestClose={handleClosePlayStatusModal}
+                shouldCloseOnOverlayClick={true}
+            >
+                <PlayStatusModalContent handleStatusChange={handleStatusChange} togglePlayed={togglePlayed} />
+            </ReactModal>
             <Col>
                 <div className="side-section">
                     {loading && (
@@ -221,7 +204,7 @@ const InteractionSidebar = ({ slug }) => {
                         <>
                             <Row>
                                 <Col id={`journal-${gameId}`} className="journal-button-container">
-                                    <Button id="open-game-log-modal-btn" className="btn-main journal-btn mx-auto">
+                                    <Button id="open-game-log-modal-btn" className="btn-main journal-btn mx-auto" onClick={handleOpenJournal}>
                                         {logId != null ? "Edit your log" : "Log or Review"}
                                     </Button>
                                 </Col>

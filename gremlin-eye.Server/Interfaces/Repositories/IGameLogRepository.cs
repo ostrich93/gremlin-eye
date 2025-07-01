@@ -18,8 +18,8 @@ namespace gremlin_eye.Server.Repositories
         GameLog GetGameLog(long gameLogId);
         RatingCount[] GetReviewCounts(long gameId);
         double GetReviewAverage(long gameId);
-        //Task<GameLog> CreateGameLog(GameLog gameLog);
-        //Task<GameLog> UpdateGameLog(GameLog gameLog);
+        
+        void UpdateGameLog(GameLog gameLog);
         //Task DeleteGameLog(GameLog gameLog);
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using gremlin_eye.Server.Data;
 
@@ -11,13 +12,15 @@ using gremlin_eye.Server.Data;
 namespace gremlin_eye.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250617162426_PlayLogTimeFix")]
+    partial class PlayLogTimeFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.6")
+                .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -188,6 +191,10 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("name");
 
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("parent_id");
+
                     b.Property<DateTimeOffset?>("ReleaseDate")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("release_date");
@@ -203,6 +210,8 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnName("summary");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("games");
                 });
@@ -675,6 +684,10 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
+                    b.Property<long>("GameId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("game_id");
+
                     b.Property<long>("PlaythroughId")
                         .HasColumnType("bigint")
                         .HasColumnName("playthrough_id");
@@ -688,6 +701,8 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GameId");
 
                     b.HasIndex("PlaythroughId")
                         .IsUnique();
@@ -855,6 +870,15 @@ namespace gremlin_eye.Server.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("gremlin_eye.Server.Entity.GameData", b =>
+                {
+                    b.HasOne("gremlin_eye.Server.Entity.GameData", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("gremlin_eye.Server.Entity.GameLike", b =>
                 {
                     b.HasOne("gremlin_eye.Server.Entity.GameData", "Game")
@@ -1010,6 +1034,12 @@ namespace gremlin_eye.Server.Migrations
 
             modelBuilder.Entity("gremlin_eye.Server.Entity.Review", b =>
                 {
+                    b.HasOne("gremlin_eye.Server.Entity.GameData", "Game")
+                        .WithMany("Reviews")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("gremlin_eye.Server.Entity.Playthrough", "Playthrough")
                         .WithOne("Review")
                         .HasForeignKey("gremlin_eye.Server.Entity.Review", "PlaythroughId")
@@ -1021,6 +1051,8 @@ namespace gremlin_eye.Server.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
+
+                    b.Navigation("Game");
 
                     b.Navigation("Playthrough");
 
@@ -1088,6 +1120,8 @@ namespace gremlin_eye.Server.Migrations
 
             modelBuilder.Entity("gremlin_eye.Server.Entity.GameData", b =>
                 {
+                    b.Navigation("Children");
+
                     b.Navigation("GameLogs");
 
                     b.Navigation("Likes");
@@ -1095,6 +1129,8 @@ namespace gremlin_eye.Server.Migrations
                     b.Navigation("ListEntries");
 
                     b.Navigation("Playthroughs");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("gremlin_eye.Server.Entity.GameLog", b =>
