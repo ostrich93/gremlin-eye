@@ -74,7 +74,7 @@ namespace gremlin_eye.Server.Repositories
             }
         }
 
-        public RatingCount[] GetReviewCounts(long gameId)
+        public RatingCount[] GetRatingCounts(long gameId)
         {
             var candidates = _context.GameLogs.Where(g => g.GameId == gameId).SelectMany(g => g.Playthroughs);
             return candidates.Where(p => p.Rating > 0)

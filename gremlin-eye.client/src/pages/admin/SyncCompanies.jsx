@@ -5,6 +5,8 @@ const SyncCompanies = () => {
     const [pageNum, setPageNum] = useState(1);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [lastStart, setLastStart] = useState(0);
+    const [lastPage, setLastPage] = useState(1);
 
     const importCompanies = async (e) => {
         e.preventDefault();
@@ -16,12 +18,33 @@ const SyncCompanies = () => {
         setLoading(true);
         setMessage('Loading...');
         try {
-            await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/import/companies`, {
+            const res = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/import/companies`, {
                 params: { page: pageNum }
             });
-            setMessage(`Imported company data from IGDB with IDs ${(pageNum - 1) * 500} through ${(pageNum * 500) - 1}`);
+            if (res.data == -1) {
+                setMessage(`Companies with IDs in range of ${(pageNum - 1) * 500} through ${(pageNum * 500) - 1} have already been imported.`);
+                setLastStart(0);
+                setLastPage(1);
+            }
+            else if (res.data > -1) {
+                if (pageNum - lastPage === 1) {
+                    setMessage(`Imported company data from IGDB with IDs ${lastStart} through ${res.data}`);
+                    setLastStart(res.data + 1);
+                    setLastPage(pageNum);
+                }
+                else {
+                    setMessage(`Imported company data from IGDB with IDs ${(pageNum - 1) * 500} through ${res.data}`);
+                    setLastStart(res.data + 1);
+                    setLastPage(pageNum);
+                }
+            }
+            else {
+                setMessage(`Imported company data from IGDB with IDs ${(pageNum - 1) * 500} through ${(pageNum * 500) - 1}`);
+            }
         } catch (err) {
             setMessage(`Error importing company data from IGDB: ${err.message}`);
+            setLastPage(1);
+            setLastStart(0);
             console.error(err.message);
         } finally {
             setLoading(false);

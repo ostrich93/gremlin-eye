@@ -591,6 +591,56 @@ input {
         max-width: 100%
     }
 
+    .col-lg-cus-6 {
+        flex: 0 0 16.666667%;
+        max-width: 16.666667%
+    }
+
+    .col-lg-cus-7 {
+        flex: 0 0 14.28571%;
+        max-width: 14.28571%
+    }
+
+    .col-lg-cus-8 {
+        flex: 0 0 12.5%;
+        max-width: 12.5%
+    }
+
+    .col-lg-cus-10 {
+        flex: 0 0 10%;
+        max-width: 10%
+    }
+
+    .col-lg-cus-15 {
+        flex: 0 0 15%;
+        max-width: 15%
+    }
+
+    .col-lg-cus-19 {
+        flex: 0 0 5.333333%;
+        max-width: 5.333333%
+    }
+
+    .col-lg-cus-20 {
+        flex: 0 0 20%;
+        max-width: 20%
+    }
+
+    .col-lg-cus-21 {
+        flex: 0 0 21%;
+        max-width: 21%
+    }
+
+    .col-lg-cus-23 {
+        flex: 0 0 23%;
+        max-width: 23%
+    }
+
+    .col-lg-cus-32 {
+        flex: 0 0 32%;
+        max-width: 32%
+    }
+
     .order-lg-first {
         order: -1
     }

@@ -32,6 +32,7 @@ const GamePage = () => {
                         platforms: res.data.platforms,
                         companies: res.data.companies,
                         series: res.data.series,
+                        genres: res.data.genres,
                         gameLog: res.data.gameLog,
                         stats: res.data.stats ?? {
                             playedCount: 0,
@@ -124,11 +125,22 @@ const GamePage = () => {
                                         <span className="filler-text">by</span>
                                     </span>
                                 </div>
-                                {gameData?.companies.map((company) => (
-                                    <div key={company.id} className="col-auto sub-title ps-1 pe-0">
-                                        <Link to={`/company/${company.slug}`}>{company.name} </Link>
-                                    </div>
-                                ))}
+                                {gameData?.companies.map((company, i) => 
+                                    i < gameData?.companies.length - 1 ?
+                                        <>
+                                            <div key={company.id} className="col-auto sub-title ps-1 pe-0">
+                                                <Link to={`/company/${company.slug}`}>{company.name} </Link>
+                                            </div>
+                                            <div className="col-auto sub-title ps-1 pe-0">
+                                                <span className="filler-text">,</span>
+                                            </div>
+                                        </> :
+                                        <>
+                                            <div key={company.id} className="col-auto sub-title ps-1 pe-0">
+                                                <Link to={`/company/${company.slug}`}>{company.name} </Link>
+                                            </div>
+                                        </>
+                                )}
                             </Row>
                             <Row>
                                 <Col id="center-content" className="px-3 mt-lg-2 my-3 my-md-1">
@@ -195,7 +207,7 @@ const GamePage = () => {
                                         </>
                                     ) }
                                 </Col>
-                                <Col className="col-12 col-lg-cus-32 mt-1 mt-lg-2">
+                                <div className="col-12 col-lg-cus-32 mt-1 mt-lg-2">
                                     <Row>
                                         <Col>
                                             <p className="mb-1 subtitle-text">Released on</p>
@@ -204,7 +216,7 @@ const GamePage = () => {
                                     <Row>
                                         <Col>
                                             {gameData?.platforms.map((platform) => (
-                                                <Link className="game-page-platform" key={platform.id} to={`/games/lib/popular/release_platform:${platform.slug}`}>{platform.name}</Link>
+                                                <Link className="game-page-platform" key={platform.id} to={`/games/lib?platform=${platform.slug}`}>{platform.name}</Link>
                                             )) }
                                         </Col>
                                     </Row>
@@ -218,7 +230,7 @@ const GamePage = () => {
                                             <Col>
                                                 {gameData?.genres.map((genre) => (
                                                     <p key={genre.id} className="genre-tag">
-                                                        <Link to={`/games/lib/popular/genre:${genre.slug}`}>{genre.name}</Link>
+                                                        <Link to={`/games/lib?genre=${genre.slug}`}>{genre.name}</Link>
                                                     </p>
                                                 )) }
                                             </Col>
@@ -232,7 +244,7 @@ const GamePage = () => {
                                             <hr className="my-auto" />
                                         </Col>
                                     </Row>
-                                </Col>
+                                </div>
                             </Row>
                             <Row id="gameReviews" className="mt-4">
                                 <Col>

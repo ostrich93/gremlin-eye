@@ -137,8 +137,31 @@ th, td {
     margin-bottom: 0;
 }
 
+.category-tag p a:hover,
+.genre-tag a:hover {
+    border-color: #fc6399;
+    color: #ffff;
+    text-decoration: none;
+}
+
+.category-tag p a,
+.genre-tag a {
+    border: 1px solid #8f9ca7;
+    border-radius: 4px;
+    color: #cbd4dc;
+    font-size: .7rem;
+    margin-left: 1px;
+    padding: 2px 4px;
+}
+
 .genre-tag {
     display: inline-block;
+}
+
+.genre-tag {
+    color: #8f9ca7;
+    margin-bottom: 0;
+    font-weight: 300;
 }
 
 .game-cover {

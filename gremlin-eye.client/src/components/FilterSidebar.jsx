@@ -33,6 +33,7 @@ export default function FilterSidebar({ show, onHide, update, clear, releaseYear
                     }
                 },
                 cacheTime: 1000 * 60 * 5,
+                staleTime: 1000 * 60 * 5,
                 retry: true
             },
             {
@@ -48,6 +49,7 @@ export default function FilterSidebar({ show, onHide, update, clear, releaseYear
                     }
                 },
                 cacheTime: 1000 * 60 * 5,
+                staleTime: 1000 * 60 * 5,
                 retry: true
             }
         ]

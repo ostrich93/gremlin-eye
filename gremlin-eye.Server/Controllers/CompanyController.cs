@@ -37,6 +37,7 @@ namespace gremlin_eye.Server.Controllers
             var query = company.Games.AsQueryable();
 
             var predicate = PredicateBuilder.New<GameData>();
+            predicate.And(g => g.Companies.Contains(company));
 
             if (releaseYear != null)
             {
@@ -68,11 +69,13 @@ namespace gremlin_eye.Server.Controllers
             if (platform != null)
                 predicate.And(g => g.Platforms.Any(p => p.Slug == platform));
 
-            //predicate.And(g => g.Playthroughs.Any(p => p.Rating >= min && p.Rating <= max));
+            var inner = PredicateBuilder.New<GameData>();
+            inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() >= min);
+            inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() <= max);
 
-            int totalItems = company.Games.Count(predicate);
+            predicate.And(inner);
 
-            PaginatedList<GameSummaryDTO> paginatedList = await _unitOfWork.Games.GetPaginatedList(query, predicate, orderBy, sortOrder, totalItems, min, max, page);
+            PaginatedList<GameSummaryDTO> paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, orderBy, sortOrder, page);
 
             return Ok(new CompanyDTO
             {

@@ -12,8 +12,11 @@ const SyncPlatforms = () => {
         setLoading(true);
         setMessage('Loading...');
         try {
-            await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/import/platforms`);
-            setMessage('Imported all platform data from IGDB');
+            const res = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/import/platforms`);
+            if (res.data > -1)
+                setMessage('Imported all platform data from IGDB');
+            else
+                setMessage('No more platform data to import from IGDB');
         } catch (err) {
             setMessage('Error importing platform data from IGDB');
             console.error(err.message);

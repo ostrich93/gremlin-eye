@@ -45,7 +45,6 @@ const GameLibrary = () => {
         queryKey: ["games", ...params],
         queryFn: async () => {
             try {
-                //console.log(params);
                 const response = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/games/lib`, {params});
                 return response.data;
             } catch (error) {

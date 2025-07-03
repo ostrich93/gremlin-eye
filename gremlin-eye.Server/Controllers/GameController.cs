@@ -75,7 +75,7 @@ namespace gremlin_eye.Server.Controllers
             //GameDetailsResponseDTO gameDetails = await _gameService.GetGameDetailsBySlug(slug, userId);
             GameStatsDTO gameStats = await _unitOfWork.GameLogs.GetGameStats(gameDetails.Id);
             gameStats.AverageRating = _unitOfWork.GameLogs.GetReviewAverage(gameDetails.Id);
-            RatingCount[] rCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);
+            RatingCount[] rCounts = _unitOfWork.GameLogs.GetRatingCounts(gameDetails.Id);
             if (rCounts.Any())
             {
                 foreach (RatingCount rCount in rCounts)
@@ -299,8 +299,12 @@ namespace gremlin_eye.Server.Controllers
             if (platform != null)
                 predicate.And(g => g.Platforms.Any(p => p.Slug == platform));
 
-            predicate.And(g => g.Playthroughs.Any(p => p.Rating >= 2 * min && p.Rating <= 2 * max) || g.Playthroughs.Count == 0);
-            
+            var inner = PredicateBuilder.New<GameData>();
+            inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() >= 2 * min);
+            inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() <= 2 * max);
+
+            predicate.And(inner);
+
             var paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, orderBy, sortOrder, page);
             return Ok(paginatedList);
         }

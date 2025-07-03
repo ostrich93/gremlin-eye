@@ -30,7 +30,7 @@ const AdminDashboard = () => {
                     </Row>
                     <Row>
                         <Col md="auto">
-                            <Button className="btn-main px-3 py-2" onClick={() => onItemClicked("Platforms")}>Sync PLatforms</Button>
+                            <Button className="btn-main px-3 py-2" onClick={() => onItemClicked("Platforms")}>Sync Platforms</Button>
                         </Col>
                         <Col md="auto">
                             <Button className="btn-main px-3 py-2" onClick={() => onItemClicked("Series")}>Sync Series</Button>
