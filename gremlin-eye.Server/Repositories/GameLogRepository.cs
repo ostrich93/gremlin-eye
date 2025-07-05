@@ -112,5 +112,9 @@ namespace gremlin_eye.Server.Repositories
             _context.GameLogs.Update(gameLog);
         }
 
+        public async Task<GameLog?> GetTargetGameLog(long logId, Guid userId)
+        {
+            return await _context.GameLogs.Where(l => l.Id == logId && l.UserId == userId).FirstOrDefaultAsync();
+        }
     }
 }

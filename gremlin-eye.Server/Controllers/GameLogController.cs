@@ -1,4 +1,5 @@
-﻿using gremlin_eye.Server.Data;
+﻿using Azure.Core;
+using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
 using gremlin_eye.Server.Enums;
@@ -423,6 +424,26 @@ namespace gremlin_eye.Server.Controllers
             gameLog.PlayStatus = request.Status;
             _unitOfWork.Context.GameLogs.Update(gameLog);
             await _unitOfWork.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpDelete("unlog")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<IActionResult> DeleteGameLog([FromBody] UnlogRequest request)
+        {
+            Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            Guid? userId = idClaim != null ? Guid.Parse(idClaim!.Value) : null;
+
+            if (userId == null) return Unauthorized();
+
+            GameLog? gameLog = await _unitOfWork.GameLogs.GetTargetGameLog(request.LogId, (Guid)userId);
+
+            if (gameLog == null)
+                return NotFound("The requested game log was not found in the database.");
+
+            _unitOfWork.Context.GameLogs.Remove(gameLog);
+            _unitOfWork.Context.SaveChanges();
 
             return Ok();
         }

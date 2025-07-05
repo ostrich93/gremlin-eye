@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button, Card, Col, Container, Dropdown, Nav, Row, Tab } from "react-bootstrap";
 import ReactModal from "react-modal";
-import { faBook, faCaretDown, faCirclePlus, faEllipsisVertical, faExclamationTriangle, faGamepad, faGift, faPlay, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faBook, faCaretDown, faCirclePlus, faEllipsisVertical, faExclamationTriangle, faGamepad, faHeart, faGift, faPlay, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import apiClient from "../../config/apiClient";
 import { useAuthState } from "../../contexts/AuthProvider";
@@ -22,11 +22,12 @@ const JournalModalContent = () => {
     const [gameLogForm, setGameLogForm] = useState(null);
     const [playthroughDrafts, setPlaythroughDrafts] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [plIdState, setPlIdState] = useState(-1);
+    const [activeTab, setActiveTab] = useState(0);
 
     const [showJournalCloseWarning, setShowJournalCloseWarning] = useState(false);
     const [showPlayStatusModal, setShowPlayStatusModal] = useState(false);
 
-    const playthroughIdRef = useRef(-1);
     const playLogIdRef = useRef(-1);
 
     useEffect(() => {
@@ -45,7 +46,8 @@ const JournalModalContent = () => {
                         isPlayed: res.data.isPlayed,
                         isPlaying: res.data.isPlaying,
                         isBacklog: res.data.isBacklog,
-                        isWishlist: res.data.isWishlist
+                        isWishlist: res.data.isWishlist,
+                        playthroughsToDelete: []
                     });
                     setPlaythroughDrafts(res.data.playthroughs);
                     setLoading(false);
@@ -58,6 +60,10 @@ const JournalModalContent = () => {
         if (gameId > -1)
             fetchGameJournal();
     }, [gameId]);
+
+    const handleCloseJournalModal = useCallback(() => {
+        dispatch({ type: "CLOSE_JOURNAL_MODAL" });
+    }, [dispatch]);
 
     const addPlayLog = (playthroughId, addInfo) => {
         setPlaythroughDrafts(playthroughDrafts.map((playthrough) => {
@@ -119,28 +125,62 @@ const JournalModalContent = () => {
         );
     };
 
-    const addPlaythrough = () => {
-        setPlaythroughDrafts([
-            ...playthroughDrafts,
-            {
-                playthroughId: playthroughIdRef.current--,
-                gameId: gameLogForm.gameId,
-                logId: gameLogForm.logId,
-                logTitle: 'Log',
-                reviewText: '',
-                containsSpoilers: false,
-                isReplay: false,
-                medium: null,
-                rating: 0,
-                platform: null,
-                playLogs: []
-            }
-        ]);
+    const addPlaythrough = (e) => {
+        e.stopPropagation();
+        if (playthroughDrafts[playthroughDrafts.length - 1].playthroughId >= 0) {
+            setPlaythroughDrafts([
+                ...playthroughDrafts,
+                {
+                    playthroughId: plIdState,
+                    gameId: gameLogForm.gameId,
+                    logId: gameLogForm.logId,
+                    logTitle: 'Log',
+                    reviewText: '',
+                    containsSpoilers: false,
+                    isReplay: false,
+                    medium: null,
+                    rating: 0,
+                    platform: null,
+                    playLogs: []
+                }
+            ]);
+        }
+        else {
+            setPlaythroughDrafts([
+                ...playthroughDrafts,
+                {
+                    playthroughId: plIdState - 1,
+                    gameId: gameLogForm.gameId,
+                    logId: gameLogForm.logId,
+                    logTitle: 'Log',
+                    reviewText: '',
+                    containsSpoilers: false,
+                    isReplay: false,
+                    medium: null,
+                    rating: 0,
+                    platform: null,
+                    playLogs: []
+                }
+            ]);
+        }
+        setPlIdState(plIdState - 1);
+        setActiveTab(playthroughDrafts.length);
     };
 
     const removePlaythrough = useCallback((playthroughId) => {
+        if (playthroughDrafts.length === 1) {
+            handleCloseJournalModal();
+            return;
+        }
+        if (activeTab === playthroughDrafts.length - 1) {
+            setActiveTab(activeTab - 1);
+        }
         setPlaythroughDrafts(playthroughDrafts.filter(playthrough => playthrough.playthroughId !== playthroughId));
-    }, [playthroughDrafts]);
+        setGameLogForm({
+            ...gameLogForm,
+            playthroughsToDelete: [...gameLogForm.playthroughsToDelete, playthroughId]
+        });
+    }, [playthroughDrafts, activeTab, gameLogForm, handleCloseJournalModal]);
 
     const updatePlaythrough = useCallback((playthroughId, field, value) => {
         setPlaythroughDrafts(playthroughDrafts.map((playthrough) => {
@@ -172,6 +212,15 @@ const JournalModalContent = () => {
         });
     };
 
+    const destroyGameLogData = useCallback(async () => {
+        if (gameLogForm.logId < 0) {
+            handleCloseJournalModal();
+        }
+        apiClient.delete(`${import.meta.env.VITE_APP_BACKEND_URL}/api/logs/unlog`, { data: { logId: gameLogForm.logId, gameId: gameLogForm.gameId } })
+            .then(() => handleCloseJournalModal())
+            .catch((err) => console.error(err));
+    }, [gameLogForm?.gameId, gameLogForm?.logId, handleCloseJournalModal]);
+
     const updateGameLogStatusValue = (e, statusValue) => {
         e.preventDefault();
         if (statusValue < 0 || statusValue > 4) {
@@ -191,10 +240,6 @@ const JournalModalContent = () => {
     const handleDeletePlaylog = (e) => {
         e.preventDefault();
         //apiClient.delete();
-        dispatch({ type: "CLOSE_JOURNAL_MODAL" });
-    };
-
-    const handleCloseJournalModal = () => {
         dispatch({ type: "CLOSE_JOURNAL_MODAL" });
     };
     
@@ -261,8 +306,10 @@ const JournalModalContent = () => {
                                                 <div className="col-auto my-auto ps-2">
                                                     <Row>
                                                         <Col>
-                                                            <h2 className="main-header mb-0">{gameLogForm?.gameName}</h2>
-                                                            <small className="subtitle-text">{formatDate(gameLogForm?.releaseDate)}</small>
+                                                            <h2 className="main-header mb-0">
+                                                                {gameLogForm?.gameName}
+                                                                <small className="subtitle-text">{formatDate(gameLogForm?.releaseDate)}</small>
+                                                            </h2>
                                                         </Col>
                                                     </Row>
                                                     <Row>
@@ -310,9 +357,21 @@ const JournalModalContent = () => {
                                                         </Col>
                                                     </Row>
                                                 </div>
-                                                <div className="col-1 my-auto px-auto">
+                                                <div className="col-1 my-auto ps-1">
+                                                    <Row>
+                                                        <div className="log-editor-liked col-auto m-auto">
+                                                            <label className="mb-0 pe-1">Like</label>
+                                                            <Row>
+                                                                <Col>
+                                                                    <label className="btn btn-link mb-0">
+                                                                        <FontAwesomeIcon icon={faHeart} />
+                                                                    </label>
+                                                                </Col>
+                                                            </Row>
+                                                        </div>
+                                                    </Row>
                                                 </div>
-                                                <div className="col-auto my-auto ps-auto">
+                                                <div className="col-auto my-auto ms-auto">
                                                     <Dropdown>
                                                         <Dropdown.Toggle id="log-extras-dropdown">
                                                             <FontAwesomeIcon icon={faEllipsisVertical} />
@@ -329,42 +388,55 @@ const JournalModalContent = () => {
                                             </Row>
                                         </Col>
                                     </Row>
-                                    <Tab.Container id="log-editor-playthrough" defaultActiveKey={playthroughDrafts?.length > 0 ? playthroughDrafts[playthroughDrafts.length - 1].playthroughId : 0}>
-                                        <Row id="log-editor-nav" className="px-3">
-                                            <Col>
-                                                <Row id="playthrough-container">
-                                                    <Nav id="log-editor-playthrough-nav" variant="underline">
-                                                        {playthroughDrafts?.map((playthrough) => (
-                                                            <Nav.Item key={playthrough.playthroughId} className="col-auto px-1 collapsable-col">
-                                                                <Nav.Link key={playthrough.playthroughId} eventKey={playthrough.playthroughId}>{playthrough.logTitle ? playthrough.logTitle : 'Log'}</Nav.Link>
-                                                            </Nav.Item>
-                                                        ))}
-                                                        <Nav.Item className="col-auto px-1">
+                                    
+                                    <Row id="log-editor-nav" className="px-3">
+                                        <Col>
+                                            <Row id="log-editor-playthrough-nav">
+                                                <div id="playthrough-container">
+                                                    {playthroughDrafts?.map((playthrough, idx) => (
+                                                        <div className="col-auto ps-1 collapsable-col">
+                                                            <Button key={playthrough.playthroughId} className="btn-link btn-nav" onClick={() => setActiveTab(idx)}>
+                                                                <span className="playthrough-option-title">{playthrough.logTitle ? playthrough.logTitle : "Log"}</span>
+                                                                <div className="selected-bar" />
+                                                            </Button>
+                                                        </div>
+                                                    )) }
+                                                </div>
+                                                <div className="col-auto">
+                                                    <Row>
+                                                        <div className="col-auto ps-1">
                                                             <Button id="new-log-btn" className="btn-link" onClick={addPlaythrough}>
                                                                 <FontAwesomeIcon icon={faCirclePlus} />
                                                             </Button>
-                                                        </Nav.Item>
-                                                    </Nav>
-                                                </Row>
-                                                <Row className="my-3 log-editor-section">
-                                                    <Tab.Content>
-                                                        {playthroughDrafts?.map((playthrough) => (
-                                                                <Tab.Pane key={playthrough.playthroughId} eventKey={playthrough.playthroughId}>
-                                                                    {/*JournalForm is the source of the bug. When rendering something like a standard element, no issue with rerender */}
-                                                                    <JournalForm
-                                                                        playthrough={playthrough}
-                                                                        updatePlayLogs={updatePlayLogs}
-                                                                        removePlaythrough={removePlaythrough}
-                                                                        updatePlaythrough={updatePlaythrough}
-                                                                        gamePlatforms={gameLogForm?.platforms}
-                                                                    />
-                                                                </Tab.Pane>
-                                                            )) }
-                                                    </Tab.Content>
-                                                </Row>
-                                            </Col>
-                                        </Row>
-                                    </Tab.Container>
+                                                        </div>
+                                                    </Row>
+                                                </div>
+                                                
+                                            </Row>
+                                        </Col>
+                                        <div className="col-auto">
+                                            <Row>
+                                                <div className="col-auto ms-auto ps-1">
+                                                    <button>Time</button>
+                                                </div>
+                                                <div className="col-auto ps-1">
+                                                    <button>Library</button>
+                                                </div>
+                                            </Row>
+                                        </div>
+                                    </Row>
+
+                                    {/* JournalForm is here rendering currenty selected tab. */}
+                                    {!loading && playthroughDrafts[activeTab] != null && (
+                                        <JournalForm
+                                            playthrough={playthroughDrafts[activeTab]}
+                                            updatePlayLogs={updatePlayLogs}
+                                            removePlaythrough={removePlaythrough}
+                                            updatePlaythrough={updatePlaythrough}
+                                            gamePlatforms={gameLogForm?.platforms}
+                                            destroyGameLog={destroyGameLogData}
+                                        />
+                                    )}
                                 </Col>
 
                             ) }

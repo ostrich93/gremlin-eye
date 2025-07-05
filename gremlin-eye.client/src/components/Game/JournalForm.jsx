@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 import { ButtonGroup, Button, Col, Container, InputGroup, Form, Row, ToggleButton } from 'react-bootstrap';
 import ReactModal from 'react-modal';
 import Rate from 'rc-rate';
@@ -12,7 +12,7 @@ import formatDate from '../../services/formatDate';
 
 //contained by a Tab in Journal Form
 //Playthroughs are simply DRAFTS of forms that get submitted to the endpoint. They can be derived from an existing play log, but can also be created from scratch.
-const JournalForm = ({ playthrough, updatePlayLogs, removePlaythrough, updatePlaythrough, gamePlatforms }) => {
+const JournalForm = memo(({ playthrough, updatePlayLogs, removePlaythrough, updatePlaythrough, gamePlatforms, destroyGameLog }) => {
     const id = playthrough.playthroughId;
 
     const [currentEvent, setCurrentEvent] = useState(null);
@@ -106,6 +106,11 @@ const JournalForm = ({ playthrough, updatePlayLogs, removePlaythrough, updatePla
         updatePlayLogs(id, events);
     };
 
+    const handleDestroyGameLog = () => {
+        destroyGameLog();
+        setShowDestroyGameLogWarning(false);
+    }
+
     const updateCurrentEvent = () => {
         currentEvent.setExtendedProp("logNote", playSessionState?.logNote);
         currentEvent.setExtendedProp("hours", playSessionState?.hours);
@@ -131,7 +136,7 @@ const JournalForm = ({ playthrough, updatePlayLogs, removePlaythrough, updatePla
                                 <br />
                                 <Row className="mt-1">
                                     <Form.Group className="col-auto mx-auto" controlId="playthroughReplay">
-                                        <Form.Check id="playthroughReplay" className="gremlin-eye-checkbox me-1">
+                                        <Form.Check id="playthroughReplay" className="gremlin-eye-checkbox me-1" onClick={(e) => updatePlaythrough(id, "isReplay", e.target.checked)}>
                                             <Form.Label className="mb-0 checkbox-label">
                                                 <FontAwesomeIcon icon={faRotateLeft} />
                                             </Form.Label>
@@ -143,16 +148,16 @@ const JournalForm = ({ playthrough, updatePlayLogs, removePlaythrough, updatePla
                         <Row className="mt-4">
                             <Form.Group as={Col} controlId="playthroughPlatform">
                                 <Form.Label>Platform</Form.Label>
-                                <Form.Select id="playthroughPlatform" style={{ width: "100%" }} title="Select release platform">
+                                <Form.Select id="playthroughPlatform" style={{ width: "100%" }} title="Select release platform" onChange={(e) => updatePlaythrough(id, "platform", {id: e.target.value, name: e.target.key, slug: e.target.getAttribute("data-slug")})}>
                                     <option value="" disabled selected hidden>Choose a platform</option>
                                     {gamePlatforms.map((platform) => (
-                                        <option key={platform.id} value={platform.id}>{platform.name}</option>
+                                        <option key={platform.id} value={platform.id} data-slug={platform.slug}>{platform.name}</option>
                                     ))}
                                 </Form.Select>
                             </Form.Group>
                             <Form.Group as={Col} controlId="playthroughOwnership">
                                 <Form.Label>Ownership</Form.Label>
-                                <Form.Select id="playthroughOwnership" style={{ width: "100%" }} title="Owned, subscription, etc. ">
+                                <Form.Select id="playthroughOwnership" style={{ width: "100%" }} title="Owned, subscription, etc. " onChange={(e) => updatePlaythrough(id, "medium", e.target.value)}>
                                     <option value="" disabled selected hidden>Owned, subscription, etc.</option>
                                     <option value="owned">Owned</option>
                                     <option value="subscribed">Subscription</option>
@@ -182,7 +187,7 @@ const JournalForm = ({ playthrough, updatePlayLogs, removePlaythrough, updatePla
                         </Row>
                         <Row>
                             <Form.Check className="col-auto me-auto" id="playthroughReviewSpoilers">
-                                <Form.Check.Input defaultChecked={playthrough.containsSpoilers} />
+                                <Form.Check.Input defaultChecked={playthrough.containsSpoilers} onClick={(e) => updatePlaythrough(id, "containsSpoilers", e.target.checked)} />
                                 <Form.Check.Label className="btn btn-small mb-0">Contains spoilers</Form.Check.Label>
                             </Form.Check>
                         </Row>
@@ -379,7 +384,7 @@ const JournalForm = ({ playthrough, updatePlayLogs, removePlaythrough, updatePla
                     </Row>
                     <Row className="mt-3">
                         <div className="col-auto">
-                            <Button id="warning-abort" className="btn-general w-100" onClick={() => setShowDestroyGameLogWarning(false)}>Return</Button>
+                            <Button id="warning-abort" className="btn-general w-100" onClick={handleDestroyGameLog}>Return</Button>
                         </div>
                         <div className="col-auto ms-auto pe-0" />
                         <div className="col-auto">
@@ -390,6 +395,6 @@ const JournalForm = ({ playthrough, updatePlayLogs, removePlaythrough, updatePla
             </ReactModal>
         </>
     );
-};
+});
 
 export default JournalForm;
