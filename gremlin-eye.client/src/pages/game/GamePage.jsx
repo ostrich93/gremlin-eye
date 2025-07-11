@@ -8,7 +8,7 @@ import apiClient from '../../config/apiClient';
 import './GamePage.css';
 import InteractionSidebar from '../../components/Game/InteractionSidebar';
 import GameStatistics from '../../components/Game/GameStatistics';
-import formatDate from '../../services/formatDate';
+import formatDate from '../../utils/formatDate';
 
 const GamePage = () => {
     const { user } = useAuthState();

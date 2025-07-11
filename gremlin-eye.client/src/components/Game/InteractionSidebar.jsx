@@ -182,12 +182,7 @@ const InteractionSidebar = ({ slug }) => {
 
     return (
         <>
-            <ReactModal
-                isOpen={showJournalModal}
-                onRequestClose={handleCloseJournalModal}
-            >
-                <JournalModalContent />
-            </ReactModal>
+            
             <ReactModal
                 isOpen={showPlayStatusModal}
                 onRequestClose={handleClosePlayStatusModal}
@@ -290,6 +285,13 @@ const InteractionSidebar = ({ slug }) => {
                     </Row>
                 ) }
             </Col>
+
+            <ReactModal
+                isOpen={showJournalModal}
+                onRequestClose={handleCloseJournalModal}
+            >
+                <JournalModalContent />
+            </ReactModal>
         </>
     );
 };

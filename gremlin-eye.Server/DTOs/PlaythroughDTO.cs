@@ -8,7 +8,7 @@
         public string LogTitle { get; set; } = string.Empty;
         public bool IsReplay { get; set; } = false;
         public string? Medium { get; set; }
-        public PlatformDTO? Platform { get; set; }
+        public long? Platform { get; set; }
         public string ReviewText { get; set; } = string.Empty;
         public bool ContainsSpoilers { get; set; } = false;
         public int? Rating { get; set; }

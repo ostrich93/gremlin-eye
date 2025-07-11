@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using gremlin_eye.Server.Data;
+﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
 using gremlin_eye.Server.Enums;
@@ -127,12 +126,7 @@ namespace gremlin_eye.Server.Controllers
                             ReviewText = pl.ReviewText,
                             ContainsSpoilers = pl.ReviewSpoilers,
                             Rating = pl.Rating,
-                            Platform = pl.Platform != null ? new PlatformDTO
-                            {
-                                Id = pl.Platform.Id,
-                                Name = pl.Platform.Name,
-                                Slug = pl.Platform.Slug
-                            } : null
+                            Platform = pl.Platform != null ? pl.PlatformId : null
                         }).Take(50).ToList() : new List<PlaythroughDTO>([new PlaythroughDTO {
                             GameId = gameId,
                             PlaythroughId = -1,
@@ -192,7 +186,7 @@ namespace gremlin_eye.Server.Controllers
                             GameLog = gameLog,
                             GameLogId = gameLog.Id,
                             IsReplay = playthrough.IsReplay,
-                            PlatformId = playthrough.Platform!.Id,
+                            PlatformId = playthrough.Platform,
                             Rating = playthrough.Rating ?? 0,
                             ReviewText = playthrough.ReviewText,
                             Review = !string.IsNullOrEmpty(playthrough.ReviewText) ? new Review
@@ -240,7 +234,7 @@ namespace gremlin_eye.Server.Controllers
                         }
                         else
                         {
-                            existingPlaythrough.PlatformId = playthrough.Platform.Id;
+                            existingPlaythrough.PlatformId = playthrough.Platform;
                         }
                         existingPlaythrough.LogTitle = playthrough.LogTitle;
 
@@ -310,7 +304,7 @@ namespace gremlin_eye.Server.Controllers
                 {
                     GameId = gameId,
                     GameLog = gameLog,
-                    PlatformId = play.Platform != null ? play.Platform.Id : null,
+                    PlatformId = play.Platform,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                     LogTitle = play.LogTitle,
