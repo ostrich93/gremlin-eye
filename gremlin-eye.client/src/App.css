@@ -1,7 +1,7 @@
 ﻿body {
     background-color: var(--bs-body-bg-rgb);
     background-size: 400px;
-    color: #badefc;
+    color: var(--back-text);
     font-family: Roboto, sans-serif !important;
     font-weight: 500;
     min-height: 100vh;
@@ -48,7 +48,7 @@ th, td {
 }
 
 .navbar #nav-bar-search {
-    background-color: #272c37;
+    background-color: var(--back-field-background);
     border-bottom-left-radius: .25rem;
     border-top-left-radius: .25rem;
     color: #fff;
@@ -58,7 +58,7 @@ th, td {
 }
 
 .navbar .search-btn {
-    background-color: #272c37;
+    background-color: var(--back-field-background);
     height: 33px;
     border-width: 0;
     padding: 0;
@@ -139,16 +139,16 @@ th, td {
 
 .category-tag p a:hover,
 .genre-tag a:hover {
-    border-color: #fc6399;
+    border-color: var(--back-pink);
     color: #ffff;
     text-decoration: none;
 }
 
 .category-tag p a,
 .genre-tag a {
-    border: 1px solid #8f9ca7;
+    border: 1px solid var(--back-text-secondary);
     border-radius: 4px;
-    color: #cbd4dc;
+    color: var(--back-link);
     font-size: .7rem;
     margin-left: 1px;
     padding: 2px 4px;
@@ -159,15 +159,15 @@ th, td {
 }
 
 .genre-tag {
-    color: #8f9ca7;
+    color: var(--back-text-secondary);
     margin-bottom: 0;
     font-weight: 300;
 }
 
 .game-cover {
     align-items: center;
-    background-color: #30394c;
-    border: 1px solid #30394c;
+    background-color: var(--back-field);
+    border: 1px solid var(--back-field);
     border-radius: 5px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -244,7 +244,7 @@ th, td {
 }
 
 #log-in #title {
-    color: #8f9ca7;
+    color: var(--back-text-secondary);
     font-size: 3rem;
     font-weight: 200;
 }

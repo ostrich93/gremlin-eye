@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Col, Container, Dropdown, Nav, Row, Tab } from "react-bootstrap";
+import { Button, Card, Col, Container, Dropdown, Nav, Row, Tab, ToggleButton } from "react-bootstrap";
 import ReactModal from "react-modal";
 import { faBook, faCaretDown, faCirclePlus, faEllipsisVertical, faExclamationTriangle, faGamepad, faHeart, faGift, faPlay, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,6 +12,9 @@ import PlayStatusModalContent from "./PlayStatusModal";
 //The JournalModal can be accessed either directly from a game page OR by clicking "Log a Game" in the Navbar, searching, and selecting a result.
 //In order to work with both cases, the JournalModal takes in a gameId and a userId to load the gamelog and playthroughs
 
+const playStatusEnumStrings = ["played", "completed", "retired", "shelved", "abandoned"];
+const playStatusEnumDisplayStrings = ["Played", "Completed", "Retired", "Shelved", "Abandoned"];
+
 const JournalModalContent = () => {
     const { gameId } = useJournalState();
     const dispatch = useJournalDispatch();
@@ -21,6 +24,7 @@ const JournalModalContent = () => {
     const [loading, setLoading] = useState(false);
     const [plIdState, setPlIdState] = useState(-1);
     const [activeKey, setActiveKey] = useState(-1);
+    const [currentPlayStatusOption, setCurrentPlayStatusOption] = useState(1);
 
     const [showJournalCloseWarning, setShowJournalCloseWarning] = useState(false);
     const [showPlayStatusModal, setShowPlayStatusModal] = useState(false);
@@ -44,6 +48,9 @@ const JournalModalContent = () => {
                         isWishlist: res.data.isWishlist,
                         playthroughsToDelete: []
                     });
+                    if (res.data.playStatus != null) {
+                        setCurrentPlayStatusOption(res.data.playStatus);
+                    }
                     setPlaythroughDrafts(res.data.playthroughs);
                     setActiveKey(res.data.playthroughs ? res.data.playthroughs[res.data.playthroughs.length - 1].playthroughId : -1);
                     setLoading(false);
@@ -162,7 +169,8 @@ const JournalModalContent = () => {
             console.log("If you're seeing this in the console, it's a bug");
             return;
         }
-        setGameLogForm({ ...gameLogForm, playStatus: statusValue });
+        setCurrentPlayStatusOption(statusValue);
+        setGameLogForm({ ...gameLogForm, isPlayed: true, playStatus: statusValue });
         setShowPlayStatusModal(false);
     };
 
@@ -212,42 +220,41 @@ const JournalModalContent = () => {
                                                         <Col>
                                                             <Row id="log-toggle-buttons" className="mt-2">
                                                                 <div id={`play-${gameId}`} className="col-auto pe-1">
-                                                                    <input id="played-toggle-checkbox" type="checkbox" name="played-toggle" hidden={true} defaultValue={gameLogForm?.isPlayed} />
-                                                                    <Row id="play-status-selectors">
+                                                                    <Row id="play-status-selectors" className="play-type-bkg">
                                                                         <div className="col-auto pe-0">
                                                                             <Button id="play-status-selector" variant="link" onClick={() => setShowPlayStatusModal(true)}>
                                                                                 <FontAwesomeIcon icon={faCaretDown} />
                                                                             </Button>
                                                                         </div>
                                                                         <Col className="ps-0 position-relative">
-                                                                            <label id="played-toggle-label" className="w-100" htmlFor="played-toggle-checkbox">
+                                                                            <ToggleButton id="played-toggle-checkbox" className={`play-type-bkg ${gameLogForm?.isPlayed ? playStatusEnumStrings[currentPlayStatusOption] : ""}`} type="checkbox" value={gameLogForm?.isPlayed} checked={gameLogForm?.isPlayed} onChange={() => setGameLogForm({ ...gameLogForm, isPlayed: !gameLogForm.isPlayed })}>
                                                                                 <div id="played-status-text">
                                                                                     <FontAwesomeIcon icon={faGamepad} />
                                                                                     <p className="label d-inline-block">
-                                                                                        <span id="played-label-title">Completed</span>
+                                                                                        <span id="played-label-title">{playStatusEnumDisplayStrings[currentPlayStatusOption]}</span>
                                                                                     </p>
                                                                                 </div>
-                                                                            </label>
+                                                                            </ToggleButton>
                                                                         </Col>
                                                                     </Row>
                                                                 </div>
                                                                 <div id={`playing-${gameId}`} className="col-auto pe-1">
-                                                                    <Button variant="link" className="btn-playing" onClick={() => setGameLogForm({...gameLogForm, isPlaying: !gameLogForm.isPlaying}) }>
-                                                                        <FontAwesomeIcon icon={faPlay} color={gameLogForm?.isPlaying ? '#ea377a' : 'gray'} />
+                                                                    <ToggleButton className="btn-playing" id="playing-toggle-checkbox" type="checkbox" value={gameLogForm?.isPlaying} checked={gameLogForm?.isPlaying} onChange={() => setGameLogForm({ ...gameLogForm, isPlaying: !gameLogForm.isPlaying })}>
+                                                                        <FontAwesomeIcon icon={faPlay} />
                                                                         <p className="label d-inline-block">Playing</p>
-                                                                    </Button>
+                                                                    </ToggleButton>
                                                                 </div>
                                                                 <div id={`backlog-${gameId}`} className="col-auto pe-1">
-                                                                    <Button variant="link" className="btn-backlog" onClick={() => setGameLogForm({ ...gameLogForm, isPlaying: !gameLogForm.isBacklog })}>
-                                                                        <FontAwesomeIcon icon={faBook} color={gameLogForm?.isBacklog ? '#ea377a' : 'gray'} />
+                                                                    <ToggleButton id="backlog-toggle-checkbox" className="btn-backlog" type="checkbox" value={gameLogForm?.isBacklog} checked={gameLogForm?.isBacklog} onChange={() => setGameLogForm({ ...gameLogForm, isBacklog: !gameLogForm.isBacklog })}>
+                                                                        <FontAwesomeIcon icon={faBook} />
                                                                         <p className="label d-inline-block">Backlog</p>
-                                                                    </Button>
+                                                                    </ToggleButton>
                                                                 </div>
                                                                 <div id={`wishlist-${gameId}`} className="col-auto pe-1">
-                                                                    <Button variant="link" className="btn-wishlist" onClick={() => setGameLogForm({ ...gameLogForm, isWishlist: !gameLogForm.isWishlist })}>
-                                                                        <FontAwesomeIcon icon={faGift} color={gameLogForm?.isWishlist ? '#ea377a' : 'gray'} />
+                                                                    <ToggleButton id="wishlist-toggle-checkbox" className="btn-wishlist" type="checkbox" value={gameLogForm?.isWishlist} checked={gameLogForm?.isWishlist} onChange={() => setGameLogForm({ ...gameLogForm, isWishlist: !gameLogForm.isWishlist })}>
+                                                                        <FontAwesomeIcon icon={faGift} />
                                                                         <p className="label d-inline-block">Wishlist</p>
-                                                                    </Button>
+                                                                    </ToggleButton>
                                                                 </div>
                                                             </Row>
                                                         </Col>
@@ -330,7 +337,7 @@ const JournalModalContent = () => {
                                 <Button className="btn-general" onClick={() => setShowJournalCloseWarning(true)}>Cancel</Button>
                             </div>
                             <div id="btn-save-log" className="col-auto my-auto pr-0">
-                                <Button className="btn-main save-log" onClick={submitGameLogForm}>Create Log</Button>
+                                <Button className="btn-main save-log" onClick={submitGameLogForm}>Save Changes</Button>
                             </div>
                         </Row>
                     </div>

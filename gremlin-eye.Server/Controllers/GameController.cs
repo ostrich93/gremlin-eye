@@ -33,6 +33,7 @@ namespace gremlin_eye.Server.Controllers
                 return NotFound("The game requested does not exist in our database.");
             }
 
+            var topReviews = await _unitOfWork.Reviews.GetGameTopReviews(data.Id, data.Slug, data.Name);
             int reviewCount = await _unitOfWork.Reviews.GetGameReviewCount(data.Id);
             int likeCount = _unitOfWork.Likes.GetGameLikeCount(data.Id);
             GameDetailsResponseDTO gameDetails = new GameDetailsResponseDTO
@@ -68,6 +69,7 @@ namespace gremlin_eye.Server.Controllers
                     Name = data.Series.First().Name,
                     Slug = data.Series.First().Slug
                 } : null,
+                TopReviews = topReviews,
                 ReviewCount = reviewCount,
                 LikeCount = likeCount
             };
@@ -80,7 +82,7 @@ namespace gremlin_eye.Server.Controllers
             {
                 foreach (RatingCount rCount in rCounts)
                 {
-                    gameStats.RatingCounts[rCount.Rating] = rCount.Count;
+                    gameStats.RatingCounts[rCount.Rating - 1] = rCount.Count;
                 }
             }
             //gameStats.RatingCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);

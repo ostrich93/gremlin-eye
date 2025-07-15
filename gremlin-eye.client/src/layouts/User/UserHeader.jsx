@@ -36,16 +36,7 @@ const UserHeader = ({ user }) => {
                             <Link className="d-none d-lg-inline" to={`/user/${user?.userName}/games`}>Games</Link>
                         </Col>
                         <Col className="col-4 col-sm-4 col-lg-auto my-auto px-1">
-                            <Link className="d-none d-lg-inline" to={`/user/${user?.userName}/journal`}>Journal</Link>
-                        </Col>
-                        <Col className="col-4 col-sm-4 col-lg-auto my-auto px-1">
                             <Link className="d-none d-lg-inline" to={`/user/${user?.userName}/reviews`}>Reviews</Link>
-                        </Col>
-                        <Col className="col-4 col-sm-4 col-lg-auto my-auto px-1">
-                            <Link className="d-none d-lg-inline" to={`/user/${user?.userName}/lists`}>Lists</Link>
-                        </Col>
-                        <Col className="col-4 col-sm-4 col-lg-auto my-auto px-1">
-                            <Link className="d-none d-lg-inline" to={`/user/${user?.userName}/likes`}>Likes</Link>
                         </Col>
                     </Row>
                 </Col>

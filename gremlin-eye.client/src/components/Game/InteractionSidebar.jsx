@@ -287,8 +287,18 @@ const InteractionSidebar = ({ slug }) => {
             </Col>
 
             <ReactModal
+                id="journal-game-modal"
                 isOpen={showJournalModal}
                 onRequestClose={handleCloseJournalModal}
+                style={{
+                    overlay: {
+                        position: 'fixed',
+                        inset: '0px',
+                        backgroundColor: "rgba(0,0,0,.85)",
+                        zIndex: 1039,
+                        width: "100vw"
+                    }
+                }}
             >
                 <JournalModalContent />
             </ReactModal>

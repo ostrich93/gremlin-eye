@@ -210,6 +210,31 @@ input {
     max-width: 53%
 }
 
+:root {
+    --back-primary: #16181c;
+    --back-secondary: #242832;
+    --back-field: #30394c;
+    --back-field-highlight: #3b4760;
+    --back-field-selected:var(--back-pink-dk);
+    --back-pink: #fc6399;
+    --back-pink-dk: #ea377a;
+    --back-text: #badefc;
+    --back-text-secondary: #8f9ca7;
+    --back-link: #cbd4dc;
+    --back-type-completed: #43b94f;
+    --back-type-mastered: #8d58af;
+    --back-type-abandoned: #ea4747;
+    --back-type-retired: #4b7bd4;
+    --back-type-shelved: #e69b3e;
+    --back-type-played: var(--back-pink-dk);
+    --back-played: var(--back-pink-dk);
+    --back-playing: #856fef;
+    --back-wishlist: #70a9c8;
+    --back-backlog: #efe36f;
+    --back-field-background: #272c37;
+    --back-field-border: #3b414e;
+}
+
 @media(min-width:576px) {
     .col-sm-cus-4 {
         flex: 0 0 25%;

@@ -9,6 +9,7 @@ import './GamePage.css';
 import InteractionSidebar from '../../components/Game/InteractionSidebar';
 import GameStatistics from '../../components/Game/GameStatistics';
 import formatDate from '../../utils/formatDate';
+import ReviewCard from '../../components/ReviewCard/ReviewCard';
 
 const GamePage = () => {
     const { user } = useAuthState();
@@ -263,7 +264,9 @@ const GamePage = () => {
                                     </Row>
                                     <Row className="mt-2">
                                         <Col id="game-reviews-section">
-                                            
+                                            {gameData?.topReviews.map((review) => (
+                                                <ReviewCard key={review.reviewId} reviewData={review} isUserSubpage={false} />
+                                            ))}
                                         </Col>
                                     </Row>
                                 </Col>
