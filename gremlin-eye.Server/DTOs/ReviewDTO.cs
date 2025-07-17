@@ -14,6 +14,7 @@ namespace gremlin_eye.Server.DTOs
         public string GameName { get; set; } = string.Empty;
         public string GameSlug { get; set; } = string.Empty;
         public string CoverUrl { get; set; } = string.Empty;
+        public DateTimeOffset? ReleaseDate { get; set; }
         public bool ContainsSpoilers { get; set; } = false;
         public int? Rating { get; set; }
         public PlatformDTO? Platform { get; set; }

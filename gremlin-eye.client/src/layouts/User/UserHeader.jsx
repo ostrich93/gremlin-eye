@@ -9,7 +9,7 @@ const UserHeader = ({ user }) => {
                     <Row>
                         <div className="col-auto ms-auto">
                             <div className="avatar static-avatar">
-                                <img src={user?.avatarUrl} width="175" height="175" />
+                                <img src={user?.avatarUrl ?? "/no_avatar.png"} width="175" height="175" />
                             </div>
                         </div>
                         <Col className="mt-auto">
@@ -30,13 +30,13 @@ const UserHeader = ({ user }) => {
                     </Row>
                     <Row className="mt-3">
                         <Col className="col-4 col-sm-4 col-lg-auto my-auto px-1">
-                            <Link className="d-none d-lg-inline" to={`/user/${user?.userName}` }>Profile</Link>
+                            <Link className="d-none d-lg-inline" to={`/users/${user?.userName}` }>Profile</Link>
                         </Col>
                         <Col className="col-4 col-sm-4 col-lg-auto my-auto px-1">
-                            <Link className="d-none d-lg-inline" to={`/user/${user?.userName}/games`}>Games</Link>
+                            <Link className="d-none d-lg-inline" to={`/users/${user?.userName}/games`}>Games</Link>
                         </Col>
                         <Col className="col-4 col-sm-4 col-lg-auto my-auto px-1">
-                            <Link className="d-none d-lg-inline" to={`/user/${user?.userName}/reviews`}>Reviews</Link>
+                            <Link className="d-none d-lg-inline" to={`/users/${user?.userName}/reviews`}>Reviews</Link>
                         </Col>
                     </Row>
                 </Col>

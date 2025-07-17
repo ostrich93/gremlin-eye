@@ -1,4 +1,5 @@
 ﻿using gremlin_eye.Server.Data;
+using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,6 +40,41 @@ namespace gremlin_eye.Server.Repositories
         public Task<AppUser?> GetUserWithTokensAsync(string username)
         {
             return _context.Users.Include(u => u.RefreshTokens).FirstOrDefaultAsync(u => u.UserName == username);
+        }
+
+        public UserProfileResponse GetUserProfile(AppUser user)
+        {
+            var totalGamesPlayed = _context.GameLogs.AsNoTracking().Where(g => g.UserId == user.Id).Count(g => g.IsPlayed);
+            var totalGamesBacklogged = _context.GameLogs.AsNoTracking().Where(g => g.UserId == user.Id).Count(g => g.IsBacklog);
+            var gamesPlayedThisYear = _context.GameLogs.AsNoTracking().Where(g => g.UserId == user.Id).Count(g => g.IsPlayed && g.UpdatedAt.Year == DateTime.UtcNow.Year);
+
+            var ratingCandidates = _context.GameLogs.Where(g => g.UserId == user.Id).SelectMany(g => g.Playthroughs);
+            int[] trueRatingCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            RatingCount[] ratings = ratingCandidates.Where(p => p.Rating > 0)
+                .GroupBy(p => p.Rating).Select(g =>
+                    new RatingCount
+                    {
+                        Rating = g.Key,
+                        Count = g.Count()
+                    }).ToArray();
+
+
+            if (ratings.Any())
+            {
+                foreach(RatingCount rc in ratings)
+                {
+                    trueRatingCounts[rc.Rating-1] = rc.Count;
+                }
+            }
+
+            return new UserProfileResponse
+            {
+                GamesBacklogged = totalGamesBacklogged,
+                GamesPlayedThisYear = gamesPlayedThisYear,
+                TotalGamesPlayed = totalGamesPlayed,
+                Username = user.UserName,
+                RatingCounts = trueRatingCounts
+            };
         }
     }
 }

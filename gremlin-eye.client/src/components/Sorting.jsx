@@ -24,6 +24,7 @@ const Sorting = ({ orderOptions, sortOrder, orderBy, update }) => {
         update([{ params: "sortOrder", value: getOppositeValue() }]);
     };
 
+    //include in fields classnames to append onto nav-interacterables?
     return (
         <div id="nav-interactables" className="col-auto">
             <Row className="h-100">

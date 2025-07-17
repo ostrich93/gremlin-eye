@@ -12,7 +12,7 @@ const UserLayout = () => {
         queryKey: ["user", username],
         queryFn: async () => {
             try {
-                const response = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/users/profiles/${slug}`);
+                const response = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/user/header/${username}`);
                 return response.data;
             } catch (error) {
                 console.error(error);

@@ -167,7 +167,7 @@ const GamePage = () => {
                                             </Link>
                                         </div>
                                         <div className="col-4 col-xl-3 pe-1">
-                                            <Link to={`/reviews/everyone/eternity/recent/${slug}`}>
+                                            <Link to={`/games/${slug}/reviews`}>
                                                 <p className="game-page-sidecard">
                                                     <FontAwesomeIcon icon={faAlignRight} />
                                                     {`${gameData?.reviewCount} Reviews`}
@@ -253,7 +253,7 @@ const GamePage = () => {
                                         <Col>
                                             <h2 className="me-auto mb-0">
                                                 Reviews
-                                                <Link className="secondary-link smaller-font ms-2" to={`/reviews/everyone/week/recent/${gameData?.slug}`}>View More</Link>
+                                                <Link className="secondary-link smaller-font ms-2" to={`/games/${gameData?.slug}/reviews`}>View More</Link>
                                             </h2>
                                         </Col>
                                         <Col className="my-auto">

@@ -5,6 +5,7 @@
         public const string ASC = "asc";
         public const string DESC = "desc";
         public const int PAGE_LIMIT_A = 60;
+        public const int PAGE_LIMIT_B = 15;
 
         public const string UPCOMING = "upcoming";
         public const string RELEASED = "released";
@@ -14,5 +15,6 @@
         public const string ORDER_GAME_RATING = "game_rating";
         public const string ORDER_GAME_TITLE = "game_title";
         public const string ORDER_TRENDING = "trending";
+        public const string ORDER_RECENT = "recent";
     }
 }

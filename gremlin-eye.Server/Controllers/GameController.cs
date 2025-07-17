@@ -95,7 +95,7 @@ namespace gremlin_eye.Server.Controllers
                 if (relatedGames != null)
                 {
                     List<GameSummaryDTO> relatedSummaries = new List<GameSummaryDTO>();
-                    foreach(var relatedGame in relatedGames)
+                    foreach (var relatedGame in relatedGames)
                     {
                         relatedSummaries.Add(new GameSummaryDTO
                         {
@@ -119,7 +119,7 @@ namespace gremlin_eye.Server.Controllers
         {
             var searchResults = await _unitOfWork.Games.SearchGames(query);
             var suggestions = new List<GameSuggestionDTO>();
-            foreach(GameData game in searchResults)
+            foreach (GameData game in searchResults)
             {
                 suggestions.Add(new GameSuggestionDTO
                 {
@@ -242,7 +242,7 @@ namespace gremlin_eye.Server.Controllers
                 };
 
                 _unitOfWork.GameLogs.Create(gameLog);
-                
+
                 if (gameLogState.Rating != null)
                 {
                     await _unitOfWork.SaveChangesAsync();
@@ -309,6 +309,26 @@ namespace gremlin_eye.Server.Controllers
 
             var paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, orderBy, sortOrder, page);
             return Ok(paginatedList);
+        }
+
+        [HttpGet("reviews/{slug}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetGameReviews(string slug, [FromQuery] int page = 1)
+        {
+            var gameData = await _unitOfWork.Games.GetGameBySlug(slug);
+            if (gameData == null)
+            {
+                return NotFound("Game not found");
+            }
+
+            var reviews = await _unitOfWork.Reviews.GetGameReviews(gameData.Id, slug, gameData.Name, page);
+            return Ok(new
+            {
+                GameName = gameData.Name,
+                gameData.CoverUrl,
+                Reviews = reviews,
+                IsEnd = reviews.Count < 32 //if the total number of reviews returned is less than 
+            });
         }
     }
 }

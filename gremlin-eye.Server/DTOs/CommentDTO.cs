@@ -9,4 +9,9 @@
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
+
+    public class CommentRequest
+    {
+        public string CommentBody { get; set; } = string.Empty;
+    }
 }

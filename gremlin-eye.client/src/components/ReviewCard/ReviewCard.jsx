@@ -11,6 +11,7 @@ const ReviewCard = ({ reviewData, isUserSubpage }) => {
     const [spoilersOpen, setSpoilersOpen] = useState(false);
 
     const renderCover = () => {
+        //console.log("reviewData: ", reviewData);
         return (
             <div className="col-2">
                 <Row>
@@ -30,10 +31,11 @@ const ReviewCard = ({ reviewData, isUserSubpage }) => {
     };
 
     const renderAvatar = () => {
+        //console.log("reviewData: ", reviewData);
         return (
             <div id="avatar" className="col-auto mb-auto pe-0">
-                <Link to={`/user/${reviewData.username}`}>
-                    <img src={reviewData.avatarUrl.length > 0 ? reviewData.avatarUrl : "/no_avatar.png"} height="40" width="40" />
+                <Link to={`/users/${reviewData.username}`}>
+                    <img src={reviewData.avatarUrl && reviewData.avatarUrl.length > 0 ? reviewData.avatarUrl : "/no_avatar.png"} height="40" width="40" />
                 </Link>
             </div>
         );
@@ -48,7 +50,7 @@ const ReviewCard = ({ reviewData, isUserSubpage }) => {
                         <Row className="top-bar mb-1">
                             <Col>
                                 <Row className="mb-1">
-                                    <Link className="mb-0 my-auto d-flex" to={`/user/${reviewData.username}`}>
+                                    <Link className="mb-0 my-auto d-flex" to={`/users/${reviewData.username}`}>
                                         <div className="col-auto my-auto username-link pe-0 me-n2">
                                             <p className="mb-0">{reviewData.username}</p>
                                         </div>
@@ -68,7 +70,7 @@ const ReviewCard = ({ reviewData, isUserSubpage }) => {
                                         </div>
                                     )}
                                     <div className="col-auto my-auto game-status ms-2 ps-2 pe-1">
-                                        <Link to={`/user/${reviewData.username}/games?type=played&status=${reviewData.playStatus}`}>
+                                        <Link to={`/users/${reviewData.username}/games?type=played&status=${reviewData.playStatus}`}>
                                             <p className="mb-0 play-type">{reviewData.playStatus}</p>
                                         </Link>
                                     </div>
@@ -78,7 +80,7 @@ const ReviewCard = ({ reviewData, isUserSubpage }) => {
                                                 <p className="mb-0">on</p>
                                             </div>
                                             <div className="col-auto my-auto ps-0 pe-1">
-                                                <Link className="my-0 ms-auto review-platform" to={`/user/${reviewData.username}/games?played&=platform=${reviewData.platform.slug}`}>
+                                                <Link className="my-0 ms-auto review-platform" to={`/users/${reviewData.username}/games?played&=platform=${reviewData.platform.slug}`}>
                                                     <p className="mb-0">{reviewData.platform.name}</p>
                                                 </Link>
                                             </div>
@@ -116,13 +118,13 @@ const ReviewCard = ({ reviewData, isUserSubpage }) => {
                                 <p className="mb-0 d-inline-block like-counter">{reviewData.totalLikes}</p>
                             </div>
                             <div className="col-auto my-auto pe-1">
-                                <Link className="comments-link" to={`/user/${reviewData.username}/review/${reviewData.reviewId}#comments`}>
+                                <Link className="comments-link" to={`/users/${reviewData.username}/review/${reviewData.reviewId}#comments`}>
                                     <FontAwesomeIcon icon={faComment} />
                                     {reviewData.commentCount}
                                 </Link>
                             </div>
                             <div className="col-auto my-auto pe-1">
-                                <Link className="open-review-link" to={`/user/${reviewData.username}/review/${reviewData.reviewId}`}>Open Review</Link>
+                                <Link className="open-review-link" to={`/users/${reviewData.username}/review/${reviewData.reviewId}`}>Open Review</Link>
                             </div>
                             {/** Include Expand area here **/ }
                         </Row>
