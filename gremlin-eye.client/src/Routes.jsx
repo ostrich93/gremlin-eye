@@ -15,7 +15,7 @@ import GameLibrary from './pages/game/GameLibrary';
 import CompanyPage from './pages/CompanyPage';
 import UserLayout from './layouts/User/UserLayout';
 import UserProfile from './pages/user/UserProfile';
-//import UserGameLibrary from './pages/user/UserGameLibrary';
+import UserGameLibrary from './pages/user/UserGameLibrary';
 import UserReviews from './pages/user/UserReviews';
 import ReviewPage from './pages/ReviewPage';
 import GameReviews from './pages/game/GameReviews';
@@ -42,11 +42,8 @@ const AppRoutes = () => {
             <Route path="/company/:slug" element={<CompanyPage />} />
 
             <Route path="/users/:username" element={<UserLayout />}>
-                /*<Route index element={<UserProfile />} />
-                {/*<Route path="/games?type=played" element={<UserGameLibrary />} />
-                <Route path="/games?type=playing" element={<UserGameLibrary />} />
-                <Route path="/games?type=backlog" element={<UserGameLibrary />} />
-                <Route path="/games?type=wishlist" element={<UserGameLibrary />} />*/}
+                <Route index element={<UserProfile />} />
+                <Route path="games" element={<UserGameLibrary />} />
                 <Route path="reviews" element={<UserReviews /> } />
             </Route>
 

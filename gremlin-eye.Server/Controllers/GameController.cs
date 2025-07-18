@@ -311,6 +311,72 @@ namespace gremlin_eye.Server.Controllers
             return Ok(paginatedList);
         }
 
+        [HttpGet("user/{username}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserGames(string username, [FromQuery] string? releaseYear, [FromQuery] string? genre, [FromQuery] string? releasePlatform,
+            [FromQuery] string? playedPlatform, [FromQuery] string? playStatus, [FromQuery(Name = "playTypes[]")] string[] playTypes,
+            [FromQuery] int rating = 0, [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
+            [FromQuery] int page = 1)
+        {
+            var user = await _unitOfWork.Users.GetUserByNameAsync(username);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var predicate = PredicateBuilder.New<GameData>();
+
+            if (releaseYear != null)
+            {
+                switch (releaseYear)
+                {
+                    case Constants.UPCOMING:
+                        predicate = predicate.And(g => g.ReleaseDate == null || g.ReleaseDate > DateTimeOffset.UtcNow);
+                        break;
+                    case Constants.RELEASED:
+                        predicate = predicate.And(g => g.ReleaseDate != null && g.ReleaseDate <= DateTimeOffset.UtcNow);
+                        break;
+                    default:
+                        if (releaseYear.Trim().Length == 0)
+                            break;
+                        int yearStr;
+                        if (int.TryParse(releaseYear, out yearStr))
+                        {
+                            predicate.And(g => g.ReleaseDate.HasValue && g.ReleaseDate.Value.Year == yearStr);
+                        }
+                        break;
+                }
+            }
+            if (genre != null)
+                predicate.And(g => g.Genres.Any(gen => gen.Slug == genre));
+            if (releasePlatform != null)
+                predicate.And(g => g.Platforms.Any(p => p.Slug == releasePlatform));
+            if (playedPlatform != null)
+                predicate.And(g => g.GameLogs.Any(l => l.UserId == user.Id && l.Playthroughs.Where(p => p.Platform != null && p.Platform.Slug == playedPlatform).Any()));
+            if (playStatus != null)
+                predicate.And(g => g.GameLogs.Any(l => l.UserId == user.Id && l.PlayStatus.HasValue && ((PlayState)l.PlayStatus).ToStringValue() == playStatus));
+
+            predicate.And(g => g.GameLogs.Any(l => l.UserId == user.Id && l.Playthroughs.Count(p => p.Rating >= rating) > 0));
+
+            var inner = PredicateBuilder.New<GameData>();
+            foreach(string playType in playTypes)
+            {
+                if (PlayingType.Played.ToStringValue() == playType)
+                    inner.Or(g => g.GameLogs.Any(l => l.UserId == user.Id && l.IsPlayed));
+                else if (PlayingType.Playing.ToStringValue() == playType)
+                    inner.Or(g => g.GameLogs.Any(l => l.UserId == user.Id && l.IsPlaying));
+                else if (PlayingType.Backlog.ToStringValue() == playType)
+                    inner.Or(g => g.GameLogs.Any(l => l.UserId == user.Id && l.IsBacklog));
+                else if (PlayingType.Wishlist.ToStringValue() == playType)
+                    inner.Or(g => g.GameLogs.Any(l => l.UserId == user.Id && l.IsWishlist));
+            }
+            predicate.And(inner);
+
+            var paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, user.Id, orderBy, sortOrder, page, 40);
+
+            return Ok(paginatedList);
+        }
+
         [HttpGet("reviews/{slug}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetGameReviews(string slug, [FromQuery] int page = 1)

@@ -2,7 +2,7 @@ import { Dropdown, Row } from 'react-bootstrap';
 import { faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const Sorting = ({ orderOptions, sortOrder, orderBy, update }) => {
+const Sorting = ({ orderOptions, sortOrder, orderBy, update, className}) => {
 
     const getOppositeValue = () => {
         if (sortOrder === 'asc') {
@@ -26,7 +26,7 @@ const Sorting = ({ orderOptions, sortOrder, orderBy, update }) => {
 
     //include in fields classnames to append onto nav-interacterables?
     return (
-        <div id="nav-interactables" className="col-auto">
+        <div id="nav-interactables" className={className ?? "col-auto"}>
             <Row className="h-100">
                 <ul className="nav col-auto">
                     <p className="my-auto subtitle-text sort-heading me-1">Sort by</p>

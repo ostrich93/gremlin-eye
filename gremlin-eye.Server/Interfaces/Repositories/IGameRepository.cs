@@ -15,7 +15,8 @@ namespace gremlin_eye.Server.Repositories
         Task UpdateRangeAndSaveAsync(IEnumerable<GameData> data);
         Task<GameData[]> SearchGames(string query);
         Task<List<GameData>?> GetRelatedGames(long seriesId, long gameId);
-        Task<PaginatedList<GameSummaryDTO>> GetPaginatedList(ExpressionStarter<GameData> predicate, string orderBy, string sortOrder, int page = 1);
+        Task<PaginatedList<GameSummaryDTO>> GetPaginatedList(ExpressionStarter<GameData> predicate, string orderBy, string sortOrder, int page = 1, int itemsPerPage = Constants.PAGE_LIMIT_A);
+        Task<PaginatedList<GameSummaryDTO>> GetPaginatedList(ExpressionStarter<GameData> predicate, Guid userId, string orderBy, string sortOrder, int page = 1, int itemsPerPage = Constants.PAGE_LIMIT_A);
         Task<PaginatedList<GameSummaryDTO>> GetPaginatedList(IQueryable<GameData> query, ExpressionStarter<GameData> predicate, string orderBy, string sortOrder, int totalItems, double min, double max, int page = 1);
     }
 }
