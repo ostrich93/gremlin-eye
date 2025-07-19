@@ -1,4 +1,5 @@
-﻿using gremlin_eye.Server.Data;
+﻿using gremlin_eye.Server.Comparers;
+using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
 using LinqKit;
@@ -194,6 +195,7 @@ namespace gremlin_eye.Server.Repositories
             var totalItems = await _context.Games.AsNoTracking().CountAsync(predicate);
 
             List<GameData> games;
+            List<GameData>? queried = null;
             switch (orderBy)
             {
                 case Constants.ORDER_RELEASE_DATE:
@@ -207,17 +209,28 @@ namespace gremlin_eye.Server.Repositories
                     games = sortOrder == Constants.ASC ? await _context.Games.AsNoTracking().Where(predicate).OrderBy(g => g.Slug).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToListAsync() : await _context.Games.AsNoTracking().Where(predicate).OrderByDescending(g => g.Slug).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToListAsync();
                     break;
                 case Constants.ORDER_LAST_PLAYED:
-                    games = sortOrder == Constants.ASC ? await _context.Games.AsNoTracking().Where(predicate).OrderBy(g => g.GameLogs.Where(l => l.UserId == userId).Select(l => l.UpdatedAt).DefaultIfEmpty()).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToListAsync()
-                        : await _context.Games.AsNoTracking().Where(predicate).OrderByDescending(g => g.GameLogs.Where(l => l.UserId == userId).Select(l => l.UpdatedAt).DefaultIfEmpty()).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToListAsync();
+                    queried = await _context.Games.AsNoTracking().Where(predicate).Include(g => g.GameLogs).ThenInclude(l => l.Playthroughs).ToListAsync();
+                    queried.Sort(new LastPlayedComparer());
+                    if (sortOrder == Constants.DESC)
+                        queried.Reverse();
+
+                    games = queried.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList();
                     break;
                 case Constants.ORDER_WHEN_ADDED:
-                    games = sortOrder == Constants.ASC ? await _context.Games.AsNoTracking().Where(predicate).OrderBy(g => g.GameLogs.Where(l => l.UserId == userId).Select(l => l.CreatedAt).DefaultIfEmpty()).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToListAsync()
-                        : await _context.Games.AsNoTracking().Where(predicate).OrderByDescending(g => g.GameLogs.Where(l => l.UserId == userId).Select(l => l.CreatedAt).DefaultIfEmpty()).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToListAsync();
+                    queried = await _context.Games.AsNoTracking().Where(predicate).Include(g => g.GameLogs).ThenInclude(l => l.Playthroughs).ToListAsync();
+                    queried.Sort(new UserGameAddedComparer());
+                    if (sortOrder == Constants.DESC)
+                        queried.Reverse();
+
+                    games = queried.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList();
                     break;
                 case Constants.ORDER_USER_RATING:
-                    var queried = _context.Games.AsNoTracking().Where(predicate).Include(g => g.GameLogs).ThenInclude(l => l.Playthroughs);
-                    games = sortOrder == Constants.ASC ? await _context.Games.AsNoTracking().Where(predicate).OrderBy(g => g.Playthroughs.Where(p => p.GameLog.UserId == userId).Select(p => p.Rating).DefaultIfEmpty()).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToListAsync()
-                        : await _context.Games.AsNoTracking().Where(predicate).OrderByDescending(g => g.Playthroughs.Where(p => p.GameLog.UserId == userId).Select(p => p.Rating).DefaultIfEmpty()).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToListAsync();
+                    queried = await _context.Games.AsNoTracking().Where(predicate).Include(g => g.GameLogs).ThenInclude(l => l.Playthroughs).ToListAsync();
+                    queried.Sort(new UserRatingComparer());
+                    if (sortOrder == Constants.DESC)
+                        queried.Reverse();
+                        
+                    games = queried.Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToList();
                     break;
                 default:
                     games = sortOrder == Constants.ASC ? await _context.Games.AsNoTracking().Where(predicate).OrderBy(g => g.Id).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToListAsync() : await _context.Games.AsNoTracking().Where(predicate).OrderByDescending(g => g.Id).Skip((page - 1) * itemsPerPage).Take(itemsPerPage).ToListAsync();
