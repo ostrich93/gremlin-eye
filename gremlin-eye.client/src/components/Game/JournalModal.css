@@ -1,2 +1,75 @@
-body {
+.play-type-bkg.completed {
+    background-color: var(--back-type-completed);
+}
+.play-type-bkg.mastered {
+    background-color: var(--back-type-mastered);
+}
+.play-type-bkg.abandoned {
+    background-color: var(--back-type-abandoned);
+}
+.play-type-bkg.shelved {
+    background-color: var(--back-type-shelved);
+}
+.play-type-bkg.played {
+    background-color: var(--back-type-played);
+}
+
+#log-editor-full #log-toggle-buttons #played-toggle-checkbox #played-status-text {
+    top: 15%;
+}
+
+#log-editor-full #log-toggle-buttons input {
+    display: none;
+}
+
+#log-editor-full #log-toggle-buttons label {
+    height: 32px;
+    padding: 4px;
+}
+
+#log-editor-full .main-header {
+    font-size: 1.5em;
+}
+
+#log-editor-full #log-editor-playthrough-nav {
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+#log-editor-full #log-editor-playthrough-nav #playthrough-container {
+    display: inline-flex;
+    max-height: 40.7px;
+    overflow: hidden;
+}
+
+#log-editor-full #log-toggle-buttons #played-status-selector {
+    border-bottom-left-radius: 4px;
+    border-right: 1px solid rgba(57,61,74,.671);
+    border-top-left-radius: 4px;
+    color: var(--back-link);
+    height: 32px;
+    padding: 0.6px;
+    position: relative;
+    z-index: 2;
+}
+
+#log-extras-dropdown.dropdown-toggle::after {
+    display: none;
+}
+
+#playthroughPlatform,
+#playthroughOwnership {
+    background-color: var(--back-field-background);
+    border: 1px solid var(--back-field-background);
+    border-radius: 4px;
+    color: #fff;
+}
+
+.nav-underline .nav-link.active {
+    color: #fff;
+    border-bottom-color: var(--back-pink-dk)
+}
+
+#journal-warning-modal.modal__container {
+    width: 450px;
 }

@@ -19,6 +19,7 @@ import UserGameLibrary from './pages/user/UserGameLibrary';
 import UserReviews from './pages/user/UserReviews';
 import ReviewPage from './pages/ReviewPage';
 import GameReviews from './pages/game/GameReviews';
+import NotFoundPage from './pages/NotFound';
 
 const AppRoutes = () => {
     return (
@@ -48,6 +49,8 @@ const AppRoutes = () => {
             </Route>
 
             <Route path="/users/:username/review/:reviewId" element={<ReviewPage /> } />
+
+            <Route path="*" element={<NotFoundPage /> } />
 
             {/*<Route path="/series/:slug" element={<SeriesPage />} />*/}
         </Routes>

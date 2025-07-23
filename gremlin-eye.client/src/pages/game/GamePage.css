@@ -29,6 +29,13 @@
     z-index: -1;
 }
 
+#game-banner-art .no-artwork-gradient {
+    background: radial-gradient(ellipse at top, var(--back-interact),transparent),radial-gradient(ellipse at bottom, var(--back-pink),transparent);
+    height: 450px;
+    width: 100%;
+    z-index: -1;
+}
+
 #game-profile #game-body {
     padding-top: 350px;
 }

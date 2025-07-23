@@ -81,7 +81,7 @@ th, td {
 }
 
 .subtitle-text {
-    font-weight: 300;
+    font-weight: 200;
 }
 .subtitle-text {
     line-height: normal;
@@ -89,6 +89,247 @@ th, td {
 .smaller-font,
 .subtitle-text {
     font-size: .9rem;
+}
+
+.btn-main {
+    background-color: var(--back-pink-dk);
+    border-color: var(--back-pink-dk);
+    line-height: normal;
+}
+
+.btn-main:hover {
+    background-color: var(--back-pink);
+    border-color: var(--back-pink);
+}
+
+.btn-general {
+    background-color: var(--back-interact);
+}
+
+.btn-general:hover {
+    background-color: var(--back-field-highlight);
+    border-color: var(--back-field-highlight);
+    transition: .2s;
+}
+
+.btn-checkbox {
+    background-color: var(--back-field);
+    color: var(--back-text-secondary);
+}
+
+.btn-checkbox:hover {
+    color: #fff;
+}
+
+.btn-link {
+    background-color: transparent;
+    border: none;
+    color: var(--back-link);
+    cursor: pointer;
+    line-height: normal;
+    outline: none;
+    padding: 0;
+}
+
+.btn-link:focus {
+    box-shadow: unset;
+    outline: none;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-small {
+    border: none;
+    padding: 2px 4px;
+}
+
+#nav-interactables .dropdown-sort {
+    background-color: var(--back-secondary);
+    border: 1px solid var(--back-field);
+    font-size: .8rem;
+    min-width: 0;
+    width: max-content;
+}
+
+#nav-interactables .dropdown-sort a {
+    color: var(--back-text);
+    font-weight: 300;
+    padding: 3px 8px;
+}
+
+#nav-interactables .dropdown-sort a:hover {
+    background-color: var(--back-field);
+    color: #fff;
+    cursor: pointer;
+}
+
+.btn-sort {
+    background-color: transparent;
+    border: 0 solid transparent;
+    color: var(--back-pink);
+    font-size: .9rem;
+    font-weight: 500;
+    padding: 0;
+}
+
+.btn-sort:focus,
+.btn-sort:hover {
+    color: var(--back-pink-dk);
+}
+
+.btn-sort:focus {
+    box-shadow: none;
+}
+
+.fill-in,
+.fill-in-slim {
+    border: 1px solid rgba(69,74,100,.439);
+    border-radius: 4px;
+    color: var(--back-link);
+    font-weight: 300;
+    line-height: normal;
+    padding: 5px 7px;
+    transition: .2s;
+}
+
+.fill-in-slim {
+    height: unset;
+    padding: 2px 6px;
+}
+
+.fill-in-slim:hover,
+.fill-in:hover {
+    background-color: rgba(41,47,60,.42);
+    color: #fff;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.fill-in-slim.filled,
+.fill-in.filled,
+input[type=checkbox]:checked+.fill-in,
+input[type=checkbox]:checked+.fill-in-slim,
+input[type=radio]:checked+.fill-in,
+input[type=radio]:checked+.fill-in-slim {
+    background-color: var(--back-field-highlight);
+    color: #fff;
+}
+
+input[type=checkbox]:checked+btn-checkbox {
+    background-color: var(--back-interact);
+    color: #fff;
+}
+
+.gremlin-eye-checkbox-lg:disabled+.checkbox-label,
+.gremlin-eye-checkbox:disabled+.checkbox-label {
+    color: var(--back-text-secondary);
+}
+
+.gremlin-eye-checkbox,
+.gremlin-eye-checkbox-lg {
+    -webkit-appearance: unset;
+    background-color: var(--back-field-background);
+    border: 1px solid var(--back-field-background);
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 9pt;
+    height: 18px;
+    text-align: center;
+    vertical-align: middle;
+    width: 18px;
+}
+
+.gremlin-eye-checkbox~.btn-link {
+    font-size: .9rem;
+}
+
+.gremlin-eye-checkbox-lg:hover,
+.gremlin-eye-checkbox:hover {
+    border-color: var(--back-field-border-hover);
+}
+
+.gremlin-eye-checkbox-lg {
+    height: 24px;
+    width: 24px;
+}
+
+.gremlin-eye-checkbox-lg:after,
+.gremlin-eye-checkbox:after {
+    display: none;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    content: "✓";
+    font-family: Font Awesome\ 6 Pro;
+    font-size: .6rem;
+    font-weight: 900;
+    line-height: 16px;
+}
+
+.gremlin-eye-checkbox-lg:checked::after,
+.gremlin-eye-checkbox:checked::after {
+    display: block;
+}
+
+.gremlin-eye-field {
+    border: 1px solid var(--back-field-border);
+    border-radius: 4px;
+    color: var(--back-link);
+    height: 2rem;
+    padding: 0 5px;
+}
+
+.gremlin-eye-field,
+.gremlin-eye-field[readonly] {
+    background-color: var(--back-field-background);
+}
+
+.gremlin-eye-field:hover {
+    border-color: var(--back-field-border-hover);
+}
+
+.gremlin-eye-field:disabled {
+    background-color: var(--back-field-background);
+    border-color: var(--back-field-border);
+    opacity: 5;
+}
+
+.gremlin-eye-field.form-control:focus {
+    background-color: var(--back-field-background);
+}
+
+textarea.gremlin-eye-field {
+    height: unset;
+}
+
+.gremlin-eye-field:-webkit-autofill:focus {
+    background-color: transparent!important;
+}
+
+.gremlin-eye-field:focus,
+textarea:focus {
+    border-color: var(--back-field-border-focus)!important;
+    box-shadow: none;
+    color: #fff;
+    outline: none;
+}
+
+.gremlin-eye-field::placeholder {
+    color: var(--back-field-placeholder);
+}
+
+.gremlin-eye-field:-ms-input-placeholder {
+    color: var(--back-field-placeholder);
+}
+
+.gremlin-eye-field::-moz-placeholder {
+    color: var(--back-field-placeholder);
 }
 
 .rate {
@@ -115,6 +356,43 @@ th, td {
     font-size: .67rem;
     font-weight: 300;
     margin-bottom: 0;
+}
+
+.btn-play svg {
+    font-size: 1.65rem;
+}
+.play-btn-container .btn-play svg {
+    line-height: 1.2rem;
+}
+
+#log-toggle-buttons label:hover,
+.btn-play:hover {
+    cursor: pointer;
+}
+
+#log-toggle-buttons label:hover p,
+.btn-play:hover p {
+    color: #fff;
+}
+
+#log-toggle-buttons label:focus,
+.btn-play:focus {
+    outline: none;
+    text-decoration: none;
+}
+
+#log-toggle-buttons label:focus p,
+.btn-play:focus p {
+    color: #fff;
+}
+
+.btn-play-fill button {
+    color: var(--back-pink);
+    text-decoration: none;
+}
+
+#buttons .btn-play-fill .btn-play[data-play_type=played] {
+    color: var(--back-pink)!important;
 }
 
 #display-filters .sort-heading,
@@ -243,6 +521,10 @@ th, td {
     overflow: hidden;
 }
 
+.main-header {
+    color: #fff;
+}
+
 #log-in #title {
     color: var(--back-text-secondary);
     font-size: 3rem;
@@ -253,8 +535,190 @@ th, td {
     width: 100%;
 }
 
+#journal-game-modal #log-editor-full #log-toggle-buttons #played-toggle-label {
+    height: 32px;
+}
+
+#journal-game-modal #log-toggle-buttons label, #log-editor-full #log-toggle-buttons label {
+    border: none;
+    border-radius: 4px;
+    color: var(--back-interact);
+    cursor: pointer;
+    display: block;
+    margin-bottom: 4px;
+    margin-top: 0;
+    position: relative;
+    text-align: center;
+}
+
+#journal-game-modal {
+    z-index: 1040;
+    display: block;
+}
+
+#journal-game-modal #log-toggle-buttons label, #log-editor-full #log-toggle-buttons label {
+    min-width: 112px;
+}
+
+#journal-game-modal #log-toggle-buttons #played-toggle-checkbox #played-status-text,
+#log-editor-full #log-toggle-buttons #played-toggle-checkbox #played-status-text {
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    text-overflow: ellipsis;
+    top: 0;
+}
+
+#journal-game-modal #log-toggle-buttons input:not(:checked) + #played-status-selectors #game-status-selector,
+#journal-game-modal #log-toggle-buttons input:not(:checked) + #played-status-selectors label,
+#journal-game-modal #log-toggle-buttons input:not(:checked) + label,
+#log-editor-full #log-toggle-buttons input:not(:checked) + #played-status-selectors,
+#log-editor-full #log-toggle-buttons input:not(:checked) + #played-status-selectors label,
+#log-editor-full #log-toggle-buttons input:not(:checked) + label {
+    background-color: var(--back-field);
+}
+
+#journal-game-modal #log-toggle-buttons input:checked + label,
+#log-editor-full #log-toggle-buttons input:checked + label {
+    background-color: var(--back-pink-dk);
+}
+
+#sort-direction-button {
+    color: var(--back-link);
+}
+
+#sort-direction-button:hover {
+    color: #fff;
+}
+
+.play-type.played {
+    border-color: var(--back-type-played)!important;
+}
+.play-type-color.played {
+    color: var(--back-type-played);
+}
+
+.play-type.completed {
+    border-color: var(--back-type-completed)!important;
+}
+.play-type-color.completed {
+    color: var(--back-type-completed);
+}
+
+.play-type.mastered {
+    border-color: var(--back-type-mastered)!important;
+}
+.play-type-color.mastered {
+    color: var(--back-type-mastered);
+}
+
+.play-type.abandoned {
+    border-color: var(--back-type-abandoned)!important;
+}
+.play-type-color.abandoned {
+    color: var(--back-type-abandoned);
+}
+
+.play-type.shelved {
+    border-color: var(--back-type-shelved)!important;
+}
+.play-type-color.shelved {
+    color: var(--back-type-shelved);
+}
+
+.play-type.retired {
+    border-color: var(--back-type-retired)!important;
+}
+.play-type-color.shelved {
+    color: var(--back-type-retired);
+}
+
+.avatar {
+    padding-bottom: 100%;
+    position: relative;
+    width: 100%;
+}
+
+.avatar img {
+    border-radius: 5px;
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    max-width: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100%;
+}
+
+.ReactModal__Overlay--after-open {
+    align-items: center;
+    background: rgba(0,0,0,0.6);
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 2000;
+}
+
+.modal__overlay:focus {
+    outline:none;
+}
+
+.modal__container {
+    background-color: var(--back-primary);
+    border-radius: 4px;
+    max-height: 100vh;
+    max-width: 500px;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.modal__content {
+    backface-visibility: hidden;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.modal-dialog {
+    margin: .5rem;
+    pointer-events: none;
+    position: relative;
+    width: auto;
+}
+
+.modal-content {
+    background-clip: padding-box;
+    border-radius: .3rem;
+    display: flex;
+    flex-direction: column;
+    outline: 0;
+    pointer-events: auto;
+    position: relative;
+    width: 100%;
+}
+
+.modal-body {
+    flex: 1 1 auto;
+    padding: 1rem;
+    position: relative;
+}
+
+.modal__header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
 @media(min-width:1200px) {
     .container {
-        max-width: 1140px
+        max-width: 1140px;
     }
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Button, Container, Form, Row } from 'react-bootstrap';
 import { useAuthState, useAuthDispatch } from '../contexts/AuthProvider';
 import { login } from '../actions/authActions';
 
@@ -32,7 +32,7 @@ const Login = () => {
                             <Form.Control type='password' value={password} placeholder='Password' onChange={e => setPassword(e.target.value)} name="password" required disabled={loading} />
                         </Form.Group>
                         <div>
-                            <Button id="register-button" type='submit' disabled={loading || (!username.length || !password.length)}>Log In</Button>
+                            <Button id="register-button" type='submit' className="btn-main" disabled={loading || (!username.length || !password.length)}>Log In</Button>
                         </div>
                     </Form>
                 </div>

@@ -4,8 +4,6 @@ import { Button, ButtonGroup, Col, Container, Form, Offcanvas, Pagination, Row, 
 import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query';
 import Rate from 'rc-rate';
 import "rc-rate/assets/index.css";
-import { faSquare } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import GameCard from "../../components/Game/GameCard";
 import Sorting from "../../components/Sorting";
 import apiClient from "../../config/apiClient";

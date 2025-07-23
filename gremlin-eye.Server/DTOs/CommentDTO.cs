@@ -1,4 +1,6 @@
-﻿namespace gremlin_eye.Server.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace gremlin_eye.Server.DTOs
 {
     public class CommentDTO
     {
@@ -12,6 +14,7 @@
 
     public class CommentRequest
     {
+        public long ReviewId { get; set; }
         public string CommentBody { get; set; } = string.Empty;
     }
 }

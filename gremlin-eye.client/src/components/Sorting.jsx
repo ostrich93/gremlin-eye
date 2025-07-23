@@ -30,22 +30,18 @@ const Sorting = ({ orderOptions, sortOrder, orderBy, update, className}) => {
             <Row className="h-100">
                 <ul className="nav col-auto">
                     <p className="my-auto subtitle-text sort-heading me-1">Sort by</p>
-                    <button id="sort-direction-button" className="my-auto" onClick={handleOrderUpdate}>
+                    <button id="sort-direction-button" className="btn-link my-auto" onClick={handleOrderUpdate}>
                         <FontAwesomeIcon icon={sortOrder === 'asc' ? faSortUp : faSortDown} />
                     </button>
                     <Dropdown title={orderBy}>
-                        <Dropdown.Toggle>{orderBy}</Dropdown.Toggle>
-                        <Dropdown.Menu>
+                        <Dropdown.Toggle className="btn-sort btn-sm py-0 px-1" variant="">{orderBy}</Dropdown.Toggle>
+                        <Dropdown.Menu className="dropdown-sort">
                             {orderOptions && (
                                 orderOptions.map(option => (
                                     <Dropdown.Item id={option.type} key={option.type} onClick={(e) => handleOptionUpdate(e, option)}>{option.name}</Dropdown.Item>
                                 ))
                             ) }
                         </Dropdown.Menu>
-                        {/*<Dropdown.Item onClick={() => update([{ params: "orderBy", value: "game_title" }, { params: "page", value: 1}])}>Game Title</Dropdown.Item>
-                        <Dropdown.Item onClick={() => update([{ params: "orderBy", value: "trending" }, { params: "page", value: 1 }])}>Trending</Dropdown.Item>
-                        <Dropdown.Item onClick={() => update([{ params: "orderBy", value: "release_date" }, { params: "page", value: 1 }])}>Release Date</Dropdown.Item>
-                        <Dropdown.Item onClick={() => update([{ params: "orderBy", value: "game_rating" }, { params: "page", value: 1 }])}>Game Rating</Dropdown.Item>*/}
                     </Dropdown>
                 </ul>
             </Row>

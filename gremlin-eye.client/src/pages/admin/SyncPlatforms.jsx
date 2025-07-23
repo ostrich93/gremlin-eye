@@ -33,7 +33,7 @@ const SyncPlatforms = () => {
                 <div className="form-group my-3">
                     <small className="form-text">Imports and syncrhonizes all platform data from IGDB.</small>
                 </div>
-                <button id="register-button" type='submit' disabled={loading}>Sync Platforms</button>
+                <button id="register-button" type='submit' className="btn-main" disabled={loading}>Sync Platforms</button>
             </form>
             <div>
                 {message && <p>{message}</p>}

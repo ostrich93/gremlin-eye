@@ -4,16 +4,15 @@ import ReactModal from "react-modal";
 import { faBook, faCaretDown, faCirclePlus, faEllipsisVertical, faExclamationTriangle, faGamepad, faHeart, faGift, faPlay, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import apiClient from "../../config/apiClient";
+import { playStatusEnumStrings, playStatusEnumDisplayStrings } from "../../utils/constants";
 import formatDate from '../../utils/formatDate';
 import JournalForm from "./JournalForm";
 import { useJournalDispatch, useJournalState } from "../../contexts/JournalProvider";
 import PlayStatusModalContent from "./PlayStatusModal";
+import './JournalModal.css';
 
 //The JournalModal can be accessed either directly from a game page OR by clicking "Log a Game" in the Navbar, searching, and selecting a result.
 //In order to work with both cases, the JournalModal takes in a gameId and a userId to load the gamelog and playthroughs
-
-const playStatusEnumStrings = ["played", "completed", "retired", "shelved", "abandoned"];
-const playStatusEnumDisplayStrings = ["Played", "Completed", "Retired", "Shelved", "Abandoned"];
 
 const JournalModalContent = () => {
     const { gameId } = useJournalState();
@@ -116,7 +115,6 @@ const JournalModalContent = () => {
         }
         setPlaythroughDrafts(playthroughDrafts => playthroughDrafts.filter(playthrough => playthrough.playthroughId !== playthroughId));
         if (playthroughId >= 0) {
-            //console.log([...gameLogForm.playthroughsToDelete, playthroughId]);
             setGameLogForm(gameLogForm => ({
                 ...gameLogForm,
                 playthroughsToDelete: [...gameLogForm.playthroughsToDelete, playthroughId]
@@ -219,22 +217,24 @@ const JournalModalContent = () => {
                                                     <Row>
                                                         <Col>
                                                             <Row id="log-toggle-buttons" className="mt-2">
-                                                                <div id={`play-${gameId}`} className="col-auto pe-1">
-                                                                    <Row id="play-status-selectors" className="play-type-bkg">
+                                                                <div id={`play-${gameId}`} className="col-auto pe-1 play-btn-container">
+                                                                    <input id="status" type="hidden" name="status" value={gameLogForm?.isPlayed ? playStatusEnumStrings[currentPlayStatusOption] : "played"} autoComplete="off" />
+                                                                    <input id="played-toggle-checkbox" type="checkbox" name="played-toggle" value={gameLogForm?.isPlayed} checked={gameLogForm?.isPlayed} onChange={() => setGameLogForm({ ...gameLogForm, isPlayed: !gameLogForm.isPlayed })} />
+                                                                    <Row id="played-status-selectors" className="play-type-bkg">
                                                                         <div className="col-auto pe-0">
-                                                                            <Button id="play-status-selector" variant="link" onClick={() => setShowPlayStatusModal(true)}>
+                                                                            <Button id="played-status-selector" className={`btn-link play-type-bkg ${gameLogForm?.isPlayed ? playStatusEnumStrings[currentPlayStatusOption] : ""}`} onClick={() => setShowPlayStatusModal(true)}>
                                                                                 <FontAwesomeIcon icon={faCaretDown} />
                                                                             </Button>
                                                                         </div>
                                                                         <Col className="ps-0 position-relative">
-                                                                            <ToggleButton id="played-toggle-checkbox" className={`play-type-bkg ${gameLogForm?.isPlayed ? playStatusEnumStrings[currentPlayStatusOption] : ""}`} type="checkbox" value={gameLogForm?.isPlayed} checked={gameLogForm?.isPlayed} onChange={() => setGameLogForm({ ...gameLogForm, isPlayed: !gameLogForm.isPlayed })}>
+                                                                            <label id="played-toggle-label" className={`play-type-bkg w-100 ${gameLogForm?.isPlayed ? playStatusEnumStrings[currentPlayStatusOption] : ""}`} htmlFor="played-toggle-checkbox">
                                                                                 <div id="played-status-text">
                                                                                     <FontAwesomeIcon icon={faGamepad} />
                                                                                     <p className="label d-inline-block">
                                                                                         <span id="played-label-title">{playStatusEnumDisplayStrings[currentPlayStatusOption]}</span>
                                                                                     </p>
                                                                                 </div>
-                                                                            </ToggleButton>
+                                                                            </label>
                                                                         </Col>
                                                                     </Row>
                                                                 </div>
@@ -276,7 +276,7 @@ const JournalModalContent = () => {
                                                 </div>
                                                 <div className="col-auto my-auto ms-auto">
                                                     <Dropdown>
-                                                        <Dropdown.Toggle id="log-extras-dropdown">
+                                                        <Dropdown.Toggle id="log-extras-dropdown" variant="link">
                                                             <FontAwesomeIcon icon={faEllipsisVertical} />
                                                         </Dropdown.Toggle>
 
@@ -344,41 +344,74 @@ const JournalModalContent = () => {
                 </div>
             </div>
 
-            <ReactModal isOpen={showJournalCloseWarning} onRequestClose={handleJournalWarningClose}>
-                <Container fluid className="modal__content my-0">
-                    <Row>
-                        <Col>
-                            <h5 className="mb-0 main-header" id="journal-close-warning-modal-title">
-                                <FontAwesomeIcon icon={faExclamationTriangle} />
-                                Warning
-                            </h5>
-                        </Col>
-                    </Row>
-                    <Row className="my-2">
-                        <Col>
-                            <p id="warning-desc" className="mb-0">Your logs have unsaved changes</p>
-                        </Col>
-                    </Row>
-                    <Row className="mt-3">
-                        <div className="col-auto">
-                            <Button id="warning-abort" className="btn-general w-100" onClick={handleJournalWarningClose}>Discard</Button>
-                        </div>
-                        <div className="col-auto ms-auto pe-0">
-                            <Button id="warning-cancel" className="btn-general w-100" onClick={() => setShowJournalCloseWarning(false)}>
-                                Return to Edit
-                            </Button>
-                        </div>
-                        <div className="col-auto">
-                            <Button id="warning-save" className="btn-main w-100">Save</Button>
-                        </div>
-                    </Row>
-                </Container>
+            <ReactModal
+                id="journal-warning-modal"
+                isOpen={showJournalCloseWarning}
+                onRequestClose={handleJournalWarningClose}
+                style={{
+                    overlay: {
+                        zIndex: 2005
+                    },
+                    content: {
+                        backgroundColor: 'var(--back-primary)',
+                        inset: 'auto'
+                    }
+                }}
+            >
+                <div className="modal__container py-3 mx-3">
+                    <Container fluid className="modal__content my-0">
+                        <Row>
+                            <Col>
+                                <h5 className="mb-0 main-header" id="journal-close-warning-modal-title">
+                                    <FontAwesomeIcon icon={faExclamationTriangle} />
+                                    Warning
+                                </h5>
+                            </Col>
+                        </Row>
+                        <Row className="my-2">
+                            <Col>
+                                <p id="warning-desc" className="mb-0">Your logs have unsaved changes</p>
+                            </Col>
+                        </Row>
+                        <Row className="mt-3">
+                            <div className="col-auto">
+                                <Button id="warning-abort" className="btn-general w-100" onClick={handleJournalWarningClose}>Discard</Button>
+                            </div>
+                            <div className="col-auto ms-auto pe-0">
+                                <Button id="warning-cancel" className="btn-general w-100" onClick={() => setShowJournalCloseWarning(false)}>
+                                    Return to Edit
+                                </Button>
+                            </div>
+                            <div className="col-auto">
+                                <Button id="warning-save" className="btn-main w-100">Save</Button>
+                            </div>
+                        </Row>
+                    </Container>
+                </div>
             </ReactModal>
 
             <ReactModal
+                id="play-type-modal"
                 isOpen={showPlayStatusModal}
                 onRequestClose={() => setShowPlayStatusModal(false)}
                 shouldCloseOnOverlayClick={true}
+                style={{
+                    overlay: {
+                        alignItems: 'center',
+                        bottom: 0,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        left: 0,
+                        position: 'fixed',
+                        right: 0,
+                        top: 0,
+                        zIndex: 2000
+                    },
+                    content: {
+                        position: 'static',
+                        backgroundColor: 'var(--back-primary)'
+                    }
+                }}
             >
                 <PlayStatusModalContent handleStatusChange={updateGameLogStatusValue} togglePlayed={markUnplayed} />
             </ReactModal>

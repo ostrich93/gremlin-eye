@@ -30,15 +30,13 @@ export default function ReviewPage() {
         },
         placeholderData: keepPreviousData,
         cacheTime: 1000 * 60 * 5,
-        staleTime: 1000 * 60 * 5
+        staleTime: 1000
     });
 
     const addCommentMutation = useMutation({
-        mutationFn: async (commentBody) => {
+        mutationFn: async ({ reviewId, commentBody }) => {
             try {
-                const response = await apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/reviews/${reviewId}/comment`, { commentBody }, {
-                    withCredentials: true
-                });
+                const response = await apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/api/reviews/addComment`, { reviewId, commentBody });
 
                 return response.data;
             } catch (error) {
@@ -46,8 +44,9 @@ export default function ReviewPage() {
                 throw new Error("Failed to submit comment");
             }
         },
-        onSuccess: (data) => {
+        onSuccess: (data, variables, context) => {
             queryClient.setQueryData(["reviews", { reviewId }], (oldData) => {
+                console.log("data: ", data);
                 oldData ? {
                     ...oldData,
                     comments: [...oldData.comments, data]
@@ -57,7 +56,7 @@ export default function ReviewPage() {
     });
 
     const editCommentMutation = useMutation({
-        mutationFn: async (commentId, commentBody) => {
+        mutationFn: async ({ commentId, commentBody }) => {
             try {
                 const response = await apiClient.patch(`${import.meta.env.VITE_APP_BACKEND_URL}/comment/${commentId}`, { commentBody }, {
                     withCredentials: true
@@ -87,7 +86,7 @@ export default function ReviewPage() {
         e.preventDefault();
         if (!commentDraft.trim()) return;
 
-        addCommentMutation.mutate({ commentBody: commentDraft });
+        addCommentMutation.mutate({ reviewId: reviewId, commentBody: commentDraft });
     };
 
     return (

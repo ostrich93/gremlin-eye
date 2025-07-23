@@ -60,7 +60,7 @@ const SyncCompanies = () => {
                     <input type='number' min='1' id="pageNum" name="pageNum" onChange={e => setPageNum(e.target.value)} required disabled={loading} />
                     <small className="form-text">Imports and synchronizes company data from IGDB in batches of 500.</small>
                 </div>
-                <button id="register-button" type='submit' disabled={loading}>Sync Companies</button>
+                <button id="register-button" className="btn-main" type='submit' disabled={loading}>Sync Companies</button>
             </form>
             <div>
                 {message && <p>{message}</p>}

@@ -52,13 +52,12 @@ const JournalForm = ({ playthrough, removePlaythrough, updatePlaythrough, gamePl
                                 <label className="mb-0" htmlFor="playthroughReplay">Replay</label>
                                 <br />
                                 <Row className="mt-1">
-                                    <Form.Group className="col-auto mx-auto" controlId="playthroughReplay">
-                                        <Form.Check id="playthroughReplay" className="gremlin-eye-checkbox me-1" onClick={(e) => updatePlaythrough(id, "isReplay", e.target.checked)}>
-                                            <Form.Label className="mb-0 checkbox-label">
-                                                <FontAwesomeIcon icon={faRotateLeft} />
-                                            </Form.Label>
-                                        </Form.Check>
-                                    </Form.Group>
+                                    <div className="col-auto my-auto">
+                                        <input id="playthroughReplay" className="gremlin-eye-checkbox me-1" type="checkbox" value={playthrough.isReplay} checked={playthrough.isReplay} onChange={(e) => updatePlaythrough(id, "isReplay", e.target.checked)} />
+                                        <label className="mb-0 checkbox-label">
+                                            <FontAwesomeIcon icon={faRotateLeft} />
+                                        </label>
+                                    </div>
                                 </Row>
                             </div>
                         </Row>
@@ -99,14 +98,14 @@ const JournalForm = ({ playthrough, removePlaythrough, updatePlaythrough, gamePl
                         <Row className="mt-3">
                             <Form.Group controlId="playthroughReview" className="col-12">
                                 <Form.Label htmlFor="playthroughReview">Review</Form.Label>
-                                <Form.Control as="textarea" rows={4} id="playthroughReview" value={playthrough.reviewText} placeholder="Write your thoughts..." onChange={(e) => updatePlaythrough(id, "reviewText", e.target.value)} />
+                                <Form.Control as="textarea" rows={4} id="playthroughReview" className="gremlin-eye-field w-100 p-2" value={playthrough.reviewText} placeholder="Write your thoughts..." onChange={(e) => updatePlaythrough(id, "reviewText", e.target.value)} />
                             </Form.Group>
                         </Row>
                         <Row>
-                            <Form.Check className="col-auto me-auto" id="playthroughReviewSpoilers">
-                                <Form.Check.Input defaultChecked={playthrough.containsSpoilers} onClick={(e) => updatePlaythrough(id, "containsSpoilers", e.target.checked)} />
-                                <Form.Check.Label className="btn btn-small mb-0">Contains spoilers</Form.Check.Label>
-                            </Form.Check>
+                            <div className="col-auto me-auto">
+                                <input id="playthroughReviewSpoilers" className="gremlin-eye-checkbox" type="checkbox" checked={playthrough.containsSpoilers} value={playthrough.containsSpoilers} onChange={(e) => updatePlaythrough(id, "containsSpoilers", e.target.checked)} />
+                                <label className="btn btn-link btn-small mb-0" htmlFor="playthroughReviewSpoilers">Contains spoilers</label>
+                            </div>
                         </Row>
                         <Row className="mb-4">
                             <div className="col-auto ms-auto">
@@ -123,58 +122,75 @@ const JournalForm = ({ playthrough, removePlaythrough, updatePlaythrough, gamePl
                 </Row>
             </Form>
 
-            <ReactModal isOpen={showDeletePlaythroughWarning} onRequestClose={() => setShowDeletePlaythroughWarning(false)}>
-                <Container fluid className="modal__content my-0">
-                    <Row>
-                        <Col>
-                            <h5 className="mb-0 main-header">
-                                <FontAwesomeIcon icon={faExclamationTriangle} />
-                                Warning
-                            </h5>
-                        </Col>
-                    </Row>
-                    <Row className="my-2">
-                        <Col>
-                            <p id="warning-desc" className="mb-0">Delete your data for this log? This includes the associated review and journal entries for this log.</p>
-                        </Col>
-                    </Row>
-                    <Row className="mt-3">
-                        <div className="col-auto">
-                            <Button id="warning-abort" className="btn-general w-100" onClick={() => setShowDeletePlaythroughWarning(false)}>Return</Button>
-                        </div>
-                        <div className="col-auto ms-auto pe-0" />
-                        <div className="col-auto">
-                            <Button id="warning-save" className="btn-main w-100" onClick={handleDeletePlaythrough}>Delete</Button>
-                        </div>
-                    </Row>
-                </Container>
+            <ReactModal
+                id="journal-delete-warning-modal"
+                isOpen={showDeletePlaythroughWarning}
+                onRequestClose={() => setShowDeletePlaythroughWarning(false)}
+                style={{
+                    overlay: {
+                        zIndex: 2005
+                    },
+                    content: {
+                        backgroundColor: 'var(--back-primary)',
+                        inset: 'auto'
+                    }
+                }}
+            >
+                <div className="modal__container py-3 mx-3">
+                    <Container fluid className="modal__content my-0">
+                        <Row>
+                            <Col>
+                                <h5 className="mb-0 main-header">
+                                    <FontAwesomeIcon icon={faExclamationTriangle} />
+                                    Warning
+                                </h5>
+                            </Col>
+                        </Row>
+                        <Row className="my-2">
+                            <Col>
+                                <p id="warning-desc" className="mb-0">Delete your data for this log? This includes the associated review and journal entries for this log.</p>
+                            </Col>
+                        </Row>
+                        <Row className="mt-3">
+                            <div className="col-auto">
+                                <Button id="warning-abort" className="btn-general w-100" onClick={() => setShowDeletePlaythroughWarning(false)}>Return</Button>
+                            </div>
+                            <div className="col-auto ms-auto pe-0" />
+                            <div className="col-auto">
+                                <Button id="warning-save" className="btn-main w-100" onClick={handleDeletePlaythrough}>Delete</Button>
+                            </div>
+                        </Row>
+                    </Container>
+                </div>
             </ReactModal>
 
             <ReactModal isOpen={showDestroyGameLogWarning} onRequestClose={() => setShowDestroyGameLogWarning}>
-                <Container fluid className="modal__content my-0">
-                    <Row>
-                        <Col>
-                            <h5 className="mb-0 main-header">
-                                <FontAwesomeIcon icon={faExclamationTriangle} />
-                                Warning
-                            </h5>
-                        </Col>
-                    </Row>
-                    <Row className="my-2">
-                        <Col>
-                            <p id="warning-desc" className="mb-0">Delete your data for this log? This includes all logs, journal entries, reviews, ratings, time tracked, etc.. for this game.</p>
-                        </Col>
-                    </Row>
-                    <Row className="mt-3">
-                        <div className="col-auto">
-                            <Button id="warning-abort" className="btn-general w-100" onClick={handleDestroyGameLog}>Return</Button>
-                        </div>
-                        <div className="col-auto ms-auto pe-0" />
-                        <div className="col-auto">
-                            <Button id="warning-save" className="btn-main w-100">Destroy</Button>
-                        </div>
-                    </Row>
-                </Container>
+                <div className="modal__container py-3 mx-3">
+                    <Container fluid className="modal__content my-0">
+                        <Row>
+                            <Col>
+                                <h5 className="mb-0 main-header">
+                                    <FontAwesomeIcon icon={faExclamationTriangle} />
+                                    Warning
+                                </h5>
+                            </Col>
+                        </Row>
+                        <Row className="my-2">
+                            <Col>
+                                <p id="warning-desc" className="mb-0">Delete your data for this log? This includes all logs, journal entries, reviews, ratings, time tracked, etc.. for this game.</p>
+                            </Col>
+                        </Row>
+                        <Row className="mt-3">
+                            <div className="col-auto">
+                                <Button id="warning-abort" className="btn-general w-100" onClick={handleDestroyGameLog}>Return</Button>
+                            </div>
+                            <div className="col-auto ms-auto pe-0" />
+                            <div className="col-auto">
+                                <Button id="warning-save" className="btn-main w-100">Destroy</Button>
+                            </div>
+                        </Row>
+                    </Container>
+                </div>
             </ReactModal>
         </>
     );

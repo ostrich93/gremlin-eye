@@ -34,9 +34,9 @@ namespace gremlin_eye.Server.Controllers
             }
         }
 
-        [HttpPost("{reviewId}/comment")]
+        [HttpPost("addComment")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<IActionResult> SubmitComment(long reviewId, [FromBody] string commentBody)
+        public async Task<IActionResult> SubmitComment(CommentRequest comment)
         {
             Claim idClaim = User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier);
             Guid userId = Guid.Parse(idClaim!.Value);
@@ -45,14 +45,14 @@ namespace gremlin_eye.Server.Controllers
             if (user == null)
                 return Unauthorized("User not found");
 
-            var review = await _unitOfWork.Context.Reviews.Where(r => r.Id == reviewId).FirstAsync();
+            var review = await _unitOfWork.Context.Reviews.Where(r => r.Id == comment.ReviewId).FirstAsync();
             ReviewComment newComment = new ReviewComment
             {
                 Author = user,
                 AuthorId = userId,
                 Review = review,
                 ReviewId = review.Id,
-                CommentBody = commentBody,
+                CommentBody = comment.CommentBody,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };

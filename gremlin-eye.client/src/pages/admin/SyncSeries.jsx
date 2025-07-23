@@ -58,7 +58,7 @@ const SyncSeries = () => {
                     <input type='number' min='1' id="pageNum" name="pageNum" onChange={e => setPageNum(e.target.value)} required disabled={loading} />
                     <small className="form-text">Imports and synchronizes series data from IGDB in batches of 500.</small>
                 </div>
-                <button id="register-button" type='submit' disabled={loading}>Sync Series</button>
+                <button id="register-button" type='submit' className="btn-main" disabled={loading}>Sync Series</button>
             </form>
             <div>
                 {message && <p>{message}</p>}

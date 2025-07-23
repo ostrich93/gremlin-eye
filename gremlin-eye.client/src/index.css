@@ -30,9 +30,34 @@ body {
     text-align: left;
 }
 
+.h1,
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 2.5rem;
+}
+
+.h2,
+h2 {
+    font-size: 2rem;
+}
+
+.h3,
+h3 {
+    font-size: 1.75rem;
+}
+
+.h4,
+h4 {
+    font-size: 1.5rem;
+}
+
+.h5,
+h5 {
+    font-size: 1.25rem;
+}
+
+.h6,
+h6 {
+    font-size: 1rem;
 }
 
 button {
@@ -216,6 +241,7 @@ input {
     --back-field: #30394c;
     --back-field-highlight: #3b4760;
     --back-field-selected:var(--back-pink-dk);
+    --back-interact: #4a5e8d;
     --back-pink: #fc6399;
     --back-pink-dk: #ea377a;
     --back-text: #badefc;
@@ -233,6 +259,8 @@ input {
     --back-backlog: #efe36f;
     --back-field-background: #272c37;
     --back-field-border: #3b414e;
+    --back-field-border-hover: #3f4b64;
+    --back-field-placeholder: #c5d7e747;
 }
 
 @media(min-width:576px) {

@@ -60,7 +60,21 @@ const GamePage = () => {
         fetchGame();
 
     }, [user, slug]);
-    
+
+    const renderBannerArt = () => {
+        if (gameData && gameData.bannerUrl) {
+            return (
+                <>
+                    <img src={gameData.bannerUrl} loading='lazy' />
+                </>
+            );
+        }
+
+        return (
+            <div className="no-artwork-gradient" />
+        )
+    }
+
     return (
         <Container>
             <Row id="game-banner-art">
@@ -69,9 +83,10 @@ const GamePage = () => {
                     {loading && !gameData && (
                         <Spinner animation="border" />
                     ) }
-                    {!loading && gameData && (
-                        <img src={gameData?.bannerUrl} loading='lazy' />
+                    {!loading && (
+                        renderBannerArt()
                     )}
+
                 </Col>
             </Row>
             <Row id="game-profile">

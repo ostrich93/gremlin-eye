@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Button, Col, Container, Pagination, Row, Spinner } from 'react-bootstrap';
+import { Col, Container, Pagination, Row, Spinner } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 //import { faTimesCircle, faSort } from '@fortawesome/free-solid-svg-icons';
@@ -108,7 +108,7 @@ const GameLibrary = () => {
             <Row id="collection-nav">
                 <div className="col-12 col-sm-auto my-auto subtitle-text">{data?.totalItems} Games</div>
                 <div className="col-auto pe-0 ms-auto">
-                    <Button id="sidebar-collapse" onClick={handleShow}>Apply Filters</Button>
+                    <button id="sidebar-collapse" className="btn-sort" onClick={handleShow}>Apply Filters</button>
                 </div>
                 <div className="col-auto pe-0 my-auto" />
                 <Sorting orderOptions={orderOptions} sortOrder={sortOrder} orderBy={orderBy} update={updateQueryParameters} />

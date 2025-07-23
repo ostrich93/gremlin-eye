@@ -11,9 +11,7 @@ import { useJournalDispatch, useJournalState } from '../../contexts/JournalProvi
 import apiClient from '../../config/apiClient';
 import JournalModalContent from './JournalModal';
 import PlayStatusModalContent from './PlayStatusModal';
-
-const playStateColors = ['#ea377a', 'green', 'blue', 'orange', 'red'];
-const defaultPlayedStateColor = 'gray';
+import { playStatusEnumStrings } from '../../utils/constants';
 
 //InteractionSidebar contains GameRatings component and 
 const InteractionSidebar = ({ slug }) => {
@@ -31,7 +29,6 @@ const InteractionSidebar = ({ slug }) => {
     const [playthroughs, setPlaythroughs] = useState([]);
 
     const [showPlayStatusModal, setShowPlayStatusModal] = useState(false);
-    //const [showJournalModal, setShowJournalModal] = useState(false);
 
     const { user } = useAuthState();
     const { showJournalModal } = useJournalState();
@@ -72,7 +69,6 @@ const InteractionSidebar = ({ slug }) => {
 
     const togglePlayed = (e) => {
         e.preventDefault();
-        console.log("gameId: ", gameId);
         apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/api/logs`, { type: 0, gameId: gameId })
             .then((res) => {
                 if (res.data) {
@@ -180,6 +176,10 @@ const InteractionSidebar = ({ slug }) => {
 
     const handleOpenJournal = () => dispatch({ type: "OPEN_JOURNAL_MODAL", payload: { gameId: gameId } });
 
+    const getPlayedStatusClassName = () => {
+        return `btn-play-fill btn-played play-type-color ${playStatusEnumStrings[playStatus]}`;
+    };
+
     return (
         <>
             
@@ -187,6 +187,24 @@ const InteractionSidebar = ({ slug }) => {
                 isOpen={showPlayStatusModal}
                 onRequestClose={handleClosePlayStatusModal}
                 shouldCloseOnOverlayClick={true}
+                style={{
+                    overlay: {
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(0,0,0,0.85)',
+                        bottom: 0,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        left: 0,
+                        position: 'fixed',
+                        right: 0,
+                        top: 0,
+                        zIndex: 2000
+                    },
+                    content: {
+                        position: 'static',
+                        backgroundColor: 'var(--back-primary)'
+                    }
+                }}
             >
                 <PlayStatusModalContent handleStatusChange={handleStatusChange} togglePlayed={togglePlayed} />
             </ReactModal>
@@ -222,29 +240,29 @@ const InteractionSidebar = ({ slug }) => {
 
                             <Row id="buttons" className="mx-0">
                                 <Col id="play" className="px-0 mt-auto btn-play-fill">
-                                    <Button variant="link" className="btn-play-fill btn-play btn-played mx-auto" onClick={handlePlayedClick}>
-                                        <FontAwesomeIcon icon={faGamepad} size="2x" color={(played && playStatus != null) ? playStateColors[playStatus] : defaultPlayedStateColor} />
+                                    <Button variant="link" className={`btn-play mx-auto ${played && playStatus != null ? getPlayedStatusClassName() : "btn-unplayed"}`} onClick={handlePlayedClick} data-play_type={played && playStatus != null ? playStatusEnumStrings[playStatus] : null }>
+                                        <FontAwesomeIcon icon={faGamepad} size="2x" />
                                         <br />
                                         <p className="label">Played</p>
                                     </Button>
                                 </Col>
-                                <Col id="playing" className="px-0 mt-auto">
+                                <Col id="playing" className={`px-0 mt-auto ${playing ? "btn-play-fill" : null}`}>
                                     <Button variant="link" className="btn-play mx-auto" onClick={togglePlaying}>
-                                        <FontAwesomeIcon icon={faPlay} size="2x" color={playing ? '#ea377a' : defaultPlayedStateColor} />
+                                        <FontAwesomeIcon icon={faPlay} size="2x" />
                                         <br />
                                         <p className="label">Playing</p>
                                     </Button>
                                 </Col>
-                                <Col id="backlog" className="px-0 mt-auto">
+                                <Col id="backlog" className={`px-0 mt-auto ${backlog ? "btn-play-fill" : null}`}>
                                     <Button variant="link" className="btn-play mx-auto" onClick={toggleBacklog}>
-                                        <FontAwesomeIcon icon={faBook} size="2x" color={backlog ? '#ea377a' : defaultPlayedStateColor} />
+                                        <FontAwesomeIcon icon={faBook} size="2x" />
                                         <br />
                                         <p className="label">Backlog</p>
                                     </Button>
                                 </Col>
-                                <Col id="wishlist" className="px-0 mt-auto">
+                                <Col id="wishlist" className={`px-0 mt-auto ${wishlist ? "btn-play-fill" : null}`}>
                                     <Button variant="link" className="btn-play mx-auto" onClick={toggleWishlist}>
-                                        <FontAwesomeIcon icon={faGift} size="2x" color={wishlist ? '#ea377a' : defaultPlayedStateColor} />
+                                        <FontAwesomeIcon icon={faGift} size="2x" />
                                         <br />
                                         <p className="label">Wishlist</p>
                                     </Button>
@@ -297,6 +315,9 @@ const InteractionSidebar = ({ slug }) => {
                         backgroundColor: "rgba(0,0,0,.85)",
                         zIndex: 1039,
                         width: "100vw"
+                    },
+                    content: {
+                        backgroundColor: 'var(--back-primary)'
                     }
                 }}
             >
