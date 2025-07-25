@@ -3,8 +3,8 @@ import { useQueries } from '@tanstack/react-query';
 import { Button, ButtonGroup, Col, Form, Offcanvas, Row, ToggleButton } from 'react-bootstrap';
 import Nouislider from 'nouislider-react';
 import "nouislider-react/node_modules/nouislider/distribute/nouislider.css";
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
+//import DatePicker from 'react-datepicker';
+//import "react-datepicker/dist/react-datepicker.css";
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import apiClient from '../config/apiClient';
@@ -33,6 +33,7 @@ export default function FilterSidebar({ show, onHide, update, clear, releaseYear
                     }
                 },
                 cacheTime: 1000 * 60 * 5,
+                staleTime: 1000 * 60 * 5,
                 retry: true
             },
             {
@@ -48,6 +49,7 @@ export default function FilterSidebar({ show, onHide, update, clear, releaseYear
                     }
                 },
                 cacheTime: 1000 * 60 * 5,
+                staleTime: 1000 * 60 * 5,
                 retry: true
             }
         ]

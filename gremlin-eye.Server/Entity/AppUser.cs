@@ -16,6 +16,7 @@ namespace gremlin_eye.Server.Entity
         [Required]
         [Column("user_name")]
         [StringLength(16, MinimumLength = 2)]
+        [Index(IsUnique = true)]
         public string UserName { get; set; } = string.Empty;
 
         [Required]

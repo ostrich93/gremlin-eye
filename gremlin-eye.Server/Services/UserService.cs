@@ -43,5 +43,22 @@ namespace gremlin_eye.Server.Services
         {
             return await _unitOfWork.Users.GetUserByNameAsync(username);
         }
+
+        public async Task<UserProfileResponse> GetUserProile(string username)
+        {
+            var user = await _unitOfWork.Users.GetUserByNameAsync(username);
+
+            if (user == null)
+            {
+                throw new Exception("User could not be found");
+            }
+
+            var profile = _unitOfWork.Users.GetUserProfile(user);
+
+            var reviews = await _unitOfWork.Reviews.GetUserTopReviews(user.Id);
+            profile.RecentReviews = reviews;
+
+            return profile;
+        }
     }
 }

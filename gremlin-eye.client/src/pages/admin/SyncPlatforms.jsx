@@ -12,8 +12,11 @@ const SyncPlatforms = () => {
         setLoading(true);
         setMessage('Loading...');
         try {
-            await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/import/platforms`);
-            setMessage('Imported all platform data from IGDB');
+            const res = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/import/platforms`);
+            if (res.data > -1)
+                setMessage('Imported all platform data from IGDB');
+            else
+                setMessage('No more platform data to import from IGDB');
         } catch (err) {
             setMessage('Error importing platform data from IGDB');
             console.error(err.message);
@@ -30,7 +33,7 @@ const SyncPlatforms = () => {
                 <div className="form-group my-3">
                     <small className="form-text">Imports and syncrhonizes all platform data from IGDB.</small>
                 </div>
-                <button id="register-button" type='submit' disabled={loading}>Sync Platforms</button>
+                <button id="register-button" type='submit' className="btn-main" disabled={loading}>Sync Platforms</button>
             </form>
             <div>
                 {message && <p>{message}</p>}

@@ -17,7 +17,7 @@ namespace gremlin_eye.Server.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.15")
+                .HasAnnotation("ProductVersion", "9.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -188,10 +188,6 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("name");
 
-                    b.Property<long?>("ParentId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("parent_id");
-
                     b.Property<DateTimeOffset?>("ReleaseDate")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("release_date");
@@ -207,8 +203,6 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnName("summary");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
 
                     b.ToTable("games");
                 });
@@ -261,6 +255,10 @@ namespace gremlin_eye.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
                     b.Property<long>("GameId")
                         .HasColumnType("bigint")
                         .HasColumnName("game_id");
@@ -284,6 +282,10 @@ namespace gremlin_eye.Server.Migrations
                     b.Property<int?>("PlayStatus")
                         .HasColumnType("int")
                         .HasColumnName("play_status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier")
@@ -514,6 +516,14 @@ namespace gremlin_eye.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date")
+                        .HasColumnName("end_date");
+
+                    b.Property<int>("Hours")
+                        .HasColumnType("int")
+                        .HasColumnName("hours");
+
                     b.Property<bool>("IsEnd")
                         .HasColumnType("bit")
                         .HasColumnName("is_end");
@@ -522,21 +532,21 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_start");
 
-                    b.Property<DateOnly>("LogDate")
-                        .HasColumnType("date")
-                        .HasColumnName("log_date");
-
                     b.Property<string>("LogNote")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("log_note");
 
-                    b.Property<TimeSpan?>("LogTime")
-                        .HasColumnType("time")
-                        .HasColumnName("log_time");
+                    b.Property<int>("Minutes")
+                        .HasColumnType("int")
+                        .HasColumnName("minutes");
 
                     b.Property<long>("PlaythroughId")
                         .HasColumnType("bigint")
                         .HasColumnName("playthrough_id");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date")
+                        .HasColumnName("start_date");
 
                     b.HasKey("Id");
 
@@ -553,6 +563,10 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnName("playthrough_id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
 
                     b.Property<long>("GameId")
                         .HasColumnType("bigint")
@@ -598,6 +612,10 @@ namespace gremlin_eye.Server.Migrations
                     b.Property<TimeSpan?>("TimePlayed")
                         .HasColumnType("time")
                         .HasColumnName("time_played");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
@@ -657,10 +675,6 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
-                    b.Property<long>("GameId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("game_id");
-
                     b.Property<long>("PlaythroughId")
                         .HasColumnType("bigint")
                         .HasColumnName("playthrough_id");
@@ -674,8 +688,6 @@ namespace gremlin_eye.Server.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GameId");
 
                     b.HasIndex("PlaythroughId")
                         .IsUnique();
@@ -843,15 +855,6 @@ namespace gremlin_eye.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("gremlin_eye.Server.Entity.GameData", b =>
-                {
-                    b.HasOne("gremlin_eye.Server.Entity.GameData", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId");
-
-                    b.Navigation("Parent");
-                });
-
             modelBuilder.Entity("gremlin_eye.Server.Entity.GameLike", b =>
                 {
                     b.HasOne("gremlin_eye.Server.Entity.GameData", "Game")
@@ -1007,12 +1010,6 @@ namespace gremlin_eye.Server.Migrations
 
             modelBuilder.Entity("gremlin_eye.Server.Entity.Review", b =>
                 {
-                    b.HasOne("gremlin_eye.Server.Entity.GameData", "Game")
-                        .WithMany("Reviews")
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("gremlin_eye.Server.Entity.Playthrough", "Playthrough")
                         .WithOne("Review")
                         .HasForeignKey("gremlin_eye.Server.Entity.Review", "PlaythroughId")
@@ -1024,8 +1021,6 @@ namespace gremlin_eye.Server.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
-
-                    b.Navigation("Game");
 
                     b.Navigation("Playthrough");
 
@@ -1093,8 +1088,6 @@ namespace gremlin_eye.Server.Migrations
 
             modelBuilder.Entity("gremlin_eye.Server.Entity.GameData", b =>
                 {
-                    b.Navigation("Children");
-
                     b.Navigation("GameLogs");
 
                     b.Navigation("Likes");
@@ -1102,8 +1095,6 @@ namespace gremlin_eye.Server.Migrations
                     b.Navigation("ListEntries");
 
                     b.Navigation("Playthroughs");
-
-                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("gremlin_eye.Server.Entity.GameLog", b =>

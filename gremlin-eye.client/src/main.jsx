@@ -7,14 +7,21 @@ import './index.css';
 import App from './App';
 import AuthProvider from './contexts/AuthProvider';
 import queryClient from './config/queryClient';
+import JournalProvider from './contexts/JournalProvider';
+import ReactModal from 'react-modal';
+
+ReactModal.defaultStyles.content.backgroundColor = 'var(--back-primary)';
+ReactModal.setAppElement('#root');
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
-                <BrowserRouter>
-                    <App />
-                </BrowserRouter>
+                <JournalProvider>
+                    <BrowserRouter>
+                        <App />
+                    </BrowserRouter>
+                </JournalProvider>
             </AuthProvider>
         </QueryClientProvider>
     </StrictMode>,

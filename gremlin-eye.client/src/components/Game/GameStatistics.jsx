@@ -15,7 +15,7 @@ const GameStatistics = memo(({ gameData }) => {
                             <Row>
                                 <Col id="game-rating" className="mx-auto game-rating">
                                     <p className="text-center mt-3 mb-0">Avg Rating</p>
-                                    <h1 className="text-center">{gameData?.stats && gameData?.stats?.averageRating ? gameData?.stats?.averageRating : 'N/A'}</h1>
+                                    <h1 className="text-center">{gameData?.stats && gameData?.stats?.averageRating ? gameData?.stats?.averageRating/2 : 'N/A'}</h1>
                                 </Col>
                             </Row>
                             

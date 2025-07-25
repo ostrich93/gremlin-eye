@@ -12,5 +12,7 @@ namespace gremlin_eye.Server.DTOs
         public bool IsPlaying { get; set; }
         public bool IsBacklog { get; set; }
         public bool IsWishlist { get; set; }
+        public ICollection<PlaythroughDTO> Playthroughs { get; set; } = new List<PlaythroughDTO>();
+        public ICollection<long> PlaythroughsToDelete { get; set; } = new List<long>();
     }
 }

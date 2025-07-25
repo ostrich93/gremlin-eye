@@ -66,12 +66,6 @@ namespace gremlin_eye.Server.Data
                     j => j.HasKey("GameId", "PlatformId"));
 
             //One to Many Relationships
-            modelBuilder.Entity<GameData>()
-                .HasOne(g => g.Parent)
-                .WithMany(p => p.Children)
-                .HasForeignKey(g => g.ParentId)
-                .IsRequired(false);
-
             modelBuilder.Entity<ListEntry>()
                 .HasOne(le => le.Game)
                 .WithMany(g => g.ListEntries)
@@ -89,11 +83,6 @@ namespace gremlin_eye.Server.Data
                 .HasForeignKey(play => play.PlatformId)
                 .IsRequired(false);
 
-            modelBuilder.Entity<Review>()
-                .HasOne(r => r.Game)
-                .WithMany(g => g.Reviews)
-                .HasForeignKey(r => r.GameId);
-
             modelBuilder.Entity<PlayLog>()
                 .HasOne(plg => plg.Playthrough)
                 .WithMany(ply => ply.PlayLogs)
@@ -109,7 +98,8 @@ namespace gremlin_eye.Server.Data
             modelBuilder.Entity<Playthrough>()
                 .HasOne(p => p.Game)
                 .WithMany(g => g.Playthroughs)
-                .HasForeignKey(p => p.GameId);
+                .HasForeignKey(p => p.GameId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.User)

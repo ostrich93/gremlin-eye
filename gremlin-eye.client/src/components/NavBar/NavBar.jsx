@@ -9,7 +9,7 @@ import './NavBar.css';
 
 const NavBar = () => {
     //the search bar will be its own component with its own context and probably reducers and will be placed at the end of the navbar
-    const { user } = useAuthState();
+    const { user, refreshToken } = useAuthState();
     //const [anchorEl, setAnchorEl] = useState(null);
     //const [menuOpen, setMenuOpen] = useState(false);
     const dispatch = useAuthDispatch();
@@ -26,7 +26,7 @@ const NavBar = () => {
     };*/
 
     const handleLogOut = async () => {
-        await logout(dispatch);
+        await logout(dispatch, { refreshToken: refreshToken });
         navigate('/');
     };
 
@@ -44,17 +44,14 @@ const NavBar = () => {
                             )}
                             {user && sessionStorage.getItem('access_token') && (
                                 <NavDropdown id="navDropdown" title={user.username} className="d-none d-md-block">
-                                    <NavDropdown.Item as={Link} to={`user/${user.username}`} className="py-1">Profile</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`users/${user.username}`} className="py-1">Profile</NavDropdown.Item>
                                     <NavDropdown.Divider className="my-0" />
-                                    <NavDropdown.Item as={Link} to={`user/${user.username}/games`} className="py-1">Played</NavDropdown.Item>
-                                    <NavDropdown.Item as={Link} to={`user/${user.username}/playing`} className="py-1">Playing</NavDropdown.Item>
-                                    <NavDropdown.Item as={Link} to={`user/${user.username}/backlog`} className="py-1">Backlog</NavDropdown.Item>
-                                    <NavDropdown.Item as={Link} to={`user/${user.username}/wishlist`} className="py-1">Wishlist</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`users/${user.username}/games`} className="py-1">Played</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`users/${user.username}/games?playTypes=playing`} className="py-1">Playing</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`users/${user.username}/games?playTypes=backlog`} className="py-1">Backlog</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`users/${user.username}/games?playTypes=wishlist`} className="py-1">Wishlist</NavDropdown.Item>
                                     <NavDropdown.Divider className="my-0" />
-                                    <NavDropdown.Item as={Link} to={`user/${user.username}/journal`} className="py-1">Journal</NavDropdown.Item>
-                                    <NavDropdown.Item as={Link} to={`user/${user.username}/reviews`} className="py-1">Reviews</NavDropdown.Item>
-                                    <NavDropdown.Item as={Link} to={`user/${user.username}/lists`} className="py-1">Lists</NavDropdown.Item>
-                                    <NavDropdown.Item as={Link} to={`user/${user.username}/likes`} className="py-1">Likes</NavDropdown.Item>
+                                    <NavDropdown.Item as={Link} to={`users/${user.username}/reviews`} className="py-1">Reviews</NavDropdown.Item>
                                     <NavDropdown.Divider className="my-0" />
                                     <NavDropdown.Item className="pt-1 pb-2" onClick={handleLogOut}>
                                         Logout
@@ -78,7 +75,7 @@ const NavBar = () => {
                             {user && (
                                 <Row className="mx-0 mb-2 mb-md-0">
                                     <Col className="my-auto px-0 mx-3 mx-md-0">
-                                        <Button id="add-a-game" className="mb-2 my-sm-0 py-0" variant="primary">
+                                        <Button id="add-a-game" className="btn-main mb-2 my-sm-0 py-0">
                                             <FontAwesomeIcon icon={faPlus} />
                                             Log a Game
                                         </Button>

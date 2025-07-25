@@ -7,5 +7,6 @@ namespace gremlin_eye.Server.Services
     {
         Task<UserResponseDTO> CreateUserAsync(RegisterUserRequestDTO request);
         Task<AppUser?> GetUserByName(string username);
+        Task<UserProfileResponse> GetUserProile(string username);
     }
 }

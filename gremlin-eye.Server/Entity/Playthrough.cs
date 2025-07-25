@@ -46,6 +46,12 @@ namespace gremlin_eye.Server.Entity
         [Range(minimum: 0, maximum: 10)]
         public int Rating { get; set; } = 0; //a rating of 0 is equivalent to unrated
 
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [Column("updated_at")]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
         //Navigation Properties
         public GameData Game { get; set; } = null!;
         public GameLog GameLog { get; set; } = null!;

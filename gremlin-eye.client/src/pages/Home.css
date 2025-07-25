@@ -3,14 +3,14 @@
     margin-top: 9vw;
 }
 #welcoming-banner h2 {
-    color: #badefc;
+    color: var(--back-text);
     font-size: 2rem;
     font-weight: 500;
     line-height: normal;
     margin-bottom: 0;
 }
 #welcoming-banner p {
-    color: #8f9ca7;
+    color: var(--back-text-secondary);
     font-size: 1.25rem;
     font-weight: 300;
     margin-bottom: 0;
@@ -30,7 +30,7 @@
     font-size: 2.3rem;
 }
 #home-about p {
-    color: #8f9ca7;
+    color: var(--back-text-secondary);
     font-size: 1.1rem;
     font-weight: 400;
     margin-bottom: 25px;

@@ -33,6 +33,7 @@ namespace gremlin_eye.Server.Controllers
                 return NotFound("The game requested does not exist in our database.");
             }
 
+            var topReviews = await _unitOfWork.Reviews.GetGameTopReviews(data.Id, data.Slug, data.Name);
             int reviewCount = await _unitOfWork.Reviews.GetGameReviewCount(data.Id);
             int likeCount = _unitOfWork.Likes.GetGameLikeCount(data.Id);
             GameDetailsResponseDTO gameDetails = new GameDetailsResponseDTO
@@ -68,6 +69,7 @@ namespace gremlin_eye.Server.Controllers
                     Name = data.Series.First().Name,
                     Slug = data.Series.First().Slug
                 } : null,
+                TopReviews = topReviews,
                 ReviewCount = reviewCount,
                 LikeCount = likeCount
             };
@@ -75,12 +77,12 @@ namespace gremlin_eye.Server.Controllers
             //GameDetailsResponseDTO gameDetails = await _gameService.GetGameDetailsBySlug(slug, userId);
             GameStatsDTO gameStats = await _unitOfWork.GameLogs.GetGameStats(gameDetails.Id);
             gameStats.AverageRating = _unitOfWork.GameLogs.GetReviewAverage(gameDetails.Id);
-            RatingCount[] rCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);
+            RatingCount[] rCounts = _unitOfWork.GameLogs.GetRatingCounts(gameDetails.Id);
             if (rCounts.Any())
             {
                 foreach (RatingCount rCount in rCounts)
                 {
-                    gameStats.RatingCounts[rCount.Rating] = rCount.Count;
+                    gameStats.RatingCounts[rCount.Rating - 1] = rCount.Count;
                 }
             }
             //gameStats.RatingCounts = _unitOfWork.GameLogs.GetReviewCounts(gameDetails.Id);
@@ -93,7 +95,7 @@ namespace gremlin_eye.Server.Controllers
                 if (relatedGames != null)
                 {
                     List<GameSummaryDTO> relatedSummaries = new List<GameSummaryDTO>();
-                    foreach(var relatedGame in relatedGames)
+                    foreach (var relatedGame in relatedGames)
                     {
                         relatedSummaries.Add(new GameSummaryDTO
                         {
@@ -117,7 +119,7 @@ namespace gremlin_eye.Server.Controllers
         {
             var searchResults = await _unitOfWork.Games.SearchGames(query);
             var suggestions = new List<GameSuggestionDTO>();
-            foreach(GameData game in searchResults)
+            foreach (GameData game in searchResults)
             {
                 suggestions.Add(new GameSuggestionDTO
                 {
@@ -179,7 +181,6 @@ namespace gremlin_eye.Server.Controllers
                     UserId = userId,
                     User = user,
                     GameId = id,
-                    Game = game,
                     IsPlayed = true,
                     PlayStatus = PlayState.Played
                 };
@@ -213,9 +214,6 @@ namespace gremlin_eye.Server.Controllers
             if (user == null)
                 return NotFound("User not found");
 
-            var game = await _unitOfWork.Games.GetGameById(gameLogState.GameId);
-            if (game == null)
-                return NotFound("Game not found");
 
             var gameLog = await _unitOfWork.GameLogs.GetGameLogByUser(gameLogState.GameId, (Guid)userId);
 
@@ -235,7 +233,6 @@ namespace gremlin_eye.Server.Controllers
                 {
                     User = user,
                     UserId = (Guid)userId,
-                    Game = game,
                     GameId = gameLogState.GameId,
                     PlayStatus = gameLogState.PlayStatus,
                     IsPlayed = gameLogState.IsPlayed,
@@ -245,14 +242,13 @@ namespace gremlin_eye.Server.Controllers
                 };
 
                 _unitOfWork.GameLogs.Create(gameLog);
-                
+
                 if (gameLogState.Rating != null)
                 {
                     await _unitOfWork.SaveChangesAsync();
                     Playthrough playthrough = new Playthrough
                     {
-                        Game = game,
-                        GameId = game.Id,
+                        GameId = gameLog.GameId,
                         GameLog = gameLog,
                         GameLogId = gameLog.Id,
                         Rating = (int)gameLogState.Rating
@@ -269,7 +265,7 @@ namespace gremlin_eye.Server.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetGameList(
             [FromQuery] string? releaseYear, [FromQuery] string? genre, [FromQuery] string? category, [FromQuery] string? platform,
-            [FromQuery] double min = 0, [FromQuery] double max = 10,
+            [FromQuery] double min = 0, [FromQuery] double max = 5,
             [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
             [FromQuery] int page = 1)
         {
@@ -305,10 +301,100 @@ namespace gremlin_eye.Server.Controllers
             if (platform != null)
                 predicate.And(g => g.Platforms.Any(p => p.Slug == platform));
 
-            predicate.And(g => g.Playthroughs.Any(p => p.Rating >= 2 * min && p.Rating <= 2 * max) || g.Playthroughs.Count == 0);
+            var inner = PredicateBuilder.New<GameData>();
+            inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() >= 2 * min);
+            inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() <= 2 * max);
+
+            predicate.And(inner);
 
             var paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, orderBy, sortOrder, page);
             return Ok(paginatedList);
+        }
+
+        [HttpGet("user/{username}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserGames(string username, [FromQuery] string? releaseYear, [FromQuery] string? genre, [FromQuery] string? releasePlatform,
+            [FromQuery] string? playedPlatform, [FromQuery] string? playStatus, [FromQuery(Name = "playTypes[]")] string[] playTypes,
+            [FromQuery] int rating = 0, [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
+            [FromQuery] int page = 1)
+        {
+            var user = await _unitOfWork.Users.GetUserByNameAsync(username);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var predicate = PredicateBuilder.New<GameData>();
+
+            if (releaseYear != null)
+            {
+                switch (releaseYear)
+                {
+                    case Constants.UPCOMING:
+                        predicate = predicate.And(g => g.ReleaseDate == null || g.ReleaseDate > DateTimeOffset.UtcNow);
+                        break;
+                    case Constants.RELEASED:
+                        predicate = predicate.And(g => g.ReleaseDate != null && g.ReleaseDate <= DateTimeOffset.UtcNow);
+                        break;
+                    default:
+                        if (releaseYear.Trim().Length == 0)
+                            break;
+                        int yearStr;
+                        if (int.TryParse(releaseYear, out yearStr))
+                        {
+                            predicate.And(g => g.ReleaseDate.HasValue && g.ReleaseDate.Value.Year == yearStr);
+                        }
+                        break;
+                }
+            }
+            if (genre != null)
+                predicate.And(g => g.Genres.Any(gen => gen.Slug == genre));
+            if (releasePlatform != null)
+                predicate.And(g => g.Platforms.Any(p => p.Slug == releasePlatform));
+            if (playedPlatform != null)
+                predicate.And(g => g.GameLogs.Any(l => l.UserId == user.Id && l.Playthroughs.Where(p => p.Platform != null && p.Platform.Slug == playedPlatform).Any()));
+            if (playStatus != null)
+                predicate.And(g => g.GameLogs.Any(l => l.UserId == user.Id && l.PlayStatus.HasValue && ((PlayState)l.PlayStatus).ToStringValue() == playStatus));
+
+            predicate.And(g => g.GameLogs.Any(l => l.UserId == user.Id && l.Playthroughs.Count(p => p.Rating >= rating) > 0));
+
+            var inner = PredicateBuilder.New<GameData>();
+            foreach(string playType in playTypes)
+            {
+                if (PlayingType.Played.ToStringValue() == playType)
+                    inner.Or(g => g.GameLogs.Any(l => l.UserId == user.Id && l.IsPlayed));
+                else if (PlayingType.Playing.ToStringValue() == playType)
+                    inner.Or(g => g.GameLogs.Any(l => l.UserId == user.Id && l.IsPlaying));
+                else if (PlayingType.Backlog.ToStringValue() == playType)
+                    inner.Or(g => g.GameLogs.Any(l => l.UserId == user.Id && l.IsBacklog));
+                else if (PlayingType.Wishlist.ToStringValue() == playType)
+                    inner.Or(g => g.GameLogs.Any(l => l.UserId == user.Id && l.IsWishlist));
+            }
+            predicate.And(inner);
+
+            var paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, user.Id, orderBy, sortOrder, page, 40);
+
+            return Ok(paginatedList);
+        }
+
+        [HttpGet("reviews/{slug}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetGameReviews(string slug, [FromQuery] int page = 1)
+        {
+            var gameData = await _unitOfWork.Games.GetGameBySlug(slug);
+            if (gameData == null)
+            {
+                return NotFound("Game not found");
+            }
+
+            var reviews = await _unitOfWork.Reviews.GetGameReviews(gameData.Id, slug, gameData.Name, page);
+            return Ok(new
+            {
+                GameName = gameData.Name,
+                gameData.CoverUrl,
+                Reviews = reviews,
+                IsEnd = reviews.Count < 32 //if the total number of reviews returned is less than 
+            });
         }
     }
 }

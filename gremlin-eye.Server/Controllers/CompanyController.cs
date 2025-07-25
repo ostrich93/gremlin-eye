@@ -30,13 +30,14 @@ namespace gremlin_eye.Server.Controllers
             [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
             [FromQuery] int page = 1)
         {
-            var company = _unitOfWork.Context.Companies.AsNoTracking().Where(c => c.Slug == slug).FirstOrDefault();
+            var company = _unitOfWork.Context.Companies.AsNoTracking().Include(c => c.Games).Where(c => c.Slug == slug).FirstOrDefault();
             if (company == null)
                 return NotFound();
 
             var query = company.Games.AsQueryable();
 
             var predicate = PredicateBuilder.New<GameData>();
+            predicate.And(g => g.Companies.Contains(company));
 
             if (releaseYear != null)
             {
@@ -68,41 +69,13 @@ namespace gremlin_eye.Server.Controllers
             if (platform != null)
                 predicate.And(g => g.Platforms.Any(p => p.Slug == platform));
 
-            predicate.And(g => g.Playthroughs.Any(p => p.Rating >= min && p.Rating <= max));
+            var inner = PredicateBuilder.New<GameData>();
+            inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() >= min);
+            inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() <= max);
 
-            List<GameData> games;
-            int totalItems = company.Games.Count(predicate);
-            switch (orderBy)
-            {
-                case Constants.ORDER_RELEASE_DATE:
-                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.ReleaseDate).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.ReleaseDate).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
-                    break;
-                case Constants.ORDER_GAME_RATING:
-                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync()
-                        : await query.Where(predicate).OrderByDescending(g => g.Playthroughs.Where(p => p.Rating > 0).Select(p => p.Rating).DefaultIfEmpty().Average()).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
-                    break;
-                case Constants.ORDER_GAME_TITLE:
-                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Slug).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.Slug).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
-                    break;
-                default:
-                    games = sortOrder == Constants.ASC ? await query.Where(predicate).OrderBy(g => g.Id).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync() : await query.Where(predicate).OrderByDescending(g => g.Id).Skip(page - 1 * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A).ToListAsync();
-                    break;
-            }
+            predicate.And(inner);
 
-            PaginatedList<GameSummaryDTO> paginatedList = new PaginatedList<GameSummaryDTO>
-            {
-                TotalItems = totalItems,
-                Items = games.Select(g => new GameSummaryDTO
-                {
-                    Id = g.Id,
-                    Name = g.Name,
-                    Slug = g.Slug,
-                    ReleaseDate = g.ReleaseDate,
-                    CoverUrl = g.CoverUrl
-                }).ToList(),
-                PageNumber = page,
-                PageLimit = Constants.PAGE_LIMIT_A
-            };
+            PaginatedList<GameSummaryDTO> paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, orderBy, sortOrder, page);
 
             return Ok(new CompanyDTO
             {

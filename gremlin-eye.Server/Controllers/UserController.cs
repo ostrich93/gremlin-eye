@@ -31,5 +31,38 @@ namespace gremlin_eye.Server.Controllers
 
             return Ok(userResponse);
         }
+
+        [HttpGet("header/{username}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserHeader(string username)
+        {
+            var user = await _userService.GetUserByName(username);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new UserHeaderResponse
+            {
+                UserName = username,
+                Id = user.Id,
+                AvatarUrl = user.AvatarUrl
+            });
+        }
+
+        [HttpGet("profile/{username}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserProfile(string username)
+        {
+            try
+            {
+                var userProfile = await _userService.GetUserProile(username);
+                return Ok(userProfile);
+            } catch(Exception ex)
+            {
+                return NotFound(ex);
+            }
+        }
     }
 }

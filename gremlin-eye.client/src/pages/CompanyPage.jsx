@@ -2,19 +2,17 @@ import { useCallback, useState } from 'react';
 import { Button, Col, Container, Pagination, Row, Spinner } from 'react-bootstrap';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { faArrowTurnDown, faArrowTurnUp } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import FilterSidebar from '../components/FilterSidebar';
 import GameCard from '../components/Game/GameCard'
 import Sorting from '../components/Sorting';
 import apiClient from '../config/apiClient';
+import ReadMore from '../components/ReadMore/ReadMore';
 
 const CompanyPage = () => {
     const { slug } = useParams();
     const [params, setSearchParams] = useSearchParams();
     const [page, setPage] = useState(params.get('page') || 1);
     const [showFilters, setShowFilters] = useState(false);
-    const [showMore, setShowMore] = useState(true);
 
     const itemsPerPage = 60;
     const orderOptions = [
@@ -44,16 +42,11 @@ const CompanyPage = () => {
     const orderBy = params.get('orderBy') || 'trending';
     const sortOrder = params.get('sortOrder') || 'desc';
 
-    const toggleShowMore = () => {
-        setShowMore(!showMore);
-    };
-
-    const { data, isLoading } = useQuery({
+    const { data, isFetching, isPending } = useQuery({
         retry: true,
         queryKey: ["company", ...params],
         queryFn: async () => {
             try {
-                //console.log(params);
                 const response = await apiClient.get(`${import.meta.env.VITE_APP_BACKEND_URL}/api/company/${slug}`, { params });
                 return response.data;
             } catch (error) {
@@ -64,7 +57,7 @@ const CompanyPage = () => {
         },
         placeholderData: keepPreviousData,
         cacheTime: 1000 * 60 * 5,
-        staleTime: 1000
+        staleTime: 1000 * 60 * 5
     });
 
     const updateQueryParameters = useCallback((params) => {
@@ -109,7 +102,7 @@ const CompanyPage = () => {
             <FilterSidebar show={showFilters} onHide={handleClose} update={updateQueryParameters} clear={clearQueryParameters} releaseYear={currentYear} genre={currentGenre} platform={currentPlatform} min={min} max={max} />
             <Row className="mt-2">
                 <Col>
-                    <p className="subtitle-text mb-0">{data?.name}</p>
+                    <p className="subtitle-text mb-0">Company</p>
                 </Col>
             </Row>
             <Row>
@@ -118,22 +111,9 @@ const CompanyPage = () => {
                 </Col>
             </Row>
             <Row>
-                <Col className="readmore-container">
-                    <p id="company-description" className="readmore-content" style={{height: '150px', maxHeight: 'none'}}>
-                        {showMore ? data?.description.slice(100) : data?.description }
-                    </p>
-                    {showMore && (
-                        <button onClick={toggleShowMore} className="readmore-closed">
-                            <FontAwesomeIcon icon={faArrowTurnDown} /> Expand
-                        </button>
-                    )}
-                    {!showMore && (
-                        <button onClick={toggleShowMore} className="readmore-open">
-                            <FontAwesomeIcon icon={faArrowTurnUp} /> Close
-                        </button>
-                    )}
-                    <div className="readmore-background gradient" />
-                </Col>
+                <ReadMore contentElId="company-desc">
+                    {isFetching ? "Loading" : data?.description }
+                </ReadMore>
             </Row>
             <hr className="mt-2" />
             <Row>
@@ -152,8 +132,8 @@ const CompanyPage = () => {
                 <Sorting orderOptions={orderOptions} sortOrder={sortOrder} orderBy={orderBy} update={updateQueryParameters} />
             </Row>
             <Row className="mx-n1">
-                {isLoading && (<Spinner animation="border" />)}
-                {data?.items.map((game) => {
+                {isPending && (<Spinner animation="border" />)}
+                {data?.published.items.map((game) => {
                     return (
                         <GameCard key={game.id} id={game.id} game={game} />
                     )
@@ -171,16 +151,16 @@ const CompanyPage = () => {
                             <Pagination.Item key={Math.max(page - 3, 2) + idx} onClick={() => updateQueryParameters([{ params: "page", value: Math.max(page - 3, 2) + idx }])}>{Math.max(page - 3, 2) + idx}</Pagination.Item>
                         )))
                     }
-                    {page < Math.ceil(data?.totalItems / itemsPerPage) && (
-                        Array.from({ length: Math.min(page + 3, Math.ceil(data?.totalItems / itemsPerPage)) - page }, (v, idx) => (
+                    {page < Math.ceil(data?.published.totalItems / itemsPerPage) && (
+                        Array.from({ length: Math.min(page + 3, Math.ceil(data?.published.totalItems / itemsPerPage)) - page }, (v, idx) => (
                             <Pagination.Item key={page + idx + 1} active={idx === 0} onClick={() => updateQueryParameters([{ params: "page", value: page + idx }])}>{page + idx}</Pagination.Item>
                         )))
                     }
-                    {page < Math.ceil(data?.totalItems / itemsPerPage) - 3 && (
+                    {page < Math.ceil(data?.published.totalItems / itemsPerPage) - 3 && (
                         <Pagination.Ellipsis />
                     )}
-                    <Pagination.Item active={page === Math.ceil(data?.totalItems / itemsPerPage)} onClick={() => updateQueryParameters([{ params: "page", value: Math.ceil(data?.totalItems / itemsPerPage) }])}>{Math.ceil(data?.totalItems / itemsPerPage)}</Pagination.Item>
-                    <Pagination.Next disabled={page === Math.ceil(data?.totalItems / itemsPerPage)} onClick={() => updateQueryParameters([{ params: "page", value: page + 1 }])} />
+                    <Pagination.Item active={page === Math.ceil(data?.published.totalItems / itemsPerPage)} onClick={() => updateQueryParameters([{ params: "page", value: Math.ceil(data?.totalItems / itemsPerPage) }])}>{Math.ceil(data?.published.totalItems / itemsPerPage)}</Pagination.Item>
+                    <Pagination.Next disabled={page === Math.ceil(data?.published.totalItems / itemsPerPage)} onClick={() => updateQueryParameters([{ params: "page", value: page + 1 }])} />
                 </Pagination>
             </Row>
         </Container>

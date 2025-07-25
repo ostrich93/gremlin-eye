@@ -14,11 +14,17 @@ namespace gremlin_eye.Server.Entity
         [Column("playthrough_id")]
         public long PlaythroughId { get; set; } //required foreign key
 
-        [Column("log_time")]
-        public TimeSpan? LogTime { get; set; } //time played
+        [Column("start_date")]
+        public DateOnly StartDate { get; set; }
 
-        [Column("log_date")]
-        public DateOnly LogDate { get; set; }
+        [Column("end_date")]
+        public DateOnly EndDate { get; set; } //by default, it's the same as start date
+
+        [Column("hours")]
+        public int Hours { get; set; } = 0;
+
+        [Column("minutes")]
+        public int Minutes { get; set; } = 0;
 
         [Column("is_start")]
         public bool IsStart { get; set; } = false;

@@ -56,7 +56,7 @@ const Register = (props) => {
                             <Form.Control required type='password' value={passwordConfirmation} placeholder='Password Confirmation' onChange={e => setPasswordConfirmation(e.target.value)} name="passwordConfirmation" />
                         </Form.Group>
                         <div>
-                            <Button id="register-button" type='submit' disabled={loading || password !== passwordConfirmation}>Register</Button>
+                            <Button id="register-button" type='submit' className="btn-main" disabled={loading || password !== passwordConfirmation}>Register</Button>
                         </div>
                     </Form>
                 </Col>

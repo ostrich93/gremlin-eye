@@ -2,6 +2,7 @@
 using gremlin_eye.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace gremlin_eye.Server.Controllers
 {
@@ -41,17 +42,25 @@ namespace gremlin_eye.Server.Controllers
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(TokenDTO logoutRequest)
         {
             try
             {
-                
-                await _authService.LogoutAsync();
+                if (logoutRequest is null || string.IsNullOrWhiteSpace(logoutRequest.RefreshToken))
+                {
+                    return BadRequest("Error logging out: no refresh token was passed in.");
+                }
+
+                Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+                Guid? userId = idClaim != null ? Guid.Parse(idClaim!.Value) : null;
+
+                if (userId != null)
+                    await _authService.LogoutAsync(userId.Value, logoutRequest.RefreshToken);
                 return Ok();
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error logging out: {ex.Message}");
+                return BadRequest($"Error logging out: {ex.Message}");
             }
         }
 

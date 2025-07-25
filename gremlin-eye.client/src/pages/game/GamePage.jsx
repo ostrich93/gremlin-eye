@@ -8,7 +8,8 @@ import apiClient from '../../config/apiClient';
 import './GamePage.css';
 import InteractionSidebar from '../../components/Game/InteractionSidebar';
 import GameStatistics from '../../components/Game/GameStatistics';
-import formatDate from '../../services/formatDate';
+import formatDate from '../../utils/formatDate';
+import ReviewCard from '../../components/ReviewCard/ReviewCard';
 
 const GamePage = () => {
     const { user } = useAuthState();
@@ -32,6 +33,7 @@ const GamePage = () => {
                         platforms: res.data.platforms,
                         companies: res.data.companies,
                         series: res.data.series,
+                        genres: res.data.genres,
                         gameLog: res.data.gameLog,
                         stats: res.data.stats ?? {
                             playedCount: 0,
@@ -58,7 +60,21 @@ const GamePage = () => {
         fetchGame();
 
     }, [user, slug]);
-    
+
+    const renderBannerArt = () => {
+        if (gameData && gameData.bannerUrl) {
+            return (
+                <>
+                    <img src={gameData.bannerUrl} loading='lazy' />
+                </>
+            );
+        }
+
+        return (
+            <div className="no-artwork-gradient" />
+        )
+    }
+
     return (
         <Container>
             <Row id="game-banner-art">
@@ -67,9 +83,10 @@ const GamePage = () => {
                     {loading && !gameData && (
                         <Spinner animation="border" />
                     ) }
-                    {!loading && gameData && (
-                        <img src={gameData?.bannerUrl} loading='lazy' />
+                    {!loading && (
+                        renderBannerArt()
                     )}
+
                 </Col>
             </Row>
             <Row id="game-profile">
@@ -124,11 +141,22 @@ const GamePage = () => {
                                         <span className="filler-text">by</span>
                                     </span>
                                 </div>
-                                {gameData?.companies.map((company) => (
-                                    <div key={company.id} className="col-auto sub-title ps-1 pe-0">
-                                        <Link to={`/company/${company.slug}`}>{company.name} </Link>
-                                    </div>
-                                ))}
+                                {gameData?.companies.map((company, i) => 
+                                    i < gameData?.companies.length - 1 ?
+                                        <>
+                                            <div key={company.id} className="col-auto sub-title ps-1 pe-0">
+                                                <Link to={`/company/${company.slug}`}>{company.name} </Link>
+                                            </div>
+                                            <div className="col-auto sub-title ps-1 pe-0">
+                                                <span className="filler-text">,</span>
+                                            </div>
+                                        </> :
+                                        <>
+                                            <div key={company.id} className="col-auto sub-title ps-1 pe-0">
+                                                <Link to={`/company/${company.slug}`}>{company.name} </Link>
+                                            </div>
+                                        </>
+                                )}
                             </Row>
                             <Row>
                                 <Col id="center-content" className="px-3 mt-lg-2 my-3 my-md-1">
@@ -154,7 +182,7 @@ const GamePage = () => {
                                             </Link>
                                         </div>
                                         <div className="col-4 col-xl-3 pe-1">
-                                            <Link to={`/reviews/everyone/eternity/recent/${slug}`}>
+                                            <Link to={`/games/${slug}/reviews`}>
                                                 <p className="game-page-sidecard">
                                                     <FontAwesomeIcon icon={faAlignRight} />
                                                     {`${gameData?.reviewCount} Reviews`}
@@ -195,7 +223,7 @@ const GamePage = () => {
                                         </>
                                     ) }
                                 </Col>
-                                <Col className="col-12 col-lg-cus-32 mt-1 mt-lg-2">
+                                <div className="col-12 col-lg-cus-32 mt-1 mt-lg-2">
                                     <Row>
                                         <Col>
                                             <p className="mb-1 subtitle-text">Released on</p>
@@ -204,7 +232,7 @@ const GamePage = () => {
                                     <Row>
                                         <Col>
                                             {gameData?.platforms.map((platform) => (
-                                                <Link className="game-page-platform" key={platform.id} to={`/games/lib/popular/release_platform:${platform.slug}`}>{platform.name}</Link>
+                                                <Link className="game-page-platform" key={platform.id} to={`/games/lib?platform=${platform.slug}`}>{platform.name}</Link>
                                             )) }
                                         </Col>
                                     </Row>
@@ -218,7 +246,7 @@ const GamePage = () => {
                                             <Col>
                                                 {gameData?.genres.map((genre) => (
                                                     <p key={genre.id} className="genre-tag">
-                                                        <Link to={`/games/lib/popular/genre:${genre.slug}`}>{genre.name}</Link>
+                                                        <Link to={`/games/lib?genre=${genre.slug}`}>{genre.name}</Link>
                                                     </p>
                                                 )) }
                                             </Col>
@@ -232,7 +260,7 @@ const GamePage = () => {
                                             <hr className="my-auto" />
                                         </Col>
                                     </Row>
-                                </Col>
+                                </div>
                             </Row>
                             <Row id="gameReviews" className="mt-4">
                                 <Col>
@@ -240,7 +268,7 @@ const GamePage = () => {
                                         <Col>
                                             <h2 className="me-auto mb-0">
                                                 Reviews
-                                                <Link className="secondary-link smaller-font ms-2" to={`/reviews/everyone/week/recent/${gameData?.slug}`}>View More</Link>
+                                                <Link className="secondary-link smaller-font ms-2" to={`/games/${gameData?.slug}/reviews`}>View More</Link>
                                             </h2>
                                         </Col>
                                         <Col className="my-auto">
@@ -251,7 +279,9 @@ const GamePage = () => {
                                     </Row>
                                     <Row className="mt-2">
                                         <Col id="game-reviews-section">
-                                            
+                                            {gameData?.topReviews.map((review) => (
+                                                <ReviewCard key={review.reviewId} reviewData={review} isUserSubpage={false} />
+                                            ))}
                                         </Col>
                                     </Row>
                                 </Col>

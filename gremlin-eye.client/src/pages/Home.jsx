@@ -1,7 +1,11 @@
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import './Home.css';
+import { useAuthState } from '../contexts/AuthProvider';
 
 const Home = () => {
+
+    const { user } = useAuthState();
+
     return (
         <Container>
             <Row id="welcoming-banner">
@@ -11,6 +15,7 @@ const Home = () => {
                             <h2>Discover, collect, and analyze games</h2>
                         </Col>
                     </Row>
+                    {!user && (
                     <Row id="landing-actions">
                         <Col md="auto" className="auto pe-0">
                             <Button href="/users/register" className="btn-main px-3 py-2">Create a Free Account</Button>
@@ -19,6 +24,7 @@ const Home = () => {
                             <p className="subtitle-text mt-2 mt-md-0">or <a href="/login">log in</a> if you have an account</p>
                         </Col>
                     </Row>
+                    )}
                 </Col>
             </Row>
             <Row id="home-about">

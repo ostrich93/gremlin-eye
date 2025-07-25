@@ -51,7 +51,6 @@ namespace gremlin_eye.Server.Entity
         public virtual ICollection<GameLog> GameLogs { get; set; } = new List<GameLog>();
         public virtual ICollection<Playthrough> Playthroughs { get; set; } = new List<Playthrough>();
         public virtual ICollection<ListEntry> ListEntries { get; set; } = new List<ListEntry>();
-        public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
         public virtual ICollection<GameLike> Likes { get; set; } = new List<GameLike>();
 
         //IGDB Data Relationships
@@ -59,11 +58,6 @@ namespace gremlin_eye.Server.Entity
         public virtual ICollection<SeriesData> Series { get; set; } = new List<SeriesData>();
         public virtual ICollection<PlatformData> Platforms { get; set; } = new List<PlatformData>();
         public virtual ICollection<GenreData> Genres { get; set; } = new List<GenreData>();
-
-        //GameData hasOne GameData (Parent) WithMany GameData (Children)
-        [Column("parent_id")]
-        public long? ParentId { get; set; }
-        public virtual GameData? Parent { get; set; } //used for things like DLC, Remasters, etc.
-        public virtual ICollection<GameData> Children { get; set; } = new List<GameData>(); //collection of remakes, remasters, etc.
     }
+
 }

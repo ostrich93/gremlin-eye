@@ -13,6 +13,13 @@ import SyncSeries from './pages/admin/SyncSeries';
 import UserRole from './enums/Role';
 import GameLibrary from './pages/game/GameLibrary';
 import CompanyPage from './pages/CompanyPage';
+import UserLayout from './layouts/User/UserLayout';
+import UserProfile from './pages/user/UserProfile';
+import UserGameLibrary from './pages/user/UserGameLibrary';
+import UserReviews from './pages/user/UserReviews';
+import ReviewPage from './pages/ReviewPage';
+import GameReviews from './pages/game/GameReviews';
+import NotFoundPage from './pages/NotFound';
 
 const AppRoutes = () => {
     return (
@@ -30,9 +37,20 @@ const AppRoutes = () => {
             <Route path="admin/syncSeries" element={<AdminRoute><SyncSeries /></AdminRoute>} />
 
             <Route path="/games/:slug" element={<GamePage />} />
+            <Route path="/games/:slug/reviews" element={<GameReviews />} />
             <Route path="/games/lib" element={<GameLibrary />} />
 
             <Route path="/company/:slug" element={<CompanyPage />} />
+
+            <Route path="/users/:username" element={<UserLayout />}>
+                <Route index element={<UserProfile />} />
+                <Route path="games" element={<UserGameLibrary />} />
+                <Route path="reviews" element={<UserReviews /> } />
+            </Route>
+
+            <Route path="/users/:username/review/:reviewId" element={<ReviewPage /> } />
+
+            <Route path="*" element={<NotFoundPage /> } />
 
             {/*<Route path="/series/:slug" element={<SeriesPage />} />*/}
         </Routes>

@@ -3,7 +3,6 @@ using gremlin_eye.Server.Entity;
 using IGDB;
 using IGDB.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
 
 namespace gremlin_eye.Server.Services
 {
@@ -22,11 +21,11 @@ namespace gremlin_eye.Server.Services
             _igdbService = igdbService;
         }
 
-        public async Task ImportGenres()
+        public async Task<long> ImportGenres()
         {
             var sourceGenres = await _igdbService.GetGenres();
             if (sourceGenres.Length == 0)
-                return;
+                return -1;
 
             var existingGenres = await _unitOfWork.Context.Genres.ToListAsync();
             List<GenreData> newGenres = new List<GenreData>();
@@ -60,23 +59,32 @@ namespace gremlin_eye.Server.Services
                     });
                 }
             }
+
+            long lastChangedId = -1;
+
             if (newGenres.Count > 0)
             {
                 _unitOfWork.Context.Genres.AddRange(newGenres);
                 await _unitOfWork.SaveChangesAsync();
+                lastChangedId = newGenres.Last().Id;
             }
             if (updatedGenres.Count > 0)
             {
                 _unitOfWork.Context.Genres.UpdateRange(updatedGenres);
                 await _unitOfWork.SaveChangesAsync();
+                long lastId = updatedGenres.Last().Id;
+                if (lastId > lastChangedId)
+                    lastChangedId = lastId;
             }
+
+            return lastChangedId;
         }
 
-        public async Task ImportPlatforms()
+        public async Task<long> ImportPlatforms()
         {
             var sourcePlatforms = await _igdbService.GetPlatforms();
             if (sourcePlatforms.Length == 0)
-                return;
+                return -1;
 
             var existingPlatforms = await _unitOfWork.Context.Platforms.ToListAsync();
             List<PlatformData> newPlatforms = new List<PlatformData>();
@@ -109,20 +117,28 @@ namespace gremlin_eye.Server.Services
                     });
                 }
             }
+
+            long lastChangedId = -1;
+
             if (newPlatforms.Count > 0)
             {
                 _unitOfWork.Context.Platforms.AddRange(newPlatforms);
                 await _unitOfWork.Context.SaveChangesAsync();
+                lastChangedId = newPlatforms.Last().Id;
             }
             if (existingPlatforms.Count > 0)
             {
                 _unitOfWork.Context.Platforms.UpdateRange(updatedPlatforms);
                 await _unitOfWork.SaveChangesAsync();
+                long lastId = updatedPlatforms.Last().Id;
+                if (lastId > lastChangedId)
+                    lastChangedId = lastId;
             }
-            
+
+            return lastChangedId;
         }
 
-        public async Task ImportSeries(int page = 1)
+        public async Task<long> ImportSeries(int page = 1)
         {
             var offset = (page - 1) * LIMIT;
 
@@ -161,19 +177,28 @@ namespace gremlin_eye.Server.Services
                     newSeries.Add(internalSeries);
                 }
             }
+
+            long lastChangedId = -1;
+
             if (newSeries.Count > 0)
             {
                 _unitOfWork.Context.Series.AddRange(newSeries);
                 await _unitOfWork.SaveChangesAsync();
+                lastChangedId = newSeries.Last().Id;
             }
             if (updatedSeries.Count > 0)
             {
                 _unitOfWork.Context.Series.UpdateRange(updatedSeries);
                 await _unitOfWork.Context.SaveChangesAsync();
+                long lastId = updatedSeries.Last().Id;
+                if (lastId > lastChangedId)
+                    lastChangedId = lastId;
             }
+
+            return lastChangedId;
         }
 
-        public async Task ImportCompanies(int page = 1)
+        public async Task<long> ImportCompanies(int page = 1)
         {
             var offset = (page - 1) * LIMIT;
 
@@ -186,7 +211,7 @@ namespace gremlin_eye.Server.Services
                 if (source.Id == null)
                     continue;
 
-                CompanyData? internalCompany = await _unitOfWork.Context.Companies.FirstOrDefaultAsync();
+                CompanyData? internalCompany = await _unitOfWork.Context.Companies.FirstOrDefaultAsync(c => c.Id == source.Id);
                 if (internalCompany != null)
                 {
                     if (internalCompany.Checksum == source.Checksum)
@@ -215,18 +240,27 @@ namespace gremlin_eye.Server.Services
                     newCompanies.Add(internalCompany);
                 }
             }
+
+            long lastChangedId = -1;
+
             if (newCompanies.Count > 0)
             {
                 _unitOfWork.Context.Companies.AddRange(newCompanies);
                 await _unitOfWork.SaveChangesAsync();
+                lastChangedId = newCompanies.Last().Id;
             }
             if (updatedCompanies.Count > 0) {
                 _unitOfWork.Context.Companies.UpdateRange(updatedCompanies);
                 await _unitOfWork.SaveChangesAsync();
+                long lastId = updatedCompanies.Last().Id;
+                if (lastId > lastChangedId)
+                    lastChangedId = lastId;
             }
+
+            return lastChangedId;
         }
 
-        public async Task ImportGames(int page = 1)
+        public async Task<long> ImportGames(int page = 1)
         {
             var offset = (page - 1) * LIMIT;
 
@@ -293,14 +327,23 @@ namespace gremlin_eye.Server.Services
                 await _unitOfWork.SaveChangesAsync();
                 counter++;*/
             }
+
+            long lastChangedId = -1;
+
             if (gamesToUpdate.Count > 0)
             {
                 await _unitOfWork.Games.UpdateRangeAndSaveAsync(gamesToUpdate);
+                lastChangedId = gamesToUpdate.Last().Id;
             }
             if (gamesToAdd.Count > 0)
             {
                 await _unitOfWork.Games.CreateRangeAndSaveAsync(gamesToAdd);
+                long lastId = gamesToAdd.Last().Id;
+                if (lastId > lastChangedId)
+                    lastChangedId = lastId;
             }
+
+            return lastChangedId;
         }
 
         private int HandleGenres(GameData gameData, Game sourceData)
@@ -500,7 +543,7 @@ namespace gremlin_eye.Server.Services
                         seriesToDelete.Add(localS);
                 }
             }
-            else if (sourceData.Collections.Values.Length > localSeries.Count)
+            else if (localSeries.Count < sourceData.Collections.Values.Length)
             {
                 var localSeriesIds = localSeries.Select(s => s.Id).ToArray();
                 IEnumerable<Collection> sourceOnlySeries = sourceData.Collections.Values.ExceptBy(localSeriesIds, s => (long)s.Id);
@@ -529,6 +572,7 @@ namespace gremlin_eye.Server.Services
             }
             foreach (var s in seriesToDelete)
                 gameData.Series.Remove(s);
+
             if (seriesToUpdate.Count > 0)
             {
                 _unitOfWork.Context.Series.UpdateRange(seriesToUpdate);

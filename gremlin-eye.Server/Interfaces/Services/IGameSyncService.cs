@@ -4,10 +4,10 @@ namespace gremlin_eye.Server.Services
 {
     public interface IGameSyncService
     {
-        Task ImportGames(int page = 1);
-        Task ImportGenres();
-        Task ImportPlatforms();
-        Task ImportSeries(int page = 1);
-        Task ImportCompanies(int page = 1);
+        Task<long> ImportGames(int page = 1);
+        Task<long> ImportGenres();
+        Task<long> ImportPlatforms();
+        Task<long> ImportSeries(int page = 1);
+        Task<long> ImportCompanies(int page = 1);
     }
 }

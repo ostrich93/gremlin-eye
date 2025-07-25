@@ -38,6 +38,12 @@ namespace gremlin_eye.Server.Entity
         [DefaultValue(false)]
         public bool IsWishlist { get; set; } = false;
 
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [Column("updated_at")]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
         //Navigation Properties
         public AppUser User { get; set; } = null!;
         public GameData Game { get; set; } = null!;

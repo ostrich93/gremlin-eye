@@ -56,9 +56,25 @@ namespace gremlin_eye.Server.Services
             }
         }
 
-        public async Task LogoutAsync()
+        public async Task LogoutAsync(Guid userId, string refreshToken)
         {
-            await Task.CompletedTask;
+            var user = _unitOfWork.Users.GetUserById(userId);
+
+            if (user == null)
+            {
+                throw new Exception("Invalid logout request: User with id was not found");
+            }
+
+            var userToken = user.RefreshTokens.SingleOrDefault(t => t.Token == refreshToken);
+            if (userToken != null && userToken.IsActive)
+            {
+                userToken.Revoked = DateTime.UtcNow;
+                await _unitOfWork.SaveChangesAsync();
+            }
+            else
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public TokenDTO RefreshToken(TokenDTO request)

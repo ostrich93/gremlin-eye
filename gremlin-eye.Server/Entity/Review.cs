@@ -11,9 +11,6 @@ namespace gremlin_eye.Server.Entity
         [Column("review_id")]
         public long Id { get; set; }
 
-        [Column("game_id")]
-        public long GameId { get; set; }
-
         [Column("user_id")]
         public Guid UserId { get; set; } //Required Foreign Key property
 
@@ -31,7 +28,6 @@ namespace gremlin_eye.Server.Entity
 
         //Navigation Properties
         public AppUser User { get; set; } = null!;
-        public GameData Game { get; set; } = null!;
         public Playthrough Playthrough { get; set; } = null!;
         public virtual ICollection<ReviewComment> Comments { get; set; } = new List<ReviewComment>();
         public virtual ICollection<ReviewLike> Likes { get; set; } = new List<ReviewLike>();

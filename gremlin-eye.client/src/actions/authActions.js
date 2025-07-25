@@ -34,9 +34,11 @@ export async function login(dispatch, payload) {
     }
 };
 
-export async function logout(dispatch) {
+export async function logout(dispatch, payload) {
     try {
-        const response = await apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/auth/logout`);
+        const response = await apiClient.post(`${import.meta.env.VITE_APP_BACKEND_URL}/auth/logout`, payload, {
+            withCredentials: true
+        });
         dispatch({ type: "LOGOUT" });
         console.log("logout success");
         sessionStorage.removeItem("current_user");

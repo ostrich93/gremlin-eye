@@ -1,0 +1,25 @@
+#profile-header .avatar.avatar-static {
+    width: 95px;
+}
+@media(max-width:575.98px) {
+    #profile-header .avatar.avatar-static {
+        width: 70px
+    }
+}
+
+#profile-header #profile-nav {
+    background-color: var(--back-secondary);
+    border-radius: 4px;
+}
+
+#profile-header #profile-nav a {
+    color: var(--back-link);
+    font-size: 1rem;
+    margin: 5px;
+    padding: 0 8px;
+    position: relative
+}
+
+#profile-header #profile-nav a:hover {
+    color: #fff;
+}
