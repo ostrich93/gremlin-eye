@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  FrontendOAI:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: "OAI for accessing the S3 frontend"
+  CloudFrontCachingPolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        MinTTL: 60
+        MaxTTL: 86400
+        Name: "GremlinCFCachePolicy"
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: true
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - "Authorization"
+          QueryStringsConfig:
+            QueryStringBehavior: whitelist
+            QueryStrings:
+              - category
+              - genre
+              - min
+              - max
+              - orderBy 
+              - page
+              - platform
+              - query
+              - releaseYear
+              - sortOrder
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !ImportValue FrontendBucketDomainName
+            Id: "FrontendS3Origin"
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${FrontendOAI}"
+        Enabled: true
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: '/index.html'
+            ErrorCachingMinTTL: 60
+        DefaultCacheBeahvior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachePolicyId: !Ref CloudFrontCachingPolicy
+          Compress: true
+          TargetOriginId: !Sub 'S3Origin-${FrontendBucketDomainName}'
+          ViewerProtocolPolicy: "redirect-to-https"
+        DefaultRootObject: 'index.html'
+        HttpVersion: http2
+        PriceClass: 'PriceClass_100'
+        Tags:
+          - Key: Name
+            Value: GremlinEyeCloudFront
+  FrontendS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !ImportValue FrontendS3BucketName
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: "AllowCloudFrontAccess"
+            Effect: "Allow"
+            Principal:
+              CanonicalUser: !GetAtt FrontendOAI.S3CanonicalUserId
+            Action: "s3:GetObject"
+            Resource: !ImportValue FrontendBucketARN
+Outputs:
+  CloudFrontDistributionId:
+    Value: !Ref CloudFrontDistribution
+    Export:
+      Name: CloudFrontDistributionId
+  CloudFrontDistributionDomainName:
+    Value: !GetAtt CloudFrontDistribution.DomainName
+    Export:
+      Name: CloudFrontDistributionDomainName

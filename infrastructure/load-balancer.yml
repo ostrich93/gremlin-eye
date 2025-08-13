@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      TargetType: ip
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 10
+      VpcId: !ImportValue VPC
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Name: ALB-ECS-Gremlin-Service
+      SecurityGroups:
+        - Ref: !ImportValue ECSSecurityGroupId
+      Subnets:
+        - Ref: !ImportValue PublicSubnetAId
+        - Ref: !ImportValue PublicSubnetBId
+Outputs:
+  TargetGroupArn:
+    Value: !Ref TargetGroup
+    Export:
+      Name: TargetGroupArn
+  LoadBalancerArn:
+    Value: !Ref LoadBalancer
+    Export:
+      Name: LoadBalancerArn
+  LoadBalancerExternalUrl:
+    Value: !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: LoadBalancerExternalUrl

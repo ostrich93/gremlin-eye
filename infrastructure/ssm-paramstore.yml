@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  ProjectName:
+    Type: String
+    Default: gremlin-eye
+  JwtSigningKey:
+    Type: String
+Resources:
+  ViteBackendUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ProjectName}/VITE_APP_BACKEND_URL"
+      Type: String
+      Value: !ImportValue LoadBalancerExternalUrl
+  JWTSigningKeyParameter:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "/${ProjectName}/JWT_SIGNING_KEY"
+      Type: String
+      Value: !Ref JwtSigningKey

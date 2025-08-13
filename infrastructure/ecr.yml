@@ -1,0 +1,23 @@
+AWSTemplateVersion: "2010-09-09"
+Resources:
+  #ECR Repository
+  Repository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: "gremlin-eye-backend"
+      ImageScanningConfiguration:
+        ScanOnPush: true
+
+Outputs:
+  ECRRepositoryName:
+    Value: !Ref Repository
+    Exports:
+      Name: ECRRepositoryName
+  ECRRepositoryArn:
+    Value: !GetAtt Repository.Arn
+    Exports:
+      Name: ECRRepositoryArn
+  ECRRepositoryUri:
+    Value: !GetAtt Repository.RepositoryUri
+    Exports:
+      Name: ECRRepositoryUri

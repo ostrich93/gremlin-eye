@@ -1,0 +1,199 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  ClusterName:
+    Type: String
+    Default: GremlinCluster
+  ServiceName:
+    Type: String
+    Default: gremlin-service
+  TaskFamily:
+    Type: String
+    Default: gremlin-task-definition
+  TaskCpu:
+    Type: Number
+    Default: 256
+    AllowedValues: [256, 512, 1024, 2048, 4096]
+  TaskMemory:
+    Type: Number
+    Default: 512
+    AllowedValues: [512, 1024, 2048, 4096, 8192, 16384]
+    Description: Memory (in MiB) for the task
+  DesiredCount:
+    Type: Number
+    Default: 2
+  LogGroupName:
+    Type: String
+    Default: /ecs/gremlin-task-definition
+Resources:
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ClusterName
+  ECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    DependsOn:
+      - ECSCluster
+    Properties:
+      VPCZoneIdentifier:
+        - !ImportValue PublicSubnetAId
+        - !ImportValue PublicSubnetBId
+      LaunchTemplate:
+        LaunchTemplateId: !Ref ContainerInstances
+        Version: !GetAtt ContainerInstances.LatestVersionNumber
+      MinSize: 0
+      MaxSize: 4
+      DesiredCapacity: !Ref DesiredCount
+      NewInstancesProtectedByScaleIn: true
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: 'true'
+  ContainerInstances:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: gremlin-asg-launch-template
+      LaunchTemplateData:
+        ImageId: !ImportValue ECRRepositoryUri
+        InstanceType: t2.micro
+        IamInstanceProfile:
+          Name: !Ref ECSInstanceProfileName
+        SecurityGroupIds:
+          - !ImportValue ECSSecurityGroupId
+        UserData: !Base64
+          Fn::Sub: 
+          - |
+            #!/bin/bash
+
+            # Install Docker
+            yum update -y
+            yum install -y docker
+
+            systemctl start docker
+
+            aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${ECRRepositoryUri}
+
+            docker pull ${ECRRepositoryUri}:latest
+
+            docker run -d -e Authentication__Igdb__ClientId=${IgdbClientId} -e Authentication__Igdb__ClientSecret=${IgdbClientSecret} -e ConnectionStrings__DefaultConnection=${DBConnectionString} -e JWT__Audience=${BackendUri} -e JWT__Issuer=${BackendUri} -e JWT__SigningKey=${JwtSigningKey} -P ${ECRRepositoryUri}:latest
+            
+          - ECRRepositoryUri:
+              Fn::ImportValue: ECRRepositoryUri
+          - IgdbClientId:
+              Fn::Sub: '{{resolve:secretsmanager:TwitchAuthenticationCredentials:SecretString:client-id}}'
+          - IgdbClientSecret:
+              Fn::Sub: '{{resolve:secretsmanager:TwitchAuthenticationCredentials:SecretString:client-secret}}'
+          - DBConnectionString:
+              Fn::Sub: '{{resolve:secretsmanager:/gremlin-eye/DB_CONNECTION_STRING:SecretString}}'
+          - BackendUri:
+              Fn::Sub: '{{resolve:ssm:/gremlin-eye/VITE_APP_BACKEND_URL}}'
+          - JwtSigningKey:
+              Fn::Sub: '{{resolve:secretsmanager:/gremlin-eye/JWT_SIGNING_KEY}}'
+  CapacityProvider:
+    Type: AWS::ECS::CapacityProvider
+    Properties:
+      AutoScalingGroupProvider:
+        AutoScalingGroupArn: !Ref ECSAutoScalingGroup
+        ManagedScaling:
+          InstanceWarmupPeriod: 60
+          MinimumScalingStepSize: 1
+          MaximumScalingStepSize: 4
+          Status: ENABLED
+          TargetCapacity: 100
+        ManagedTerminationProtection: ENABLED
+  CapacityProviderAssociation:
+    Type: AWS::ECS::ClusterCapacityProviderAssociations
+    Properties:
+      CapacityProviders:
+        - !Ref CapacityProvider
+      Cluster: !Ref ECSCluster
+      DefaultCapacityProviderStrategy:
+        - Base: 0
+          CapacityProvider: !Ref CapacityProvider
+          Weight: 1
+  ECSTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ECSCluster
+    Properties:
+      Family: !Ref TaskFamily
+      Cpu: !Ref TaskCpu
+      Memory: !Ref TaskMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - EC2
+      ExecutionRoleArn: !ImportValue ECSTaskExecutionRoleArn
+      ContainerDefinitions:
+        - Name: !Ref ServiceName
+          Cpu: !Ref TaskCpu
+          Memory: !Ref TaskMemory
+          Essential: true
+          Image: !ImportValue ECRRepositoryUri
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              mode: non-blocking
+              max-buffer-size: 25m
+              awslogs-create-group: 'true'
+              awslogs-group: !Ref LogGroupName
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: ecs
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
+              Protocol: tcp
+          RuntimePlatform:
+            OperationSystemFamily: Linux
+  ECSService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - ECSCluster
+      - LoadBalancerListener
+    Properties:
+      ServiceName: !Ref ServiceName
+      Cluster: !Ref ECSCluster
+      PlacementStrategies:
+        - Field: 'availability:ecs:availability-zone'
+          Type: spread
+        - Field: cpu
+          Type: binpack
+      DesiredCount: !Ref DesiredCount
+      LaunchType: EC2
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      NetworkConfiguration:
+        AwsvcpConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref ECSSecurityGroup
+          Subnets:
+            - !ImportValue PublicSubnetAId
+            - !ImportValue PublicSubnetBId
+      TaskDefinition: !Ref ECSTaskDefinition
+      LoadBalancers:
+        - ContainerName: !Ref ServiceName
+          ContainerPort: 80
+          TargetGroupArn: !ImportValue TargetGroup
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefautlActions:
+        - Type: forward
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn: !ImportValue TargetGroupArn
+                Weight: 100
+      LoadBalancerArn: !ImportValue LoadBalancerArn
+      Port: 80
+      Protocol: HTTP
+Outputs:
+  ClusterName:
+    Value: !Ref ECSCluster
+    Export:
+      Name: ClusterName
+  ServiceName:
+    Value: !Ref ECSService
+    Export:
+      Name: ServiceName
+  ECSTaskDefinitionArn:
+    Value: !GetAtt ECSTaskDefinition.Arn
+    Export:
+      Name: ECSTaskDefinitionArn

@@ -1,0 +1,266 @@
+AWSTemplateVersion: "2010-09-09"
+Resources:
+  #CodeBuild Role
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - "codebuild.amazonaws.com"
+            Action:
+                - "sts:AssumeRole"
+      Policies:
+        - PolicyName: CodeBuildPolicy
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                  - "s3:GetBucketVersioning"
+                  - "s3:PutObject" 
+                  - "s3:PutObjectAcl"
+                Resource:
+                  - !ImportValue PipelineBucketARN
+                  - !ImportValue FrontendBucketARN
+              -
+                Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "cloudfront:CreateInvalidation" 
+                  - "ecr:GetAuthorizationToken"
+                Resource: "*"
+              -
+                Effect: Allow
+                Action:
+                  - "ecr:GetDownloadUrlForLayer"
+                  - "ecr:BatchGetImage"
+                  - "ecr:BatchCheckLayerAvailability"
+                  - "ecr:PutImage"
+                  - "ecr:InitiateLayerUpload"
+                  - "ecr:UploadLayerPart"
+                  - "ecr:CompleteLayerUpload"
+                Resource: !ImportValue ECRRepositoryArn
+
+  #CodePipeline Role
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service: "codepipeline.amazonaws.com"
+      Policies:
+        - PolicyName: "CodePipelinePolicy"
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                  - "s3:ListBucket"
+                Resource:
+                  - !ImportValue PipelineBucketARN
+                  - !ImportValue FrontendBucketARN
+              -
+                Effect: Allow
+                Action:
+                  - "codedeploy:CreateDeployment"
+                  - "codedeploy:CreateDeploymentGroup"
+                  - "codedeploy:GetApplication"
+                  - "codedeploy:GetApplicationRevision"
+                  - "codedeploy:GetDeployment"
+                  - "codedeploy:GetDeploymentConfig"
+                  - "codedeploy:RegisterApplicationRevision"
+                  - "codebuild:StartBuild"
+                  - "codebuild:BatchGetBuilds"
+                  - "iam:PassRole" 
+                Resource: "*"
+
+  #CodeDeploy Role
+  CodeDeployServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service: "codedeploy.amazonaws.com"
+      Policies:
+        - PolicyName: "CodeDeployPolicy"
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                  - "s3:ListBucket"
+                Resource:
+                  - !ImportValue PipelineBucketARN
+                  - !ImportValue FrontendBucketARN
+              -
+                Effect: Allow
+                Action:
+                  - "codedeploy:CreateDeployment"
+                  - "codedeploy:CreateDeploymentGroup"
+                  - "codedeploy:GetApplication"
+                  - "codedeploy:GetApplicationRevision"
+                  - "codedeploy:GetDeployment"
+                  - "codedeploy:GetDeploymentConfig"
+                  - "codedeploy:RegisterApplicationRevision"
+                  - "ec2:*"
+                Resource: "*"
+
+  #IAM Role for EC2 Instance(s)
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: "sts:AssumeRole"
+            Effect: "Allow"
+            Principal:
+              Service: "ec2.amazonaws.com"
+      Policies:
+        - PolicyName: EC2InstancePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                  - "s3:ListBucket"
+                Resource:
+                  - !ImportValue PipelineBucketARN
+              - Effect: "Allow"
+                Action:
+                  - "codedeploy:BatchGetApplications"
+                  - "codedeploy:BatchGetDeployments"
+                  - "codedeploy:GetApplicationRevision"
+                  - "codedeploy:GetDeployment"
+                  - "codedeploy:RegisterApplicationVersion"
+                  - "codedeploy:GetDeploymentConfig"
+                  - "codedeploy:GetDeploymentGroup"
+                Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "ssm:GetParameter"
+                  - "ssm:GetParameters"
+                  - "ssm:GetParameterHistory"
+                  - "ssm:GetParametersByPath"
+                  - "ssm:PutParameter"
+                  - "ssm:DeleteParameter"
+                  - "secretsmanager:GetSecretValue"
+                  - "secretsmanager:PutSecretValue"
+                  - "secretsmanager:RotateSecret"
+                Resource: "*"
+
+  #IAM Role for Task Execution
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: "sts:AssumeRole"
+            Effect: "Allow"
+            Principal:
+              Service: "ecs-tasks.amazonaws.com"
+      Policies:
+        - PolicyName: ECSTaskExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                  - "s3:ListBucket"
+                Resource:
+                  - !ImportValue PipelineBucketARN
+              - Effect: "Allow"
+                Action:
+                  - "codedeploy:BatchGetApplications"
+                  - "codedeploy:BatchGetDeployments"
+                  - "codedeploy:GetApplicationRevision"
+                  - "codedeploy:GetDeployment"
+                  - "codedeploy:RegisterApplicationVersion"
+                  - "codedeploy:GetDeploymentConfig"
+                  - "codedeploy:GetDeploymentGroup"
+                Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "ssm:GetParameter"
+                  - "ssm:GetParameters"
+                  - "ssm:GetParameterHistory"
+                  - "ssm:GetParametersByPath"
+                  - "ssm:PutParameter"
+                  - "ssm:DeleteParameter"
+                  - "secretsmanager:GetSecretValue"
+                  - "secretsmanager:PutSecretValue"
+                  - "secretsmanager:RotateSecret"
+              - Effect: "Allow"
+                Action:
+                  - "ecs:CreateCluster"
+                  - "ecs:DeregisterContainerInstance"
+                  - "ecs:DiscoverPollEndpoint"
+                  - "ecs:RegisterContainerInstance"
+                  - "ecs:StartTelemetrySession"
+                  - "ecs:Submit*"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "ecr:BatchCheckLayerAvailability"
+                  - "ecr:BatchGetImage"
+                  - "ecr:GetDownloadUrlForLayer"
+                  - "ecr:GetAuthorizationToken"
+                  - "ecr:*" 
+                Resource: "*"
+
+  #EC2 Instance Profile (to attach onto IAM Role for EC2 instance(s))
+  ECSInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2InstanceRole
+
+  Outputs:
+    ECSInstanceProfileName:
+      Value: !Ref ECSInstanceProfile
+      Export:
+        Name: ECSInstanceProfileName
+    CodePipelineServiceRoleArn:
+      Value: !GetAtt CodePipelineServiceRole.Arn
+      Export:
+        Name: CodePipelineServiceRoleArn
+    CodeBuildServiceRoleArn:
+      Value: !GetAtt CodeBuildServiceRole.Arn
+      Export:
+        Name: CodeBuildServiceRoleArn
+    CodeDeployServiceRoleArn:
+      Value: !GetAtt CodeDeployServiceRole.Arn
+      Export:
+        Name: CodeDeployServiceRoleArn
+    ECSTaskExecutionRoleArn:
+      Value: !GetAtt ECSTaskExecutionRole.Arn
+      Export:
+        Name: ECSTaskExecutionRoleArn
