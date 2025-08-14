@@ -1,4 +1,4 @@
-AWSTemplateVersion: "2010-09-09"
+AWSTemplateFormatVersion: "2010-09-09"
 Resources:
   #ECR Repository
   Repository:
@@ -11,13 +11,13 @@ Resources:
 Outputs:
   ECRRepositoryName:
     Value: !Ref Repository
-    Exports:
+    Export:
       Name: ECRRepositoryName
   ECRRepositoryArn:
     Value: !GetAtt Repository.Arn
-    Exports:
+    Export:
       Name: ECRRepositoryArn
   ECRRepositoryUri:
     Value: !GetAtt Repository.RepositoryUri
-    Exports:
+    Export:
       Name: ECRRepositoryUri

@@ -1,4 +1,4 @@
-AWSTemplateVersion: "2010-09-09"
+AWSTemplateFormatVersion: "2010-09-09"
 Resources:
   #CodeBuild Role
   CodeBuildServiceRole:
@@ -243,24 +243,24 @@ Resources:
       Roles:
         - !Ref EC2InstanceRole
 
-  Outputs:
-    ECSInstanceProfileName:
-      Value: !Ref ECSInstanceProfile
-      Export:
-        Name: ECSInstanceProfileName
-    CodePipelineServiceRoleArn:
-      Value: !GetAtt CodePipelineServiceRole.Arn
-      Export:
-        Name: CodePipelineServiceRoleArn
-    CodeBuildServiceRoleArn:
-      Value: !GetAtt CodeBuildServiceRole.Arn
-      Export:
-        Name: CodeBuildServiceRoleArn
-    CodeDeployServiceRoleArn:
-      Value: !GetAtt CodeDeployServiceRole.Arn
-      Export:
-        Name: CodeDeployServiceRoleArn
-    ECSTaskExecutionRoleArn:
-      Value: !GetAtt ECSTaskExecutionRole.Arn
-      Export:
-        Name: ECSTaskExecutionRoleArn
+Outputs:
+  ECSInstanceProfileName:
+    Value: !Ref ECSInstanceProfile
+    Export:
+      Name: ECSInstanceProfileName
+  CodePipelineServiceRoleArn:
+    Value: !GetAtt CodePipelineServiceRole.Arn
+    Export:
+      Name: CodePipelineServiceRoleArn
+  CodeBuildServiceRoleArn:
+    Value: !GetAtt CodeBuildServiceRole.Arn
+    Export:
+      Name: CodeBuildServiceRoleArn
+  CodeDeployServiceRoleArn:
+    Value: !GetAtt CodeDeployServiceRole.Arn
+    Export:
+      Name: CodeDeployServiceRoleArn
+  ECSTaskExecutionRoleArn:
+    Value: !GetAtt ECSTaskExecutionRole.Arn
+    Export:
+      Name: ECSTaskExecutionRoleArn
