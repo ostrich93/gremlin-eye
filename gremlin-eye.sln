@@ -9,6 +9,30 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gremlin-eye.Server", "greml
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gremlin-eye.Server.Tests", "gremlin-eye.Server.Tests\gremlin-eye.Server.Tests.csproj", "{AE182F8C-2406-4A26-9F99-412A02F29798}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructure", "infrastructure", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		infrastructure\ci-cd-pipeline.yml = infrastructure\ci-cd-pipeline.yml
+		infrastructure\cloudfront.yml = infrastructure\cloudfront.yml
+		infrastructure\ecr.yml = infrastructure\ecr.yml
+		infrastructure\ecs.yml = infrastructure\ecs.yml
+		infrastructure\iam.yml = infrastructure\iam.yml
+		infrastructure\load-balancer.yml = infrastructure\load-balancer.yml
+		infrastructure\main.yml = infrastructure\main.yml
+		infrastructure\network.yml = infrastructure\network.yml
+		infrastructure\rds.yml = infrastructure\rds.yml
+		infrastructure\route53.yml = infrastructure\route53.yml
+		infrastructure\s3.yml = infrastructure\s3.yml
+		infrastructure\ssm-paramstore.yml = infrastructure\ssm-paramstore.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{857CD8B8-13EE-4D26-B9A5-6D27B23C768C}"
+	ProjectSection(SolutionItems) = preProject
+		buildspec-frontend.yml = buildspec-frontend.yml
+		buildspec.yml = buildspec.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +53,10 @@ Global
 		{AE182F8C-2406-4A26-9F99-412A02F29798}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE182F8C-2406-4A26-9F99-412A02F29798}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE182F8C-2406-4A26-9F99-412A02F29798}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

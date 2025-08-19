@@ -5,6 +5,7 @@ import Rate from 'rc-rate';
 import "rc-rate/assets/index.css";
 import { faComment, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { playStatusEnumDisplayStrings } from '../../utils/constants';
 
 const ReviewCard = ({ reviewData, isUserSubpage }) => {
 
@@ -31,7 +32,6 @@ const ReviewCard = ({ reviewData, isUserSubpage }) => {
     };
 
     const renderAvatar = () => {
-        //console.log("reviewData: ", reviewData);
         return (
             <div id="avatar" className="col-auto mb-auto pe-0">
                 <Link to={`/users/${reviewData.username}`}>
@@ -71,7 +71,7 @@ const ReviewCard = ({ reviewData, isUserSubpage }) => {
                                     )}
                                     <div className="col-auto my-auto game-status ms-2 ps-2 pe-1">
                                         <Link to={`/users/${reviewData.username}/games?type=played&status=${reviewData.playStatus}`}>
-                                            <p className="mb-0 play-type">{reviewData.playStatus}</p>
+                                            <p className="mb-0 play-type">{playStatusEnumDisplayStrings[reviewData.playStatus] ?? ""}</p>
                                         </Link>
                                     </div>
                                     {reviewData.platform && (

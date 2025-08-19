@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  #Pipeline S3 Bucket
+  PipelineBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      AccessControl: BucketOwnerFullControl
+      BucketName: "codepipeline-artifacts-gremlin-eye-bucket"
+
+  #Frontend S3 Bucket
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      AccessControl: BucketOwnerFullControl
+      BucketName: "gremlin-eye.com"
+      WebsiteConfiguration:
+        IndexDocument: "index.html"
+      VersioningConfiguration:
+        Status: Enabled
+
+Outputs:
+  PipelineBucketName:
+    Description: "Name of the CodePipeline Artifacts S3 Bucket"
+    Value: !Ref PipelineBucket
+    Export:
+      Name: PipelineBucketName
+
+  PipelineBucketARN:
+    Description: "The ARN of the CodePipeline Artifacts S3 Bucket"
+    Value: !Sub "arn:aws:s3:::${PipelineBucket}/*"
+    Export:
+      Name: PipelineBucketARN
+
+  FrontendBucketName:
+    Description: "Name of the Frontend S3 Bucket"
+    Value: !Ref FrontendBucket
+    Export:
+      Name: FrontendBucketName
+
+  FrontendBucketARN:
+    Description: "The ARN of the Frontend S3 Bucket"
+    Value: !Sub "arn:aws:s3:::${FrontendBucket}/*"
+    Export:
+      Name: FrontendBucketARN
+
+  FrontendBucketWebsiteURL:
+    Description: "The S3 website endpoint for the frontend bucket"
+    Value: !GetAtt FrontendBucket.WebsiteURL
+    Export:
+      Name: FrontendBucketWebsiteURL
+
+  FrontendBucketDomainName:
+    Description: "The IPv4 name of the S3 bucket for the frontend"
+    Value: !GetAtt FrontendBucket.DomainName
+    Export:
+      Name: FrontendBucketDomainName
+
+  FrontendBucketRegionalDomainName:
+    Description: "The regional domain name for the S3 bucket for the frontend"
+    Value: !GetAtt FrontendBucket.RegionalDomainName
+    Export:
+      Name: FrontendBucketRegionalDomainName

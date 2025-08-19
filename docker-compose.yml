@@ -1,0 +1,36 @@
+services:
+  gremlindb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: on-failure
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Pass@word
+      - MSSQL_PID=Developer 
+    ports:
+      - "1433:1433"
+    volumes:
+      - ${USERPROFILE}\mssql_data:/var/opt/mssql/data
+      - ${USERPROFILE}\mssql_log:/var/opt/mssql/log
+      - ${USERPROFILE}\mssql_backup:/var/opt/mssql/backup
+
+  gremlin-eye.server:
+    build:
+      context: .
+      dockerfile: ./gremlin-eye.Server/Dockerfile
+    env_file:
+      - ./gremlin-eye.Server/.env.development
+    restart: on-failure
+    ports:
+      - "5000:80"
+      - "5001:443" 
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ASPNETCORE_URLS=http://+:443;http://+:80
+        - ASPNETCORE_Kestrel__Certificates__Default__Password=Secure@12345
+        - ASPNETCORE_Kestrel__Certificates__Default__PATH=/https/localhost.pfx
+        - JWT__Audience=localhost:5000
+        - JWT__Issuer=localhost:5000
+    depends_on:
+      - gremlindb
