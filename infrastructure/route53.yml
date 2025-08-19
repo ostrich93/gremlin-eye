@@ -19,6 +19,8 @@ Resources:
       HostedZoneId: !Ref HostedZoneId
       RecordSets:
         - Name: 'gremlin-eye.com.'
-          HostedZoneId: Z2FDTNDATAQYW2 #The hosted zone id provided by aws for cloudfront distributions
           Type: "A"
+          AliasTarget:
+            DNSName: !ImportValue CloudFrontDistributionDomainName
+            HostedZoneId: Z2FDTNDATAQYW2 #The hosted zone id provided by aws for cloudfront distributions
   

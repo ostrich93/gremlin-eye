@@ -4,7 +4,7 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
-      EnableDNSSupport: true
+      EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
         - Key: Name
@@ -177,32 +177,32 @@ Resources:
           ToPort: 1433
           SourceSecurityGroup: !Ref ECSSecurityGroup
 
-  Outputs:
-    VpcId:
-      Value: !Ref VPC
-      Export:
-        Name: VpcId
-    PublicSubnetAId:
-      Value: !Ref PublicSubnetA
-      Export:
-        Name: PublicSubnetAId
-    PublicSubnetBId:
-      Value: !Ref PublicSubnetB
-      Export:
-        Name: PublicSubnetBId
-    PrivateSubnetAId:
-      Value: !Ref PrivateSubnetA
-      Export:
-        Name: PrivateSubnetAId
-    PrivateSubnetBId:
-      Value: !Ref PrivateSubnetB
-      Export:
-        Name: PrivateSubnetBId
-    ECSSecurityGroupId:
-      Value: !Ref ECSSecurityGroup
-      Export:
-        Name: ECSSecurityGroupId
-    RDSSecurityGroupId:
-      Value: !Ref RDSSecuirtyGroup
-      Export:
-        Name: RDSSecurityGroupId
+Outputs:
+  VpcId:
+    Value: !Ref VPC
+    Export:
+      Name: VpcId
+  PublicSubnetAId:
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: PublicSubnetAId
+  PublicSubnetBId:
+    Value: !Ref PublicSubnetB
+    Export:
+      Name: PublicSubnetBId
+  PrivateSubnetAId:
+    Value: !Ref PrivateSubnetA
+    Export:
+      Name: PrivateSubnetAId
+  PrivateSubnetBId:
+    Value: !Ref PrivateSubnetB
+    Export:
+      Name: PrivateSubnetBId
+  ECSSecurityGroupId:
+    Value: !Ref ECSSecurityGroup
+    Export:
+      Name: ECSSecurityGroupId
+  RDSSecurityGroupId:
+    Value: !Ref RDSSecurityGroup
+    Export:
+      Name: RDSSecurityGroupId

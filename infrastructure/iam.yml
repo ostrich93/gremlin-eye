@@ -16,7 +16,7 @@ Resources:
                 - "sts:AssumeRole"
       Policies:
         - PolicyName: CodeBuildPolicy
-        - PolicyDocument:
+          PolicyDocument:
             Version: "2012-10-17"
             Statement:
               -
@@ -64,7 +64,7 @@ Resources:
               Service: "codepipeline.amazonaws.com"
       Policies:
         - PolicyName: "CodePipelinePolicy"
-        - PolicyDocument:
+          PolicyDocument:
             Version: "2012-10-17"
             Statement:
               -
@@ -104,7 +104,7 @@ Resources:
               Service: "codedeploy.amazonaws.com"
       Policies:
         - PolicyName: "CodeDeployPolicy"
-        - PolicyDocument:
+          PolicyDocument:
             Version: "2012-10-17"
             Statement:
               -
@@ -136,10 +136,14 @@ Resources:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
-          - Action: "sts:AssumeRole"
-            Effect: "Allow"
+          - Effect: "Allow"
             Principal:
               Service: "ec2.amazonaws.com"
+            Action: "sts:AssumeRole"
+          - Effect: "Allow"
+            Principal:
+              Service: "ecs-tasks.amazonaws.com"
+            Action: "sts:AssumeRole"
       Policies:
         - PolicyName: EC2InstancePolicy
           PolicyDocument:
@@ -174,6 +178,34 @@ Resources:
                   - "secretsmanager:PutSecretValue"
                   - "secretsmanager:RotateSecret"
                 Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "ecs:CreateCluster"
+                  - "ecs:DeregisterContainerInstance"
+                  - "ecs:DiscoverPollEndpoint"
+                  - "ecs:RegisterContainerInstance"
+                  - "ecs:StartTelemetrySession"
+                  - "ecs:UpdateContainerInstancesState"
+                  - "ecs:Submit*"
+                  - "ec2:AttachNetworkInterface"
+                  - "ec2:CreateNetworkInterface"
+                  - "ec2:CreateNetworkInterfacePermission"
+                  - "ec2:DeleteNetworkInterface"
+                  - "ec2:DeleteNetworkInterfacePermission"
+                  - "ec2:Describe*"
+                  - "ec2:DetachingNetworkInterface"
+                  - "elasticloadbalancing:DeregisterInstanceFromLoadBalancer"
+                  - "elasticloadbalancing:DeregisterTargets"
+                  - "elasticloadbalancing:Describe*"
+                  - "elasticloadbalancing:RegisterInstanceFromLoadBalancer"
+                  - "elasticloadbalancing:RegisterTargets"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "ecr:BatchCheckLayerAvailability"
+                  - "ecr:BatchGetImage"
+                  - "ecr:GetDownloadUrlForLayer"
+                  - "ecr:GetAuthorizationToken"
+                Resource: "*"
 
   #IAM Role for Task Execution
   ECSTaskExecutionRole:
@@ -193,47 +225,12 @@ Resources:
             Statement:
               - Effect: "Allow"
                 Action:
-                  - "s3:GetObject"
-                  - "s3:GetObjectVersion"
-                  - "s3:ListBucket"
-                Resource:
-                  - !ImportValue PipelineBucketARN
-              - Effect: "Allow"
-                Action:
-                  - "codedeploy:BatchGetApplications"
-                  - "codedeploy:BatchGetDeployments"
-                  - "codedeploy:GetApplicationRevision"
-                  - "codedeploy:GetDeployment"
-                  - "codedeploy:RegisterApplicationVersion"
-                  - "codedeploy:GetDeploymentConfig"
-                  - "codedeploy:GetDeploymentGroup"
-                Resource: "*"
-              - Effect: "Allow"
-                Action:
-                  - "ssm:GetParameter"
-                  - "ssm:GetParameters"
-                  - "ssm:GetParameterHistory"
-                  - "ssm:GetParametersByPath"
-                  - "ssm:PutParameter"
-                  - "ssm:DeleteParameter"
-                  - "secretsmanager:GetSecretValue"
-                  - "secretsmanager:PutSecretValue"
-                  - "secretsmanager:RotateSecret"
-              - Effect: "Allow"
-                Action:
-                  - "ecs:CreateCluster"
-                  - "ecs:DeregisterContainerInstance"
-                  - "ecs:DiscoverPollEndpoint"
-                  - "ecs:RegisterContainerInstance"
-                  - "ecs:StartTelemetrySession"
-                  - "ecs:Submit*"
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
                   - "ecr:BatchCheckLayerAvailability"
                   - "ecr:BatchGetImage"
                   - "ecr:GetDownloadUrlForLayer"
                   - "ecr:GetAuthorizationToken"
-                  - "ecr:*" 
                 Resource: "*"
 
   #EC2 Instance Profile (to attach onto IAM Role for EC2 instance(s))
@@ -248,6 +245,10 @@ Outputs:
     Value: !Ref ECSInstanceProfile
     Export:
       Name: ECSInstanceProfileName
+  ECSInstanceRoleArn:
+    Value: !GetAtt EC2InstanceRole.Arn
+    Export:
+      Name: ECSInstanceRoleArn
   CodePipelineServiceRoleArn:
     Value: !GetAtt CodePipelineServiceRole.Arn
     Export:

@@ -1,5 +1,4 @@
 AWSTemplateFormatVersion: 2010-09-09
-
 Parameters:
   GitHubUser:
     Type: String
@@ -20,21 +19,20 @@ Resources:
       - FrontendCodeBuildProject 
     Properties:
       RoleArn: !ImportValue CodePipelineServiceRoleArn
-      ArtifactsStore:
+      ArtifactStore:
         Type: S3
         Location: !ImportValue PipelineBucketName
-    Stages:
-      -
-        Name: Source
+      Stages:
+      - Name: Source
         Actions:
           - InputArtifacts: []
             ActionTypeId:
               Version: '1'
               Owner: ThirdParty
               Category: Source
-              Provider: Github
+              Provider: GitHub
             OutputArtifacts:
-              - Name: GremlinSourceArtifact
+              - Name: SourceOutput
             RunOrder: 1
             Configuration:
               Owner: !Ref GitHubUser
@@ -43,8 +41,7 @@ Resources:
               Branch: !Ref GitHubBranch
               OAuthToken: '{{resolve:secretsmanager:MyGithubSecret:SecretString:token}}'
             Name: ApplicationSource
-      -
-        Name: Build
+      - Name: Build
         Actions:
           - Name: BackendBuild
             ActionTypeId:
@@ -70,8 +67,7 @@ Resources:
               - Name: FrontendBuildOutput
             Configuration:
               ProjectName: !Ref FrontendCodeBuildProject
-      -
-        Name: Deploy
+      - Name: Deploy
         Actions:
           - Name: DeployBackend
             ActionTypeId:
@@ -84,9 +80,6 @@ Resources:
             Configuration:
               ApplicationName: !Ref GremlinBackendDeployApp
               DeploymentGroupName: !Ref GremlinBackendDeploymentGroup
-              TaskDefinitionTemplateArtifact: "BackendBuildOutput"
-              AppSpecTemplateArtifact: "BackendBuildOutput"
-              AppSpecTemplatePath: "appspec.yml"
           - Name: DeployFrontend
             ActionTypeId:
               Category: Deploy
@@ -96,14 +89,14 @@ Resources:
             InputArtifacts:
               - Name: FrontendBuildOutput
             Configuration:
-              BucketName: !Ref FrontendBucket
+              BucketName: !ImportValue FrontendBucketName
               Extract: true
 
   #Backend CodeDeploy
   GremlinBackendDeployApp:
     Type: AWS::CodeDeploy::Application
     Properties:
-      ComputePlatform: ECS
+      ComputePlatform: Server
 
   #CodeDeploy BackendGroup
   GremlinBackendDeploymentGroup:
@@ -111,11 +104,11 @@ Resources:
     Properties:
       ApplicationName: !Ref GremlinBackendDeployApp
       DeploymentGroupName: "GremlinBackendDeploymentGroup"
-      ServiceRoleArn: !ImportValue CodeBuildServiceRoleArn
+      ServiceRoleArn: !ImportValue CodeDeployServiceRoleArn
       DeploymentConfigName: "CodeDeployDefault.AllAtOnce"
-      EC2TagFilters:
+      Ec2TagFilters:
         - Key: "Name"
-          Value: !ImportValue EC2InstanceName
+          Value: GremlinEC2Instance
           Type: "KEY_AND_VALUE"
   
   #Backend CodeBuild
@@ -147,16 +140,16 @@ Resources:
     Properties:
       Name: "FrontendCodeBuild"
       ServiceRole: !ImportValue CodeBuildServiceRoleArn
-    Source:
-      Type: CODEPIPELINE
-      BuildSpec: buildspec-frontend.yml
-    Artifacts:
-      Type: CODEPIPELINE
-    Environment:
-      ComputeType: BUILD_GENERAL1_SMALL
-      Image: "aws/codebuild/standard:5.0"
-      Type: LINUX_CONTAINER
-      EnvironmentVariables:
-        - Name: VITE_APP_BACKEND_URL
-          Value: '{{resolve:ssm:/gremlin-eye/VITE_APP_BACKEND_URL}}'
-          Type: PLAINTEXT
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: buildspec-frontend.yml
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: "aws/codebuild/standard:5.0"
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: VITE_APP_BACKEND_URL
+            Value: '{{resolve:ssm:/gremlin-eye/VITE_APP_BACKEND_URL}}'
+            Type: PLAINTEXT

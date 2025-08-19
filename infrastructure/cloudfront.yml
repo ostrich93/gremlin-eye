@@ -1,4 +1,9 @@
 AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  FrontendBucketDomainName:
+    Type: String
+  FrontendS3BucketName:
+    Type: String
 Resources:
   FrontendOAI:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
@@ -9,6 +14,7 @@ Resources:
     Type: AWS::CloudFront::CachePolicy
     Properties:
       CachePolicyConfig:
+        DefaultTTL: 3600
         MinTTL: 60
         MaxTTL: 86400
         Name: "GremlinCFCachePolicy"
@@ -38,7 +44,7 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-          - DomainName: !ImportValue FrontendBucketDomainName
+          - DomainName: !Ref FrontendBucketDomainName
             Id: "FrontendS3Origin"
             S3OriginConfig:
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${FrontendOAI}"
@@ -48,7 +54,7 @@ Resources:
             ResponseCode: 200
             ResponsePagePath: '/index.html'
             ErrorCachingMinTTL: 60
-        DefaultCacheBeahvior:
+        DefaultCacheBehavior:
           AllowedMethods:
             - GET
             - HEAD
@@ -59,18 +65,18 @@ Resources:
             - OPTIONS
           CachePolicyId: !Ref CloudFrontCachingPolicy
           Compress: true
-          TargetOriginId: !Sub 'S3Origin-${FrontendBucketDomainName}'
+          TargetOriginId: "FrontendS3Origin"
           ViewerProtocolPolicy: "redirect-to-https"
         DefaultRootObject: 'index.html'
         HttpVersion: http2
         PriceClass: 'PriceClass_100'
-        Tags:
-          - Key: Name
-            Value: GremlinEyeCloudFront
+      Tags:
+        - Key: Name
+          Value: GremlinEyeCloudFront
   FrontendS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !ImportValue FrontendS3BucketName
+      Bucket: !Ref FrontendS3BucketName
       PolicyDocument:
         Version: '2012-10-17'
         Statement:

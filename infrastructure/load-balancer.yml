@@ -9,17 +9,17 @@ Resources:
       Port: 80
       Protocol: HTTP
       UnhealthyThresholdCount: 10
-      VpcId: !ImportValue VPC
+      VpcId: !ImportValue VpcId
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Type: application
       Name: ALB-ECS-Gremlin-Service
       SecurityGroups:
-        - Ref: !ImportValue ECSSecurityGroupId
+        - !ImportValue ECSSecurityGroupId
       Subnets:
-        - Ref: !ImportValue PublicSubnetAId
-        - Ref: !ImportValue PublicSubnetBId
+        - !ImportValue PublicSubnetAId
+        - !ImportValue PublicSubnetBId
 Outputs:
   TargetGroupArn:
     Value: !Ref TargetGroup

@@ -16,5 +16,4 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: !Sub "/${ProjectName}/JWT_SIGNING_KEY"
-      Type: String
-      Value: !Ref JwtSigningKey
+      SecretString: !Sub '{"JwtSigningKey": ${JwtSigningKey}}'

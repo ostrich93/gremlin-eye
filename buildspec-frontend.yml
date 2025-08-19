@@ -5,8 +5,8 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
-      - cd gremlin-eye.client
       - npm install
+      - cd gremlin-eye.client
 
   build:
     commands:
@@ -20,4 +20,4 @@ phases:
 
   cache:
     paths:
-      - client/node_modules/**/*
+      - gremlin-eye.client/node_modules/**/*

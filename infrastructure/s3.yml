@@ -48,11 +48,17 @@ Outputs:
   FrontendBucketWebsiteURL:
     Description: "The S3 website endpoint for the frontend bucket"
     Value: !GetAtt FrontendBucket.WebsiteURL
+    Export:
+      Name: FrontendBucketWebsiteURL
 
   FrontendBucketDomainName:
     Description: "The IPv4 name of the S3 bucket for the frontend"
     Value: !GetAtt FrontendBucket.DomainName
+    Export:
+      Name: FrontendBucketDomainName
 
   FrontendBucketRegionalDomainName:
     Description: "The regional domain name for the S3 bucket for the frontend"
     Value: !GetAtt FrontendBucket.RegionalDomainName
+    Export:
+      Name: FrontendBucketRegionalDomainName

@@ -9,7 +9,7 @@ Parameters:
     Type: String
   DBName:
     Type: String
-    Default: GremlinDB
+    Default: gremlindb
 
 Resources:
   DBCredentials:
@@ -44,22 +44,24 @@ Resources:
     Type: AWS::RDS::DBInstance
     DependsOn: DBCredentials
     Properties:
-      DBInstanceIdentifier: "gremlin-db-instance"
+      DBInstanceIdentifier: !Ref DBName
       DBInstanceClass: db.t3.micro
-      Engine: mssql
-      DBName: !Ref DBName
+      Engine: sqlserver-ex
+      LicenseModel: license-included
       MasterUsername: !Sub "{{resolve:secretsmanager:/${ProjectName}/DB_CREDENTIALS:SecretString:username}}"
-      MasterPassword: !Sub "{{resolve:secretsmanager:/${ProjectName}/DB_CREDENTIALS:SecretString:password}}"
-      AllocateStorage: 20
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:/${ProjectName}/DB_CREDENTIALS:SecretString:password}}"
+      AllocatedStorage: 20
       VPCSecurityGroups:
-        - ImportValue RDSSecurityGroupId
+        - !ImportValue RDSSecurityGroupId
       DBSubnetGroupName: !Ref DBSubnetGroup
       MultiAZ: false
       StorageType: gp2
-      PublicyAccessible: false
+      PubliclyAccessible: false
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
+      DBSubnetGroupName: gremlindb-rds-private
+      DBSubnetGroupDescription: An RDS Private Network
       SubnetIds:
         - !ImportValue PrivateSubnetAId
         - !ImportValue PrivateSubnetBId

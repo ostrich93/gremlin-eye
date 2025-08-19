@@ -21,9 +21,14 @@ Parameters:
   DesiredCount:
     Type: Number
     Default: 2
-  LogGroupName:
+  ECSAMI:
+    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Default: "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended/image_id"
+  TwitchClientSecretName:
     Type: String
-    Default: /ecs/gremlin-task-definition
+  ECSInstanceName:
+    Type: String
+    Default: "GremlinEC2Instance"
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
@@ -43,50 +48,48 @@ Resources:
       MinSize: 0
       MaxSize: 4
       DesiredCapacity: !Ref DesiredCount
-      NewInstancesProtectedByScaleIn: true
+      NewInstancesProtectedFromScaleIn: true
     UpdatePolicy:
       AutoScalingReplacingUpdate:
         WillReplace: 'true'
+  ECSLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: gremlin-eye-ecs-awslogs
+      RetentionInDays: 30
+  EC2KeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: GremlinKeyPair
   ContainerInstances:
     Type: AWS::EC2::LaunchTemplate
+    DependsOn:
+      - EC2KeyPair
     Properties:
       LaunchTemplateName: gremlin-asg-launch-template
       LaunchTemplateData:
-        ImageId: !ImportValue ECRRepositoryUri
+        ImageId: !Ref ECSAMI
         InstanceType: t2.micro
         IamInstanceProfile:
-          Name: !Ref ECSInstanceProfileName
+          Name: !ImportValue ECSInstanceProfileName
+        KeyName: !Ref EC2KeyPair
         SecurityGroupIds:
           - !ImportValue ECSSecurityGroupId
         UserData: !Base64
-          Fn::Sub: 
-          - |
+          Fn::Sub: |
             #!/bin/bash
 
             # Install Docker
-            yum update -y
-            yum install -y docker
-
-            systemctl start docker
-
-            aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${ECRRepositoryUri}
-
-            docker pull ${ECRRepositoryUri}:latest
-
-            docker run -d -e Authentication__Igdb__ClientId=${IgdbClientId} -e Authentication__Igdb__ClientSecret=${IgdbClientSecret} -e ConnectionStrings__DefaultConnection=${DBConnectionString} -e JWT__Audience=${BackendUri} -e JWT__Issuer=${BackendUri} -e JWT__SigningKey=${JwtSigningKey} -P ${ECRRepositoryUri}:latest
-            
-          - ECRRepositoryUri:
-              Fn::ImportValue: ECRRepositoryUri
-          - IgdbClientId:
-              Fn::Sub: '{{resolve:secretsmanager:TwitchAuthenticationCredentials:SecretString:client-id}}'
-          - IgdbClientSecret:
-              Fn::Sub: '{{resolve:secretsmanager:TwitchAuthenticationCredentials:SecretString:client-secret}}'
-          - DBConnectionString:
-              Fn::Sub: '{{resolve:secretsmanager:/gremlin-eye/DB_CONNECTION_STRING:SecretString}}'
-          - BackendUri:
-              Fn::Sub: '{{resolve:ssm:/gremlin-eye/VITE_APP_BACKEND_URL}}'
-          - JwtSigningKey:
-              Fn::Sub: '{{resolve:secretsmanager:/gremlin-eye/JWT_SIGNING_KEY}}'
+            echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+            yum install -y aws-cfn-bootstrap
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource ContainerInstances --configsets full_install --region ${AWS::Region}
+        MetadataOptions:
+          HttpEndpoint: enabled
+        TagSpecifications:
+          - ResourceType: "instance"
+            Tags:
+              - Key: Name
+                Value: !Ref ECSInstanceName
   CapacityProvider:
     Type: AWS::ECS::CapacityProvider
     Properties:
@@ -99,6 +102,7 @@ Resources:
           Status: ENABLED
           TargetCapacity: 100
         ManagedTerminationProtection: ENABLED
+      Name: Gremlin-CapacityProvider
   CapacityProviderAssociation:
     Type: AWS::ECS::ClusterCapacityProviderAssociations
     Properties:
@@ -120,6 +124,7 @@ Resources:
       RequiresCompatibilities:
         - EC2
       ExecutionRoleArn: !ImportValue ECSTaskExecutionRoleArn
+      TaskRoleArn: !ImportValue ECSInstanceRoleArn
       ContainerDefinitions:
         - Name: !Ref ServiceName
           Cpu: !Ref TaskCpu
@@ -131,16 +136,27 @@ Resources:
             Options:
               mode: non-blocking
               max-buffer-size: 25m
-              awslogs-create-group: 'true'
-              awslogs-group: !Ref LogGroupName
+              awslogs-group: !Ref ECSLogGroup
               awslogs-region: !Ref 'AWS::Region'
-              awslogs-stream-prefix: ecs
+              awslogs-stream-prefix: gremlin-eye-ecs-logs
           PortMappings:
             - ContainerPort: 80
               HostPort: 80
               Protocol: tcp
-          RuntimePlatform:
-            OperationSystemFamily: Linux
+          Environment:
+            - Name: BackendUri
+              Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/gremlin-eye/VITE_APP_BACKEND_URL"
+          Secrets:
+            - Name: Authentication__Igdb__ClientId
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${TwitchClientSecretName}:client-id"
+            - Name: Authentication__Igdb__ClientSecret
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${TwitchClientSecretName}:client-secret"
+            - Name: DBConnectionString
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/gremlin-eye/DB_CONNECTION_STRING"
+            - Name: JwtSigningKey
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/gremlin-eye/JWT_SIGNING_KEY:JwtSigningKey"
+      RuntimePlatform:
+        OperatingSystemFamily: LINUX
   ECSService:
     Type: AWS::ECS::Service
     DependsOn:
@@ -150,20 +166,21 @@ Resources:
       ServiceName: !Ref ServiceName
       Cluster: !Ref ECSCluster
       PlacementStrategies:
-        - Field: 'availability:ecs:availability-zone'
+        - Field: 'attribute:ecs.availability-zone'
           Type: spread
         - Field: cpu
           Type: binpack
       DesiredCount: !Ref DesiredCount
+      DeploymentController:
+        Type: CODE_DEPLOY
       LaunchType: EC2
       DeploymentConfiguration:
         MaximumPercent: 200
         MinimumHealthyPercent: 75
       NetworkConfiguration:
-        AwsvcpConfiguration:
-          AssignPublicIp: ENABLED
+        AwsvpcConfiguration:
           SecurityGroups:
-            - !Ref ECSSecurityGroup
+            - !ImportValue ECSSecurityGroupId
           Subnets:
             - !ImportValue PublicSubnetAId
             - !ImportValue PublicSubnetBId
@@ -171,11 +188,11 @@ Resources:
       LoadBalancers:
         - ContainerName: !Ref ServiceName
           ContainerPort: 80
-          TargetGroupArn: !ImportValue TargetGroup
+          TargetGroupArn: !ImportValue TargetGroupArn
   LoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
-      DefautlActions:
+      DefaultActions:
         - Type: forward
           ForwardConfig:
             TargetGroups:
@@ -197,3 +214,7 @@ Outputs:
     Value: !GetAtt ECSTaskDefinition.Arn
     Export:
       Name: ECSTaskDefinitionArn
+  ECSInstanceName:
+    Value: !Ref ECSInstanceName
+    Export:
+      Name: ECSInstanceName
