@@ -7,17 +7,15 @@ phases:
   pre_build:
     commands:
       - echo "Logging into ECR..."
-      - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
   
   build:
     commands:
       - echo "Building the Docker Image..."
-      - cd gremlin-eye.Server/
-      - docker build -t $REPOSITORY_NAME:latest .
-      - docker tag $REPOSITORY_NAME:latest $REPOSITORY_URI:latest
+      - docker build -f ./gremlin-eye.Server/Dockerfile -t $REPOSITORY_NAME:latest ./gremlin-eye.Server
 
   post_build:
     commands:
-      - echo Build completed
+      - echo Build completed. Pushing image to ECR...
       - echo Pushing the Docker image
       - docker push $REPOSITORY_URI:latest
