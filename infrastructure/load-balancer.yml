@@ -13,10 +13,14 @@ Resources:
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: '60'
       Type: application
       Name: ALB-ECS-Gremlin-Service
       SecurityGroups:
-        - !ImportValue ECSSecurityGroupId
+        - !ImportValue PublicLoadBalancerSGId
       Subnets:
         - !ImportValue PublicSubnetAId
         - !ImportValue PublicSubnetBId

@@ -15,5 +15,5 @@ Resources:
   JWTSigningKeyParameter:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: !Sub "/${ProjectName}/JWT_SIGNING_KEY"
+      Name: !Sub "/${ProjectName}/JWT_SIGN_KEY"
       SecretString: !Sub '{"JwtSigningKey": ${JwtSigningKey}}'

@@ -5,8 +5,6 @@ Parameters:
     Default: gremlin-eye
   RDSMasterUsername:
     Type: String
-  RDSPassword:
-    Type: String
   DBName:
     Type: String
     Default: gremlindb
@@ -28,7 +26,7 @@ Resources:
     Type: AWS::SecretsManager::Secret
     DependsOn: RDSInstance
     Properties:
-      Name: !Sub "/${ProjectName}/DB_CONNECTION_STRING"
+      Name: !Sub "/${ProjectName}/DB_CONNECT_STRING"
       SecretString: !Join ["",
         [
           "Server=", !Join ["", [!GetAtt RDSInstance.Endpoint.Address, ""] ],

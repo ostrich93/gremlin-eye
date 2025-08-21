@@ -12,9 +12,12 @@ phases:
   build:
     commands:
       - echo "Building the Docker Image..."
+      - cd gremlin-eye.Server/
       - docker build -t $REPOSITORY_NAME:latest .
+      - docker tag $REPOSITORY_NAME:latest $REPOSITORY_URI:latest
 
   post_build:
     commands:
-      - docker tag $REPOSITORY_NAME:latest $REPOSITORY_URI:latest
+      - echo Build completed
+      - echo Pushing the Docker image
       - docker push $REPOSITORY_URI:latest

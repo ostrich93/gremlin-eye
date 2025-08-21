@@ -74,15 +74,29 @@ Resources:
       InternetGatewayId: !Ref InternetGateway
 
   #NAT Gateway in a Public Subnet (for private subnets to access the internet, which is very useful with IGDB)
-  EIP:
+  NatGatewayAAttachment:
     Type: AWS::EC2::EIP
     DependsOn: AttachGateway
+    Properties:
+      Domain: vpc
 
-  NatGateway:
+  NatGatewayBAttachment:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachGateway
+    Properties:
+      Domain: vpc
+
+  NatGatewayA:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId: !GetAtt EIP.AllocationId
+      AllocationId: !GetAtt NatGatewayAAttachment.AllocationId
       SubnetId: !Ref PublicSubnetA
+
+  NatGatewayB:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGatewayBAttachment.AllocationId
+      SubnetId: !Ref PublicSubnetB
 
   #Public Route Table
   PublicRouteTable:
@@ -96,13 +110,21 @@ Resources:
   #Public Route
   PublicRoute:
     Type: AWS::EC2::Route
+    DependsOn: AttachGateway
     Properties:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
-  #Private Route Table
-  PrivateRouteTable:
+  #Private Route Tables
+  PrivateSubnetRouteTableA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: PrivateRouteTable
+  PrivateSubnetRouteTableB:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
@@ -111,12 +133,18 @@ Resources:
           Value: PrivateRouteTable
 
   #Private Route
-  PrivateRoute:
+  PrivateSubnetRouteA:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref PrivateSubnetRouteTableA
       DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NatGateway
+      NatGatewayId: !Ref NatGatewayA
+  PrivateSubnetRouteB:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTableB
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGatewayB
 
   PublicSubnetRouteTableAssociationA:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -134,14 +162,32 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PrivateSubnetA
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref PrivateSubnetRouteTableA
 
   PrivateSubnetRouteTableAssociationB:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PrivateSubnetB
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref PrivateSubnetRouteTableB
 
+  #LoadBalancerSecurityGroup
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security Group for the the public facing loadbalancer"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+      SecurityGroupEgress:
+        - CidrIp: 10.0.0.0/8
+          IpProtocol: "-1"
   #ECS Secrurity Group
   ECSSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -155,13 +201,14 @@ Resources:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80 #HTTP
+          SouceSecurityGroup: !Ref LoadBalancerSecurityGroup
           CidrIp: 0.0.0.0/0
-
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443 #HTTPS
           CidrIp: 0.0.0.0/0
-
+          SourceSecurityGroup: !Ref LoadBalancerSecurityGroup
+  
   #RDS Security Group
   RDSSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -198,6 +245,10 @@ Outputs:
     Value: !Ref PrivateSubnetB
     Export:
       Name: PrivateSubnetBId
+  PublicLoadBalancerSGId:
+    Value: !Ref LoadBalancerSecurityGroup
+    Export:
+      Name: PublicLoadBalancerSGId
   ECSSecurityGroupId:
     Value: !Ref ECSSecurityGroup
     Export:
