@@ -13,6 +13,7 @@ phases:
     commands:
       - echo "Building the Docker Image..."
       - docker build -f ./gremlin-eye.Server/Dockerfile -t $REPOSITORY_NAME:latest ./gremlin-eye.Server
+      - docker tag $REPOSITORY_NAME:latest $REPOSITORY_URI:latest
 
   post_build:
     commands:
