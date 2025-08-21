@@ -20,7 +20,7 @@ RUN curl -sL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 RUN apt-get install -y nodejs
 
 WORKDIR /src
-COPY ["gremlin-eye.Server/gremlin-eye.Server.csproj", "gremlin-eye.Server/"]
+COPY ["gremlin-eye.Server.csproj", "gremlin-eye.Server/"]
 RUN dotnet restore "gremlin-eye.Server/gremlin-eye.Server.csproj"
 COPY . .
 WORKDIR "/src/gremlin-eye.Server"
