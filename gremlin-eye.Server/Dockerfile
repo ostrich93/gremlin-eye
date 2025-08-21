@@ -12,14 +12,14 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 COPY ["gremlin-eye.Server.csproj", "gremlin-eye.Server/"]
 RUN dotnet restore "gremlin-eye.Server/gremlin-eye.Server.csproj"
-COPY . .
 WORKDIR "/src/gremlin-eye.Server"
-RUN dotnet build "./gremlin-eye.Server.csproj" -c Release -o /app/build
+COPY . .
+RUN dotnet build "gremlin-eye.Server.csproj" -c Release -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./gremlin-eye.Server.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "gremlin-eye.Server.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
