@@ -23,4 +23,9 @@ Resources:
           AliasTarget:
             DNSName: !ImportValue CloudFrontDistributionDomainName
             HostedZoneId: Z2FDTNDATAQYW2 #The hosted zone id provided by aws for cloudfront distributions
+Outputs:
+  SSLCertificateArn:
+    Value: !Ref SSLCertificate
+    Export:
+      Name: SSLCertificateArn
   

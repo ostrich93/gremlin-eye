@@ -4,6 +4,8 @@ Parameters:
     Type: String
   FrontendS3BucketName:
     Type: String
+  SSLCertificateArn:
+    Type: String
 Resources:
   FrontendOAI:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
@@ -45,9 +47,14 @@ Resources:
       DistributionConfig:
         Origins:
           - DomainName: !Ref FrontendBucketDomainName
-            Id: "FrontendS3Origin"
-            S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${FrontendOAI}"
+            Id: "www.gremlin-eye.com"
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: 'http-only'
+        Aliases:
+          - www.gremlin-eye.com
+          - gremlin-eye.com 
         Enabled: true
         CustomErrorResponses:
           - ErrorCode: 403
@@ -65,11 +72,14 @@ Resources:
             - OPTIONS
           CachePolicyId: !Ref CloudFrontCachingPolicy
           Compress: true
-          TargetOriginId: "FrontendS3Origin"
+          TargetOriginId: "www.gremlin-eye.com"
           ViewerProtocolPolicy: "redirect-to-https"
         DefaultRootObject: 'index.html'
         HttpVersion: http2
         PriceClass: 'PriceClass_100'
+        ViewerCertificate:
+          AcmCertificateArn: !Ref SSLCertificateArn
+          SslSupportMethod: sni-only
       Tags:
         - Key: Name
           Value: GremlinEyeCloudFront

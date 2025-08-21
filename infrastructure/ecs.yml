@@ -21,98 +21,18 @@ Parameters:
   DesiredCount:
     Type: Number
     Default: 2
-  ECSAMI:
-    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
-    Default: "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended/image_id"
   TwitchClientSecretName:
     Type: String
-  ECSInstanceName:
-    Type: String
-    Default: "GremlinEC2Instance"
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: !Ref ClusterName
-  ECSAutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    DependsOn:
-      - ECSCluster
-    Properties:
-      VPCZoneIdentifier:
-        - !ImportValue PublicSubnetAId
-        - !ImportValue PublicSubnetBId
-      LaunchTemplate:
-        LaunchTemplateId: !Ref ContainerInstances
-        Version: !GetAtt ContainerInstances.LatestVersionNumber
-      MinSize: 0
-      MaxSize: 4
-      DesiredCapacity: !Ref DesiredCount
-      NewInstancesProtectedFromScaleIn: true
-    UpdatePolicy:
-      AutoScalingReplacingUpdate:
-        WillReplace: 'true'
   ECSLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: gremlin-eye-ecs-awslogs
       RetentionInDays: 30
-  EC2KeyPair:
-    Type: AWS::EC2::KeyPair
-    Properties:
-      KeyName: GremlinKeyPair
-  ContainerInstances:
-    Type: AWS::EC2::LaunchTemplate
-    DependsOn:
-      - EC2KeyPair
-    Properties:
-      LaunchTemplateName: gremlin-asg-launch-template
-      LaunchTemplateData:
-        ImageId: !Ref ECSAMI
-        InstanceType: t2.micro
-        IamInstanceProfile:
-          Name: !ImportValue ECSInstanceProfileName
-        KeyName: !Ref EC2KeyPair
-        SecurityGroupIds:
-          - !ImportValue ECSSecurityGroupId
-        UserData: !Base64
-          Fn::Sub: |
-            #!/bin/bash
-
-            # Install Docker
-            echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
-            yum install -y aws-cfn-bootstrap
-            /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource ContainerInstances --configsets full_install --region ${AWS::Region}
-        MetadataOptions:
-          HttpEndpoint: enabled
-        TagSpecifications:
-          - ResourceType: "instance"
-            Tags:
-              - Key: Name
-                Value: !Ref ECSInstanceName
-  CapacityProvider:
-    Type: AWS::ECS::CapacityProvider
-    Properties:
-      AutoScalingGroupProvider:
-        AutoScalingGroupArn: !Ref ECSAutoScalingGroup
-        ManagedScaling:
-          InstanceWarmupPeriod: 60
-          MinimumScalingStepSize: 1
-          MaximumScalingStepSize: 4
-          Status: ENABLED
-          TargetCapacity: 100
-        ManagedTerminationProtection: ENABLED
-      Name: Gremlin-CapacityProvider
-  CapacityProviderAssociation:
-    Type: AWS::ECS::ClusterCapacityProviderAssociations
-    Properties:
-      CapacityProviders:
-        - !Ref CapacityProvider
-      Cluster: !Ref ECSCluster
-      DefaultCapacityProviderStrategy:
-        - Base: 0
-          CapacityProvider: !Ref CapacityProvider
-          Weight: 1
   ECSTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     DependsOn: ECSCluster
@@ -121,8 +41,7 @@ Resources:
       Cpu: !Ref TaskCpu
       Memory: !Ref TaskMemory
       NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - EC2
+      RequiresCompatibilities: [ FARGATE ]
       ExecutionRoleArn: !ImportValue ECSTaskExecutionRoleArn
       TaskRoleArn: !ImportValue ECSInstanceRoleArn
       ContainerDefinitions:
@@ -144,60 +63,57 @@ Resources:
               HostPort: 80
               Protocol: tcp
           Environment:
-            - Name: BackendUri
-              Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/gremlin-eye/VITE_APP_BACKEND_URL"
+            - Name: ASPNETCORE_URLS
+              Value: http://+:443;http://+:80
+            - Name: ASPNETCORE_ENVIRONMENT
+              Value: Production
           Secrets:
             - Name: Authentication__Igdb__ClientId
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${TwitchClientSecretName}:client-id"
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${TwitchClientSecretName}:client-id::"
             - Name: Authentication__Igdb__ClientSecret
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${TwitchClientSecretName}:client-secret"
-            - Name: DBConnectionString
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/gremlin-eye/DB_CONNECTION_STRING"
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${TwitchClientSecretName}:client-secret::"
+            - Name: ConnectionStrings__DefaultConnection
+              ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/gremlin-eye/DB_CONNECTION_STRING"
             - Name: JwtSigningKey
-              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/gremlin-eye/JWT_SIGNING_KEY:JwtSigningKey"
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/gremlin-eye/JWT_SIGN_KEY:JwtSigningKey::"
       RuntimePlatform:
         OperatingSystemFamily: LINUX
   ECSService:
     Type: AWS::ECS::Service
     DependsOn:
       - ECSCluster
-      - LoadBalancerListener
     Properties:
       ServiceName: !Ref ServiceName
       Cluster: !Ref ECSCluster
-      PlacementStrategies:
-        - Field: 'attribute:ecs.availability-zone'
-          Type: spread
-        - Field: cpu
-          Type: binpack
       DesiredCount: !Ref DesiredCount
       DeploymentController:
         Type: CODE_DEPLOY
-      LaunchType: EC2
-      DeploymentConfiguration:
-        MaximumPercent: 200
-        MinimumHealthyPercent: 75
+      LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
           SecurityGroups:
             - !ImportValue ECSSecurityGroupId
           Subnets:
-            - !ImportValue PublicSubnetAId
-            - !ImportValue PublicSubnetBId
+            - !ImportValue PrivateSubnetAId
+            - !ImportValue PrivateSubnetBId
       TaskDefinition: !Ref ECSTaskDefinition
       LoadBalancers:
         - ContainerName: !Ref ServiceName
           ContainerPort: 80
           TargetGroupArn: !ImportValue TargetGroupArn
-  LoadBalancerListener:
+  LoadBalancerHttpListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
-        - Type: forward
-          ForwardConfig:
-            TargetGroups:
-              - TargetGroupArn: !ImportValue TargetGroupArn
-                Weight: 100
+        - Type: redirect
+          RedirectConfig:
+            Protocol: HTTPS
+            Port: 443
+            Host: '#{host}'
+            Path: '/#{path}'
+            Query: '#{query}'
+            StatusCode: HTTP_302
       LoadBalancerArn: !ImportValue LoadBalancerArn
       Port: 80
       Protocol: HTTP
@@ -214,7 +130,3 @@ Outputs:
     Value: !GetAtt ECSTaskDefinition.Arn
     Export:
       Name: ECSTaskDefinitionArn
-  ECSInstanceName:
-    Value: !Ref ECSInstanceName
-    Export:
-      Name: ECSInstanceName

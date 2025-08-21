@@ -8,7 +8,7 @@ Parameters:
 
   GitHubBranch:
     Type: String
-    Default: main
+    Default: master
 Resources:
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
@@ -124,6 +124,7 @@ Resources:
         Type: CODEPIPELINE
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
+        PriviligedMode: true
         Image: "aws/codebuild/standard:5.0"
         Type: "LINUX_CONTAINER"
         EnvironmentVariables:
@@ -147,6 +148,7 @@ Resources:
         Type: CODEPIPELINE
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
+        PriviligedMode: true
         Image: "aws/codebuild/standard:5.0"
         Type: LINUX_CONTAINER
         EnvironmentVariables:

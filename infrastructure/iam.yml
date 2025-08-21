@@ -232,6 +232,18 @@ Resources:
                   - "ecr:GetDownloadUrlForLayer"
                   - "ecr:GetAuthorizationToken"
                 Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "ssm:GetParameter"
+                  - "ssm:GetParameters"
+                  - "ssm:GetParameterHistory"
+                  - "ssm:GetParametersByPath"
+                  - "ssm:PutParameter"
+                  - "ssm:DeleteParameter"
+                  - "secretsmanager:GetSecretValue"
+                  - "secretsmanager:PutSecretValue"
+                  - "secretsmanager:RotateSecret"
+                Resource: "*"
 
   #EC2 Instance Profile (to attach onto IAM Role for EC2 instance(s))
   ECSInstanceProfile:
