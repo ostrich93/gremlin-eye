@@ -4,20 +4,26 @@ phases:
   install:
     runtime-versions:
       nodejs: 22
-    commands:
-      - npm install
+    commands: 
       - cd gremlin-eye.client
+      - npm ci
 
   build:
     commands:
       - echo "Building the frontend React application..."
       - npm run build
   
+  post_build:
+    commands:
+      - echo "Copying build files to s3"
+      - aws s3 sync dist/ s3://gremlin-eye.com/ --delete
+      - wait $!
+      - echo "Updating Cloudfront cache..." 
+      - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
 artifacts:
   files:
     - "**/*"
-  base-directory: gremlin-eye.client/dist
 
 cache:
   paths:
-    - gremlin-eye.client/node_modules/**/*
+    - node_modules/**/*
