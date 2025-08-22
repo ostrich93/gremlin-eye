@@ -5,19 +5,24 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
-      - npm install
+      - VITE_APP_BACKEND_URL=$VITE_APP_BACKEND_URL
       - cd gremlin-eye.client
+      - npm ci
 
   build:
     commands:
       - echo "Building the frontend React application..."
       - npm run build
   
+  post_build:
+    commands:
+      - echo "Copying build files to s3"
+      - aws s3 sync s3://gremlin-eye.com/ --delete
 artifacts:
   files:
     - "**/*"
-  base-directory: gremlin-eye.client/dist
+  base-directory: dist
 
 cache:
   paths:
-    - gremlin-eye.client/node_modules/**/*
+    - node_modules/**/*
