@@ -82,17 +82,6 @@ Resources:
             Configuration:
               ApplicationName: !Ref GremlinBackendDeployApp
               DeploymentGroupName: !Ref GremlinBackendDeploymentGroup
-          - Name: DeployFrontend
-            ActionTypeId:
-              Category: Deploy
-              Owner: AWS
-              Provider: S3
-              Version: '1'
-            InputArtifacts:
-              - Name: FrontendBuildOutput
-            Configuration:
-              BucketName: !ImportValue FrontendBucketName
-              Extract: true
 
   #Backend CodeDeploy
   GremlinBackendDeployApp:
@@ -122,7 +111,7 @@ Resources:
         Type: CODEPIPELINE
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        PriviligedMode: true
+        PrivilegedMode: true
         Image: "aws/codebuild/standard:5.0"
         Type: "LINUX_CONTAINER"
         EnvironmentVariables:
@@ -146,7 +135,7 @@ Resources:
         Type: CODEPIPELINE
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        PriviligedMode: true
+        PrivilegedMode: true
         Image: "aws/codebuild/standard:5.0"
         Type: LINUX_CONTAINER
         EnvironmentVariables:

@@ -27,9 +27,18 @@ Resources:
                   - "s3:GetBucketVersioning"
                   - "s3:PutObject" 
                   - "s3:PutObjectAcl"
+                  - "s3:DeleteObject"
                 Resource:
                   - !ImportValue PipelineBucketARN
                   - !ImportValue FrontendBucketARN
+              - Effect: Allow
+                Action:
+                  - "s3:ListBucket"
+                  - "s3:GetBucketLocation"
+                Resource:
+                  - Fn::Sub:
+                    - "arn:aws:s3:::${FrontendBucketName}"
+                    - FrontendBucketName: !ImportValue FrontendBucketName
               -
                 Effect: Allow
                 Action:
