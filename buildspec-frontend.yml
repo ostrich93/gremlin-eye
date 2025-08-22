@@ -4,8 +4,7 @@ phases:
   install:
     runtime-versions:
       nodejs: 22
-    commands:
-      - VITE_APP_BACKEND_URL=$VITE_APP_BACKEND_URL
+    commands: 
       - cd gremlin-eye.client
       - npm ci
 
@@ -17,7 +16,10 @@ phases:
   post_build:
     commands:
       - echo "Copying build files to s3"
-      - aws s3 sync s3://gremlin-eye.com/ --delete
+      - aws s3 sync dist/ s3://gremlin-eye.com/ --delete
+      - wait $!
+      - echo "Updating Cloudfront cache..." 
+      - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
 artifacts:
   files:
     - "**/*"

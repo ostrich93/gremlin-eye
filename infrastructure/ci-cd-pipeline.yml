@@ -9,6 +9,8 @@ Parameters:
   GitHubBranch:
     Type: String
     Default: master
+  CloudfrontDistributionId:
+    Type: String
 Resources:
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
@@ -106,10 +108,6 @@ Resources:
       DeploymentGroupName: "GremlinBackendDeploymentGroup"
       ServiceRoleArn: !ImportValue CodeDeployServiceRoleArn
       DeploymentConfigName: "CodeDeployDefault.AllAtOnce"
-      Ec2TagFilters:
-        - Key: "Name"
-          Value: GremlinEC2Instance
-          Type: "KEY_AND_VALUE"
   
   #Backend CodeBuild
   BackendCodeBuildProject:
@@ -154,4 +152,7 @@ Resources:
         EnvironmentVariables:
           - Name: VITE_APP_BACKEND_URL
             Value: '{{resolve:ssm:/gremlin-eye/VITE_APP_BACKEND_URL}}'
+            Type: PLAINTEXT
+          - Name: CLOUDFRONT_DISTRIBUTION_ID
+            Value: !Ref CloudfrontDistributionId
             Type: PLAINTEXT
