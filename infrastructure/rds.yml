@@ -32,9 +32,9 @@ Resources:
           "Server=", !Join ["", [!GetAtt RDSInstance.Endpoint.Address, ""] ],
           ",", !GetAtt RDSInstance.Endpoint.Port,
           ";Database=", !Join ["", [!Ref DBName, ""] ],
-          ";TrustedConnection=False;TrustServerCertificate=True;User Id=", !Join ["", [!Sub "{{resolve:secretsmanager:/${ProjectName}/DB_CREDENTIALS:SecretString:username}}", ""] ],
+          ";Trusted_Connection=False;TrustServerCertificate=True;User Id=", !Join ["", [!Sub "{{resolve:secretsmanager:/${ProjectName}/DB_CREDENTIALS:SecretString:username}}", ""] ],
           ";Password=", !Join ["", [!Sub "{{resolve:secretsmanager:/${ProjectName}/DB_CREDENTIALS:SecretString:password}}", ""] ],
-          ";ConnectionTimeout=120;MultipleActiveResultsSets=True;"
+          ";Connect Timeout=30;MultipleActiveResultSets=True;"
         ]
       ]
       
