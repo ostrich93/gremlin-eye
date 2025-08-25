@@ -84,5 +84,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGet("/", () => "Healthy");
 
 app.Run();

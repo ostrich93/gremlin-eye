@@ -64,9 +64,13 @@ Resources:
               Protocol: tcp
           Environment:
             - Name: ASPNETCORE_URLS
-              Value: http://+:443;http://+:80
+              Value: https://+:443;http://+:80
             - Name: ASPNETCORE_ENVIRONMENT
               Value: Production
+            - Name: Jwt__Audience
+              Value: !ImportValue LoadBalancerExternalUrl
+            - Name: Jwt__Issuer
+              Value: !ImportValue LoadBalancerExternalUrl
           Secrets:
             - Name: Authentication__Igdb__ClientId
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${TwitchClientSecretName}:client-id::"
@@ -74,7 +78,7 @@ Resources:
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${TwitchClientSecretName}:client-secret::"
             - Name: ConnectionStrings__DefaultConnection
               ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/gremlin-eye/DB_CONNECTION_STRING"
-            - Name: JwtSigningKey
+            - Name: Jwt__SigningKey
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/gremlin-eye/JWT_SIGN_KEY:JwtSigningKey::"
       RuntimePlatform:
         OperatingSystemFamily: LINUX
