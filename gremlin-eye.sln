@@ -19,10 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructure", "infrastru
 		infrastructure\ecs.yml = infrastructure\ecs.yml
 		infrastructure\iam.yml = infrastructure\iam.yml
 		infrastructure\load-balancer.yml = infrastructure\load-balancer.yml
-		infrastructure\main.yml = infrastructure\main.yml
 		infrastructure\network.yml = infrastructure\network.yml
 		infrastructure\rds.yml = infrastructure\rds.yml
-		infrastructure\route53.yml = infrastructure\route53.yml
 		infrastructure\s3.yml = infrastructure\s3.yml
 		infrastructure\ssm-paramstore.yml = infrastructure\ssm-paramstore.yml
 	EndProjectSection

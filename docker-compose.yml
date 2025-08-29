@@ -27,7 +27,7 @@ services:
       - ~/.aspnet/https:/https:ro
     environment:
         - ASPNETCORE_ENVIRONMENT=Development
-        - ASPNETCORE_URLS=http://+:443;http://+:80
+        - ASPNETCORE_URLS=https://+:443;http://+:80
         - ASPNETCORE_Kestrel__Certificates__Default__Password=Secure@12345
         - ASPNETCORE_Kestrel__Certificates__Default__PATH=/https/localhost.pfx
         - JWT__Audience=localhost:5000

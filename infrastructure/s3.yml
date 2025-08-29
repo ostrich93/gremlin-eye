@@ -1,4 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  DomainName:
+    Type: String
+    Description: The base domain name, e.g. gremlin-eye.com
+    AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
+    ConstraintDescription: Must be a valid DNS zone name
+    Default: gremlin-eye.com
 Resources:
   #Pipeline S3 Bucket
   PipelineBucket:
@@ -13,10 +20,12 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     Properties:
+      BucketName: !Ref DomainName
       AccessControl: BucketOwnerFullControl
-      BucketName: "gremlin-eye.com"
-      WebsiteConfiguration:
-        IndexDocument: "index.html"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
       VersioningConfiguration:
         Status: Enabled
 
@@ -44,12 +53,6 @@ Outputs:
     Value: !Sub "arn:aws:s3:::${FrontendBucket}/*"
     Export:
       Name: FrontendBucketARN
-
-  FrontendBucketWebsiteURL:
-    Description: "The S3 website endpoint for the frontend bucket"
-    Value: !GetAtt FrontendBucket.WebsiteURL
-    Export:
-      Name: FrontendBucketWebsiteURL
 
   FrontendBucketDomainName:
     Description: "The IPv4 name of the S3 bucket for the frontend"
