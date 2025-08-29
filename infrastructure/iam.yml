@@ -99,6 +99,11 @@ Resources:
                   - "codebuild:BatchGetBuilds"
                   - "iam:PassRole" 
                 Resource: "*"
+              -
+                Effect: Allow
+                Action:
+                  - "codestar-connections:UseConnection"
+                Resource: "*" 
 
   #CodeDeploy Role
   CodeDeployServiceRole:
@@ -139,7 +144,7 @@ Resources:
                 Resource: "*"
 
   #IAM Role for EC2 Instance(s)
-  EC2InstanceRole:
+  ECSInstanceRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -259,7 +264,7 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-        - !Ref EC2InstanceRole
+        - !Ref ECSInstanceRole
 
 Outputs:
   ECSInstanceProfileName:
@@ -267,7 +272,7 @@ Outputs:
     Export:
       Name: ECSInstanceProfileName
   ECSInstanceRoleArn:
-    Value: !GetAtt EC2InstanceRole.Arn
+    Value: !GetAtt ECSInstanceRole.Arn
     Export:
       Name: ECSInstanceRoleArn
   CodePipelineServiceRoleArn:

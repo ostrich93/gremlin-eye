@@ -99,7 +99,15 @@ Resources:
       SubnetId: !Ref PublicSubnetB
 
   #Public Route Table
-  PublicRouteTable:
+  PublicRouteTableA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: PublicRouteTable
+
+  PublicRouteTableB:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
@@ -108,11 +116,19 @@ Resources:
           Value: PublicRouteTable
 
   #Public Route
-  PublicRoute:
+  PublicRouteA:
     Type: AWS::EC2::Route
     DependsOn: AttachGateway
     Properties:
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref PublicRouteTableA
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicRouteB:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTableB
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
@@ -150,13 +166,13 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PublicSubnetA
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref PublicRouteTableA
 
   PublicSubnetRouteTableAssociationB:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PublicSubnetB
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref PublicRouteTableB
 
   PrivateSubnetRouteTableAssociationA:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -185,9 +201,6 @@ Resources:
           IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-      SecurityGroupEgress:
-        - CidrIp: 10.0.0.0/8
-          IpProtocol: "-1"
   #ECS Secrurity Group
   ECSSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -195,7 +208,9 @@ Resources:
       GroupDescription: "Security Group for ECS tasks. Allows for HTTP, HTTPS"
       VpcId: !Ref VPC
       SecurityGroupEgress:
-        - IpProtocol: "-1"
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
           CidrIp: 0.0.0.0/0
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -208,6 +223,7 @@ Resources:
           ToPort: 443 #HTTPS
           CidrIp: 0.0.0.0/0
           SourceSecurityGroup: !Ref LoadBalancerSecurityGroup
+
   
   #RDS Security Group
   RDSSecurityGroup:
@@ -215,9 +231,6 @@ Resources:
     Properties:
       GroupDescription: "Security Group for RDS Database Instance"
       VpcId: !Ref VPC
-      SecurityGroupEgress:
-        - IpProtocol: "-1"
-          CidrIp: 0.0.0.0/0
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 1433

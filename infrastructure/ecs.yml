@@ -64,13 +64,9 @@ Resources:
               Protocol: tcp
           Environment:
             - Name: ASPNETCORE_URLS
-              Value: https://+:443;http://+:80
+              Value: http://+:80
             - Name: ASPNETCORE_ENVIRONMENT
-              Value: Production
-            - Name: Jwt__Audience
-              Value: !ImportValue LoadBalancerExternalUrl
-            - Name: Jwt__Issuer
-              Value: !ImportValue LoadBalancerExternalUrl
+              Value: Release
           Secrets:
             - Name: Authentication__Igdb__ClientId
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${TwitchClientSecretName}:client-id::"
@@ -80,6 +76,10 @@ Resources:
               ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/gremlin-eye/DB_CONNECTION_STRING"
             - Name: Jwt__SigningKey
               ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/gremlin-eye/JWT_SIGN_KEY:JwtSigningKey::"
+            - Name: Jwt__Audience
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/gremlin-eye/JWT_PERMISSIONS:Audience::"
+            - Name: Jwt__Issuer
+              ValueFrom: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/gremlin-eye/JWT_PERMISSIONS:Issuer::"
       RuntimePlatform:
         OperatingSystemFamily: LINUX
   ECSService:
@@ -91,7 +91,7 @@ Resources:
       Cluster: !Ref ECSCluster
       DesiredCount: !Ref DesiredCount
       DeploymentController:
-        Type: CODE_DEPLOY
+        Type: ECS
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -106,21 +106,7 @@ Resources:
         - ContainerName: !Ref ServiceName
           ContainerPort: 80
           TargetGroupArn: !ImportValue TargetGroupArn
-  LoadBalancerHttpListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      DefaultActions:
-        - Type: redirect
-          RedirectConfig:
-            Protocol: HTTPS
-            Port: 443
-            Host: '#{host}'
-            Path: '/#{path}'
-            Query: '#{query}'
-            StatusCode: HTTP_302
-      LoadBalancerArn: !ImportValue LoadBalancerArn
-      Port: 80
-      Protocol: HTTP
+
 Outputs:
   ClusterName:
     Value: !Ref ECSCluster
@@ -131,6 +117,6 @@ Outputs:
     Export:
       Name: ServiceName
   ECSTaskDefinitionArn:
-    Value: !GetAtt ECSTaskDefinition.Arn
+    Value: !Ref ECSTaskDefinition
     Export:
       Name: ECSTaskDefinitionArn

@@ -11,12 +11,16 @@ Parameters:
     Default: master
   CloudfrontDistributionId:
     Type: String
+  CodeStarConnectionArn:
+    Type: String
+  ECSClusterName:
+    Type: String
+  ECSServiceName:
+    Type: String
 Resources:
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     DependsOn:
-      - GremlinBackendDeployApp
-      - GremlinBackendDeploymentGroup 
       - BackendCodeBuildProject
       - FrontendCodeBuildProject 
     Properties:
@@ -27,22 +31,24 @@ Resources:
       Stages:
       - Name: Source
         Actions:
-          - InputArtifacts: []
+          - Name: ApplicationSource
+            InputArtifacts: []
             ActionTypeId:
               Version: '1'
-              Owner: ThirdParty
+              Owner: AWS
               Category: Source
-              Provider: GitHub
+              Provider: CodeStarSourceConnection
             OutputArtifacts:
               - Name: SourceOutput
             RunOrder: 1
             Configuration:
-              Owner: !Ref GitHubUser
-              Repo: !Ref GitHubRepo
-              PollForSourceChanges: 'false'
-              Branch: !Ref GitHubBranch
-              OAuthToken: '{{resolve:secretsmanager:MyGithubSecret:SecretString:token}}'
-            Name: ApplicationSource
+              BranchName: !Ref GitHubBranch
+              ConnectionArn: !Ref CodeStarConnectionArn
+              FullRepositoryId:
+                Fn::Sub:
+                  - "${OwnerName}/${RepoName}"
+                  - OwnerName: !Ref GitHubUser
+                    RepoName: !Ref GitHubRepo
       - Name: Build
         Actions:
           - Name: BackendBuild
@@ -75,29 +81,25 @@ Resources:
             ActionTypeId:
               Category: Deploy
               Owner: AWS
-              Provider: CodeDeploy
+              Provider: ECS
               Version: '1'
             InputArtifacts:
               - Name: BackendBuildOutput
             Configuration:
-              ApplicationName: !Ref GremlinBackendDeployApp
-              DeploymentGroupName: !Ref GremlinBackendDeploymentGroup
+              ClusterName: !Ref ECSClusterName
+              ServiceName: !Ref ECSServiceName
+            RunOrder: 1
+      Triggers:
+        - ProviderType: CodeStarSourceConnection
+          GitConfiguration:
+            PullRequest:
+              - Branches:
+                  Includes:
+                    - master
+                Events:
+                  - CLOSED
+            SourceActionName: ApplicationSource
 
-  #Backend CodeDeploy
-  GremlinBackendDeployApp:
-    Type: AWS::CodeDeploy::Application
-    Properties:
-      ComputePlatform: Server
-
-  #CodeDeploy BackendGroup
-  GremlinBackendDeploymentGroup:
-    Type: AWS::CodeDeploy::DeploymentGroup
-    Properties:
-      ApplicationName: !Ref GremlinBackendDeployApp
-      DeploymentGroupName: "GremlinBackendDeploymentGroup"
-      ServiceRoleArn: !ImportValue CodeDeployServiceRoleArn
-      DeploymentConfigName: "CodeDeployDefault.AllAtOnce"
-  
   #Backend CodeBuild
   BackendCodeBuildProject:
     Type: AWS::CodeBuild::Project

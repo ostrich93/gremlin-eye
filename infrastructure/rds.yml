@@ -22,21 +22,21 @@ Resources:
             "username": "${RDSMasterUsername}"
           }
         GenerateStringKey: "password"
-  DBConnectionString:
-    Type: AWS::SecretsManager::Secret
-    DependsOn: RDSInstance
-    Properties:
-      Name: !Sub "/${ProjectName}/DB_CONNECT_STRING"
-      SecretString: !Join ["",
-        [
-          "Server=", !Join ["", [!GetAtt RDSInstance.Endpoint.Address, ""] ],
-          ",", !GetAtt RDSInstance.Endpoint.Port,
-          ";Database=", !Join ["", [!Ref DBName, ""] ],
-          ";Trusted_Connection=False;TrustServerCertificate=True;User Id=", !Join ["", [!Sub "{{resolve:secretsmanager:/${ProjectName}/DB_CREDENTIALS:SecretString:username}}", ""] ],
-          ";Password=", !Join ["", [!Sub "{{resolve:secretsmanager:/${ProjectName}/DB_CREDENTIALS:SecretString:password}}", ""] ],
-          ";Connect Timeout=30;MultipleActiveResultSets=True;"
-        ]
-      ]
+  # DBConnectionString:
+  #   Type: AWS::SSM::Parameter
+  #   DependsOn: RDSInstance
+  #   Properties:
+  #     Name: !Sub "/${ProjectName}/DB_CONNECT_STRING"
+  #     SecretString: !Join ["",
+  #       [
+  #         "Server=", !Join ["", [!GetAtt RDSInstance.Endpoint.Address, ""] ],
+  #         ",", !GetAtt RDSInstance.Endpoint.Port,
+  #         ";Database=", !Join ["", [!Ref DBName, ""] ],
+  #         ";Trusted_Connection=False;TrustServerCertificate=True;User Id=", !Join ["", [!Sub "{{resolve:secretsmanager:/${ProjectName}/DB_CREDENTIALS:SecretString:username}}", ""] ],
+  #         ";Password=", !Join ["", [!Sub "{{resolve:secretsmanager:/${ProjectName}/DB_CREDENTIALS:SecretString:password}}", ""] ],
+  #         ";Connect Timeout=30;MultipleActiveResultSets=True;"
+  #       ]
+  #     ]
       
   RDSInstance:
     Type: AWS::RDS::DBInstance
@@ -72,3 +72,7 @@ Outputs:
     Value: !GetAtt RDSInstance.Endpoint.Address
     Export:
       Name: DBEndpoint
+  DBPort:
+    Value: !GetAtt RDSInstance.Endpoint.Port
+    Export:
+      Name: DBPort
