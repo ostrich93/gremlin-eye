@@ -15,7 +15,7 @@
     <RootNamespace>gremlin_eye.Server</RootNamespace>
     <SpaRoot>..\gremlin-eye.client</SpaRoot>
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
-    <SpaProxyServerUrl>https://localhost:58614</SpaProxyServerUrl>
+    <SpaProxyServerUrl>https://localhost:3000</SpaProxyServerUrl>
     <UserSecretsId>48cd0a24-5a91-4868-94b7-85058e98992a</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <TypeScriptModuleKind>none</TypeScriptModuleKind>
