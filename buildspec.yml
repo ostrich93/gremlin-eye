@@ -6,6 +6,8 @@ phases:
       dotnet: 9.0.301
   pre_build:
     commands:
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
       - echo "Logging into ECR..."
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
   
@@ -13,14 +15,17 @@ phases:
     commands:
       - echo "Building the Docker Image..."
       - docker build -f ./gremlin-eye.Server/Dockerfile -t $REPOSITORY_NAME:latest ./gremlin-eye.Server
-      - docker tag $REPOSITORY_NAME:latest $REPOSITORY_URI:latest
+      - docker tag $REPOSITORY_NAME:latest $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
       - echo Build completed. Pushing image to ECR...
       - echo Pushing the Docker image
       - docker push $REPOSITORY_URI:latest
+      - echo Writing image definitions file...
+      - printf '[{"name":"gremlin-eye", "imageUri":"%s:%s"}]' $REPOSITORY_URI $IMAGE_TAG > imagedefinitions.json
 
 artifacts:
   files:
     - "gremlin-eye.Server/**/*"
+    - "imagedefinitions.json" 
