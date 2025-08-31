@@ -54,8 +54,9 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddCors(options => {
-    options.AddPolicy("CorsPolicy",
-        policyBuilder => policyBuilder.WithOrigins(builder.Configuration["DomainName"] ?? "https://localhost:3000")
+    options.AddPolicy("AllowClientApplication",
+        policyBuilder => policyBuilder.WithOrigins(builder.Configuration["DomainName"] ?? "http://localhost:3000")
+        .AllowCredentials()
         .AllowAnyMethod()
         .AllowAnyHeader());
 });
@@ -78,7 +79,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("CorsPolicy");
+app.UseCors("AllowClientApplication");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
