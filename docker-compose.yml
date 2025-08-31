@@ -30,7 +30,8 @@ services:
         - ASPNETCORE_URLS=https://+:443;http://+:80
         - ASPNETCORE_Kestrel__Certificates__Default__Password=Secure@12345
         - ASPNETCORE_Kestrel__Certificates__Default__PATH=/https/localhost.pfx
-        - JWT__Audience=localhost:5000
-        - JWT__Issuer=localhost:5000
+        - JWT__Audience=https://localhost:5001
+        - JWT__Issuer=https://localhost:5001
+        - DomainName=http://localhost:3000 
     depends_on:
       - gremlindb
