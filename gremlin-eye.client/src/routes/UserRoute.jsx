@@ -4,7 +4,7 @@ import UserRole from '../enums/Role';
 
 const UserRoute = ({ children }) => {
     const { user } = useAuthState();
-    const token = sessionStorage.getItem('access_token');
+    const token = localStorage.getItem('access_token');
 
     return token && (user?.role === UserRole.User || user?.role === UserRole.Admin) ? children : <Navigate to='/login' replace />
 };

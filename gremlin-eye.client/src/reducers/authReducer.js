@@ -1,13 +1,13 @@
 const getUser = () => {
-    return sessionStorage.getItem("current_user") ? JSON.parse(sessionStorage.getItem("current_user")) : null;
+    return localStorage.getItem("current_user") ? JSON.parse(localStorage.getItem("current_user")) : null;
 };
 
 const getAccessToken = () => {
-    return sessionStorage.getItem("access_token") || '';
+    return localStorage.getItem("access_token") || '';
 };
 
 const getRefreshToken = () => {
-    return sessionStorage.getItem("refresh_token") || '';
+    return localStorage.getItem("refresh_token") || '';
 }
 
 export const initialState = {
