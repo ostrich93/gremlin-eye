@@ -474,6 +474,51 @@ textarea:focus {
     height: 100%;
 }
 
+.game-cover:hover {
+    background-color: var(--back-field-highlight)!important;
+    border-color: var(--back-field-highlight);
+    transition: .2s;
+}
+
+.game-cover:hover .background-img-blur,
+.game-cover:hover .card-img {
+    opacity: 1!important;
+    transition: .2s;
+}
+
+.game-cover:hover .card-img {
+    filter: unset!important;
+}
+
+.game-cover:hover .game-text-centered,
+.game-cover:hover .overlay {
+    opacity: 1;
+}
+
+.empty-card {
+    background-image: radial-gradient(var(--back-secondary) 43%, var(--back-primary) 121%);
+    position: relative;
+}
+
+.background-img-blur {
+    -webkit-filter: blur(6px);
+    -moz-filter: blur(6px);
+    -o-filter: blur(6px);
+    -ms-filter: blur(6px);
+    filter: blur(6px);
+    max-width: none;
+    z-index: 0
+}
+
+.background-img-blur,
+.game-cover .overlay {
+    bottom: 0;
+    display: block;
+    flex-shrink: 0;
+    position: absolute;
+    top: 0;
+}
+
 .game-cover .overlay {
     background-color: rgba(0,0,0,0.7);
     height: 100%;
@@ -520,6 +565,10 @@ textarea:focus {
     z-index: 1;
     overflow: hidden;
 }
+
+.unknown-game {
+    opacity: 1
+};
 
 .main-header {
     color: #fff;

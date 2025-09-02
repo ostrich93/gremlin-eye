@@ -20,16 +20,19 @@ namespace gremlin_eye.Server.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserRequestDTO request)
         {
-            //Validation
-
             //create the user
-            var userResponse = await _userService.CreateUserAsync(request);
-            if (userResponse == null)
-            {
-                return BadRequest("Bad Request Data");
-            }
+            try {
+                var userResponse = await _userService.CreateUserAsync(request);
+                if (userResponse == null)
+                {
+                    return BadRequest("Bad Request Data");
+                }
 
-            return Ok(userResponse);
+                return Ok(userResponse);
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpGet("header/{username}")]

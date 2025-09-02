@@ -1,6 +1,7 @@
 import { Dropdown, Row } from 'react-bootstrap';
 import { faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { orderMapping } from '../utils/constants';
 
 const Sorting = ({ orderOptions, sortOrder, orderBy, update, className}) => {
 
@@ -33,8 +34,8 @@ const Sorting = ({ orderOptions, sortOrder, orderBy, update, className}) => {
                     <button id="sort-direction-button" className="btn-link my-auto" onClick={handleOrderUpdate}>
                         <FontAwesomeIcon icon={sortOrder === 'asc' ? faSortUp : faSortDown} />
                     </button>
-                    <Dropdown title={orderBy}>
-                        <Dropdown.Toggle className="btn-sort btn-sm py-0 px-1" variant="">{orderBy}</Dropdown.Toggle>
+                    <Dropdown title={orderMapping[orderBy]}>
+                        <Dropdown.Toggle className="btn-sort btn-sm py-0 px-1" variant="">{orderMapping[orderBy]}</Dropdown.Toggle>
                         <Dropdown.Menu className="dropdown-sort">
                             {orderOptions && (
                                 orderOptions.map(option => (

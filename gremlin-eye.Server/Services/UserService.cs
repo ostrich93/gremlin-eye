@@ -17,6 +17,16 @@ namespace gremlin_eye.Server.Services
 
         public async Task<UserResponseDTO> CreateUserAsync(RegisterUserRequestDTO request)
         {
+            var existingUser = _unitOfWork.Users.SearchUser(request);
+            if (existingUser != null)
+            {
+                string exceptionMessage = "Error:\n";
+                if (existingUser.UserName == request.Username)
+                    exceptionMessage += string.Format("The username {0} is already in use\n", request.Username);
+                if (existingUser.Email == request.Email)
+                    exceptionMessage += "Email has already been taken";
+                throw new Exception(exceptionMessage);
+            }
             _passwordHasher.HashPassword(request.Password, out string hashedPassword, out byte[] salt);
             var user = new AppUser
             {

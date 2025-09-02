@@ -76,5 +76,12 @@ namespace gremlin_eye.Server.Repositories
                 RatingCounts = trueRatingCounts
             };
         }
+
+        public AppUser? SearchUser(RegisterUserRequestDTO registerRequest)
+        {
+            if (string.IsNullOrEmpty(registerRequest.Username) || string.IsNullOrEmpty(registerRequest.Email))
+                return null;
+            return _context.Users.Where(u => registerRequest.Username == u.Email || registerRequest.Email == registerRequest.Email).FirstOrDefault();
+        }
     }
 }
