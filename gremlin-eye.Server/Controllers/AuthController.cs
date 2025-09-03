@@ -82,5 +82,61 @@ namespace gremlin_eye.Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("forgotPassword")]
+        public async Task<IActionResult> ForgotPassword(string emailAddress)
+        {
+            if (string.IsNullOrEmpty(emailAddress))
+                return BadRequest("Email Address cannot be empty");
+
+            try
+            {
+                await _authService.GenerateValidationToken(emailAddress);
+                return Ok();
+            } catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPut]
+        [Route("updatePassword")]
+        public async Task<IActionResult> UpdatePassword([FromBody] PasswordChangeRequest changeRequest)
+        {
+            try
+            {
+                Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+                Guid? userId = idClaim != null ? Guid.Parse(idClaim!.Value) : null;
+
+                if (userId == null)
+                {
+                    throw new Exception("Error: The user could not be found in the database.");
+                }
+
+                await _authService.HandlePasswordChange(changeRequest);
+                return Ok();
+            } catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("{userId}/resetPassword")]
+        public IActionResult ResetPassword(Guid userId, [FromQuery(Name = "c")] string code)
+        {
+            try
+            {
+                bool isTokenValid = _authService.ValidatePasswordVerificationToken(code);
+                return Ok();
+            } catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ namespace gremlin_eye.Server.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        //private readonly IEmailSender _emailSender;
 
         public UserController(IUserService userService)
         {

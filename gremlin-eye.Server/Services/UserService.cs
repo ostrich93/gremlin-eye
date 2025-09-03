@@ -1,6 +1,7 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
+using System.Security.Cryptography;
 
 namespace gremlin_eye.Server.Services
 {
@@ -35,7 +36,8 @@ namespace gremlin_eye.Server.Services
                 CreatedAt = DateTime.UtcNow,
                 Role = request.Role,
                 PasswordHash = hashedPassword,
-                Salt = salt
+                Salt = salt,
+                Stamp = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16))
             };
             var createdUser = await _unitOfWork.Users.CreateUserAsync(user);
             

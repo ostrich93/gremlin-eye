@@ -83,5 +83,16 @@ namespace gremlin_eye.Server.Repositories
                 return null;
             return _context.Users.Where(u => registerRequest.Username == u.Email || registerRequest.Email == registerRequest.Email).FirstOrDefault();
         }
+
+        public AppUser? GetUserByEmail(string email)
+        {
+            //vaildation on email string handled by service calling this function
+            return _context.Users.Where(u => email == u.Email).FirstOrDefault();
+        }
+
+        public AppUser? GetUserByConfirmationToken(string token)
+        {
+            return _context.Users.Where(u => token.Equals(u.ConfirmationToken)).FirstOrDefault();
+        }
     }
 }

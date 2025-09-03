@@ -1,9 +1,11 @@
+using gremlin_eye.Server.Configurations;
 using gremlin_eye.Server.Data;
+using gremlin_eye.Server.Interfaces.Services;
 using gremlin_eye.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +25,9 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -30,6 +35,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IIGDBService, IGDBService>();
 builder.Services.AddScoped<IGameSyncService, GameSyncService>();
+builder.Services.AddTransient<IMailService, MailService>();
 
 builder.Services.AddAuthentication(options =>
 {

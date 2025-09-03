@@ -1,6 +1,8 @@
 ﻿appsettings.json
 appsettings.*.json
 
+snippet.txt
+
 obj/
 bin/
 **/[Bb]in/
