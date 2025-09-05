@@ -20,6 +20,8 @@ import UserReviews from './pages/user/UserReviews';
 import ReviewPage from './pages/ReviewPage';
 import GameReviews from './pages/game/GameReviews';
 import NotFoundPage from './pages/NotFound';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import ConfirmPasswordResetPage from './pages/ConfirmPasswordResetPage';
 
 const AppRoutes = () => {
     return (
@@ -41,6 +43,10 @@ const AppRoutes = () => {
             <Route path="/games/lib" element={<GameLibrary />} />
 
             <Route path="/company/:slug" element={<CompanyPage />} />
+
+            <Route path="/users/password/new" element={<ResetPasswordPage />} />
+
+            <Route path="/resetPassword/:token" element={<ConfirmPasswordResetPage /> } />
 
             <Route path="/users/:username" element={<UserLayout />}>
                 <Route index element={<UserProfile />} />

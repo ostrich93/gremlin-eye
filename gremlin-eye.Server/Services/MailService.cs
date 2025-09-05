@@ -1,7 +1,7 @@
 ﻿using gremlin_eye.Server.Configurations;
 using gremlin_eye.Server.DTOs;
-using gremlin_eye.Server.Interfaces.Services;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace gremlin_eye.Server.Services
@@ -10,9 +10,9 @@ namespace gremlin_eye.Server.Services
     {
         private readonly EmailSettings _mailSettings;
 
-        public MailService(EmailSettings mailSettings)
+        public MailService(IOptions<EmailSettings> mailSettings)
         {
-            _mailSettings = mailSettings;
+            _mailSettings = mailSettings.Value;
         }
         public bool SendMail(MailData data)
         {
@@ -29,8 +29,8 @@ namespace gremlin_eye.Server.Services
 
                 using (var client = new SmtpClient())
                 {
-                    client.Connect(_mailSettings.Host, _mailSettings.Port, _mailSettings.UseSSL);
-                    client.Authenticate(_mailSettings.EmailId, _mailSettings.Password);
+                    client.Connect(_mailSettings.Host, _mailSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
+                    client.Authenticate(_mailSettings.UserName, _mailSettings.Password);
                     client.Send(message);
                     client.Disconnect(true);
                     client.Dispose();

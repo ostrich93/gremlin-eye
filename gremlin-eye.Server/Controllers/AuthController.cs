@@ -86,7 +86,7 @@ namespace gremlin_eye.Server.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("forgotPassword")]
-        public async Task<IActionResult> ForgotPassword(string emailAddress)
+        public async Task<IActionResult> ForgotPassword([FromBody] string emailAddress)
         {
             if (string.IsNullOrEmpty(emailAddress))
                 return BadRequest("Email Address cannot be empty");
@@ -108,14 +108,6 @@ namespace gremlin_eye.Server.Controllers
         {
             try
             {
-                Claim? idClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
-                Guid? userId = idClaim != null ? Guid.Parse(idClaim!.Value) : null;
-
-                if (userId == null)
-                {
-                    throw new Exception("Error: The user could not be found in the database.");
-                }
-
                 await _authService.HandlePasswordChange(changeRequest);
                 return Ok();
             } catch (Exception ex)
@@ -126,12 +118,12 @@ namespace gremlin_eye.Server.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("{userId}/resetPassword")]
-        public IActionResult ResetPassword(Guid userId, [FromQuery(Name = "c")] string code)
+        [Route("canResetPassword")]
+        public IActionResult ValidatePasswordReset([FromQuery] string token)
         {
             try
             {
-                bool isTokenValid = _authService.ValidatePasswordVerificationToken(code);
+                bool isTokenValid = _authService.ValidatePasswordVerificationToken(token);
                 return Ok();
             } catch(Exception ex)
             {

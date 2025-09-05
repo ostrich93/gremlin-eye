@@ -1,6 +1,5 @@
 using gremlin_eye.Server.Configurations;
 using gremlin_eye.Server.Data;
-using gremlin_eye.Server.Interfaces.Services;
 using gremlin_eye.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +34,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IIGDBService, IGDBService>();
 builder.Services.AddScoped<IGameSyncService, GameSyncService>();
-builder.Services.AddTransient<IMailService, MailService>();
+builder.Services.AddScoped<IMailService, MailService>();
 
 builder.Services.AddAuthentication(options =>
 {

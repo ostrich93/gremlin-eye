@@ -1,7 +1,6 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
-using gremlin_eye.Server.Interfaces.Services;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
@@ -10,13 +9,15 @@ namespace gremlin_eye.Server.Services
 {
     public class AuthService : IAuthService
     {
+        private readonly IConfiguration _configuration;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenService _tokenService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMailService _mailService;
 
-        public AuthService(IPasswordHasher passwordHasher, ITokenService tokenService, IUnitOfWork unitOfWork, IMailService mailService)
+        public AuthService(IConfiguration configuration, IPasswordHasher passwordHasher, ITokenService tokenService, IUnitOfWork unitOfWork, IMailService mailService)
         {
+            _configuration = configuration;
             _passwordHasher = passwordHasher;
             _tokenService = tokenService;
             _unitOfWork = unitOfWork;
@@ -25,7 +26,7 @@ namespace gremlin_eye.Server.Services
 
         public async Task GenerateValidationToken(string emailAddress)
         {
-            if (!Regex.IsMatch(emailAddress, @"/^([a-z0-9_.-]+)@([\\da-z.-]+).([a-z.]{2,6})$/"))
+            if (!Regex.IsMatch(emailAddress, "^([a-z0-9_.-]+)@([\\da-z.-]+).([a-z.]{2,6})$"))
                 throw new ArgumentException("Email address is invalid");
 
             AppUser? user = _unitOfWork.Users.GetUserByEmail(emailAddress);
@@ -39,7 +40,7 @@ namespace gremlin_eye.Server.Services
             user.ConfirmationToken = token;
             await _unitOfWork.SaveChangesAsync();
 
-            string messageBody = $"<span>Dear {user.UserName},<br><br>You have requested to reset your password.<br><br>To set a new password, follow this link: https://gremlin-eye.com/resetPassword?c={token} <br><br>Have a great day!";
+            string messageBody = $"<span>Dear {user.UserName},<br><br>You have requested to reset your password.<br><br>To set a new password, follow this link: {_configuration["DomainName"]}/resetPassword/{token} <br><br>Have a great day!";
             MailData mailData = new MailData
             {
                 MailToName = user.UserName,

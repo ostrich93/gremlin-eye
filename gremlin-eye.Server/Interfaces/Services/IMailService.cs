@@ -1,6 +1,6 @@
 ﻿using gremlin_eye.Server.DTOs;
 
-namespace gremlin_eye.Server.Interfaces.Services
+namespace gremlin_eye.Server.Services
 {
     public interface IMailService
     {

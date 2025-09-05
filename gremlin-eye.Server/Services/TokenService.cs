@@ -143,7 +143,7 @@ namespace gremlin_eye.Server.Services
             ulong utcTicksExpiration = StreamUtils.ReadUInt64(plaintextWithHeader, 0);
             DateTimeOffset embeddedExpiration = new DateTimeOffset(checked((long)utcTicksExpiration), TimeSpan.Zero /* UTC */); //extracts expiration date
 
-            return DateTimeOffset.UtcNow > embeddedExpiration;
+            return embeddedExpiration > DateTimeOffset.UtcNow;
         }
     }
 }
