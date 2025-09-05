@@ -21,9 +21,9 @@ export async function login(dispatch, payload) {
                     refreshToken: response.data.refreshToken
                 }
             });
-            sessionStorage.setItem("current_user", JSON.stringify(userData));
-            sessionStorage.setItem("access_token", response.data.accessToken);
-            sessionStorage.setItem("refresh_token", response.data.refreshToken);
+            localStorage.setItem("current_user", JSON.stringify(userData));
+            localStorage.setItem("access_token", response.data.accessToken);
+            localStorage.setItem("refresh_token", response.data.refreshToken);
             return response.data;
         }
         else {
@@ -41,9 +41,9 @@ export async function logout(dispatch, payload) {
         });
         dispatch({ type: "LOGOUT" });
         console.log("logout success");
-        sessionStorage.removeItem("current_user");
-        sessionStorage.removeItem("access_token");
-        sessionStorage.removeItem("refresh_token");
+        localStorage.removeItem("current_user");
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
         return response;
     } catch (error) {
         dispatch({ type: "LOGOUT_ERROR", error: error });
@@ -64,7 +64,7 @@ export async function refreshAccessToken(dispatch, payload) {
                     accessToken: response.data.accessToken
                 }
             });
-            sessionStorage.setItem("access_token", response.data.accessToken);
+            localStorage.setItem("access_token", response.data.accessToken);
             return response.data;
         } else {
             dispatch({ type: "REFRESH_ERROR", error: `Failed to refresh the access token: ${response.statusText}` });

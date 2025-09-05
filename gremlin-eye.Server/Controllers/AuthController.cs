@@ -82,5 +82,53 @@ namespace gremlin_eye.Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("forgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] string emailAddress)
+        {
+            if (string.IsNullOrEmpty(emailAddress))
+                return BadRequest("Email Address cannot be empty");
+
+            try
+            {
+                await _authService.GenerateValidationToken(emailAddress);
+                return Ok();
+            } catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPut]
+        [Route("updatePassword")]
+        public async Task<IActionResult> UpdatePassword([FromBody] PasswordChangeRequest changeRequest)
+        {
+            try
+            {
+                await _authService.HandlePasswordChange(changeRequest);
+                return Ok();
+            } catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("canResetPassword")]
+        public IActionResult ValidatePasswordReset([FromQuery] string token)
+        {
+            try
+            {
+                bool isTokenValid = _authService.ValidatePasswordVerificationToken(token);
+                return Ok();
+            } catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

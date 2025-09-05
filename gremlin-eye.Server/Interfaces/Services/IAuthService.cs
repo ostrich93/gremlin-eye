@@ -7,5 +7,8 @@ namespace gremlin_eye.Server.Services
         Task<UserResponseDTO> LoginAsync(LoginDTO request);
         Task LogoutAsync(Guid userId, string refreshToken);
         TokenDTO RefreshToken(TokenDTO request);
+        Task GenerateValidationToken(string emailAddress);
+        Task HandlePasswordChange(PasswordChangeRequest changeRequest);
+        bool ValidatePasswordVerificationToken(string code);
     }
 }

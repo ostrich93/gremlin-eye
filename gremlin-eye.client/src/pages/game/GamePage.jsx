@@ -10,6 +10,7 @@ import InteractionSidebar from '../../components/Game/InteractionSidebar';
 import GameStatistics from '../../components/Game/GameStatistics';
 import formatDate from '../../utils/formatDate';
 import ReviewCard from '../../components/ReviewCard/ReviewCard';
+import { CardContent } from '../../components/Game/GameCard';
 
 const GamePage = () => {
     const { user } = useAuthState();
@@ -95,10 +96,7 @@ const GamePage = () => {
                         <div id="interactions-sidebar" className="col-12 col-sm-5 col-md-cus-30 col-lg-cus-23 col-xl-cus-21 me-sm-3">
                             <Row>
                                 <Col className="col-cover px-sm-0 my-auto mx-auto mb-0 mb-sm-2 mb-lg-0">
-                                    <Card className="mx-auto game-cover">
-                                        <Card.Img src={gameData?.coverUrl} loading='lazy' />
-                                    </Card>
-                                    <div className="overlay"></div>
+                                    <CardContent game={gameData} />
                                 </Col>
                                 <Col className="col-sm-12 mt-3 mt-sm-5">
                                     <Row>

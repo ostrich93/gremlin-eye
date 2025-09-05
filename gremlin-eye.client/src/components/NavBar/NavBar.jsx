@@ -37,12 +37,12 @@ const NavBar = () => {
                     <Navbar.Brand as={Link} to='/' className="me-2 my-auto py-0">Gremlin-Eye</Navbar.Brand>
                     <Navbar.Collapse id="navbarSupportedContent" className="mt-2 mt-md-0">
                         <Nav className="ms-auto">
-                            {user && user.role == 1 && sessionStorage.getItem('access_token') && (
+                            {user && user.role == 1 && localStorage.getItem('access_token') && (
                                 <Nav.Item>
                                     <Nav.Link as={Link} to='/admin'>Admin</Nav.Link>
                                 </Nav.Item>
                             )}
-                            {user && sessionStorage.getItem('access_token') && (
+                            {user && localStorage.getItem('access_token') && (
                                 <NavDropdown id="navDropdown" title={user.username} className="d-none d-md-block">
                                     <NavDropdown.Item as={Link} to={`users/${user.username}`} className="py-1">Profile</NavDropdown.Item>
                                     <NavDropdown.Divider className="my-0" />
@@ -58,7 +58,7 @@ const NavBar = () => {
                                     </NavDropdown.Item>
                                 </NavDropdown>
                             )}
-                            {(!user || !sessionStorage.getItem('access_token')) && (
+                            {(!user || !localStorage.getItem('access_token')) && (
                                 <>
                                     <Nav.Item>
                                         <Nav.Link as={Link} to={`/login`}>Log In</Nav.Link>

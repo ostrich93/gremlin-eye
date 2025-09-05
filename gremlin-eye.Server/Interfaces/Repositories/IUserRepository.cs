@@ -7,8 +7,10 @@ namespace gremlin_eye.Server.Repositories
     {
         AppUser? GetUserByName(string username);
         AppUser? GetUserById(Guid userId);
+        AppUser? GetUserByEmail(string email);
         Task<AppUser?> GetUserByNameAsync(string username);
-
+        AppUser? SearchUser(RegisterUserRequestDTO registerRequest);
+        AppUser? GetUserByConfirmationToken(string token);
         Task<AppUser?> GetUserWithTokensAsync(string username);
         Task<AppUser> CreateUserAsync(AppUser user);
         UserProfileResponse GetUserProfile(AppUser user);

@@ -11,7 +11,7 @@ export default function AuthProvider ({ children }) {
 
     useEffect(() => {
         const authInterceptor = apiClient.interceptors.request.use((config) => {
-            const accessToken = authState.accessToken || sessionStorage.getItem("access_token");
+            const accessToken = authState.accessToken || localStorage.getItem("access_token");
             config.headers.Authorization = !config._retry && accessToken
                 ? `Bearer ${accessToken}` : config.headers.Authorization;
 
@@ -27,8 +27,8 @@ export default function AuthProvider ({ children }) {
             async (error) => {
                 
                 const originalRequest = error.config;
-                const _accessToken = authState.accessToken || sessionStorage.getItem('access_token');
-                const _refreshToken = authState.refreshToken || sessionStorage.getItem("refresh_token");
+                const _accessToken = authState.accessToken || localStorage.getItem('access_token');
+                const _refreshToken = authState.refreshToken || localStorage.getItem("refresh_token");
                 if (error.isAxiosError &&
                     (error.response.status === 401 || error.response.status === 403) &&
                     (_accessToken && _refreshToken)) {
@@ -44,7 +44,7 @@ export default function AuthProvider ({ children }) {
                                     withCredentials: true
                                 });
                             if (res.data) {
-                                sessionStorage.setItem("access_token", res.data.accessToken);
+                                localStorage.setItem("access_token", res.data.accessToken);
                                 dispatch({
                                     type: "REFRESH_SUCCESS",
                                     payload: {

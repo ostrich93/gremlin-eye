@@ -1,6 +1,7 @@
 ﻿using gremlin_eye.Server.Data;
 using gremlin_eye.Server.DTOs;
 using gremlin_eye.Server.Entity;
+using System.Security.Cryptography;
 
 namespace gremlin_eye.Server.Services
 {
@@ -17,6 +18,16 @@ namespace gremlin_eye.Server.Services
 
         public async Task<UserResponseDTO> CreateUserAsync(RegisterUserRequestDTO request)
         {
+            var existingUser = _unitOfWork.Users.SearchUser(request);
+            if (existingUser != null)
+            {
+                string exceptionMessage = "Error:\n";
+                if (existingUser.UserName == request.Username)
+                    exceptionMessage += string.Format("The username {0} is already in use\n", request.Username);
+                if (existingUser.Email == request.Email)
+                    exceptionMessage += "Email has already been taken";
+                throw new Exception(exceptionMessage);
+            }
             _passwordHasher.HashPassword(request.Password, out string hashedPassword, out byte[] salt);
             var user = new AppUser
             {
@@ -25,7 +36,8 @@ namespace gremlin_eye.Server.Services
                 CreatedAt = DateTime.UtcNow,
                 Role = request.Role,
                 PasswordHash = hashedPassword,
-                Salt = salt
+                Salt = salt,
+                Stamp = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16))
             };
             var createdUser = await _unitOfWork.Users.CreateUserAsync(user);
             

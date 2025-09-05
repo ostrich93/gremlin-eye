@@ -41,6 +41,12 @@ namespace gremlin_eye.Server.Entity
         [Required]
         public UserRole Role { get; set; }
 
+        [Column("stamp")]
+        public string? Stamp { get; set; } //Used to determine value of Confirmation Token, changes when credentials change and generated on register.
+
+        [Column("confirmationToken")]
+        public string ConfirmationToken { get; set; } = string.Empty;
+
         //Navigation Properties
         public virtual ICollection<GameLog> GameLogs { get; set; } = new List<GameLog>();
         public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();

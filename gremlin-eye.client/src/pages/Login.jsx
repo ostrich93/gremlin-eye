@@ -45,6 +45,10 @@ const Login = () => {
                             <Button id="register-button" type='submit' className="btn-main" disabled={loading || (!username.length || !password.length)}>Log In</Button>
                         </div>
                     </Form>
+                    <br />
+                    <a className="text-center link mt-2" href="/users/register">If you're a new user, sign up here</a>
+                    <br />
+                    <a className="text-center link mt-2" href="/users/password/new">Forgot your password?</a>
                 </div>
             </Row>
         </Container>
