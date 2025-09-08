@@ -21,10 +21,6 @@ namespace gremlin_eye.Server.Controllers
         {
             long lastGameId = await _gameSyncService.ImportGames(page);
 
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-
             return Results.Ok(lastGameId);
         }
 

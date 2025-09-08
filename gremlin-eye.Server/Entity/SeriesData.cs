@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gremlin_eye.Server.Entity
 {
-    [Table("game_series")]
+    [Table("series_data")]
     public class SeriesData : IChecksum
     {
         [Key]
@@ -21,6 +21,6 @@ namespace gremlin_eye.Server.Entity
         [Column("checksum")]
         public string? Checksum { get; set; }
         //Navigation Properties
-        public virtual ICollection<GameData> Games { get; set; } = new List<GameData>();
+        public List<GameSeries>? GameSeries { get; set; }
     }
 }

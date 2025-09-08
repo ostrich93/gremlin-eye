@@ -18,12 +18,21 @@ namespace gremlin_eye.Server.Repositories
 
         public async Task<GameData[]> GetGames(int offset, int limit)
         {
-            return await _context.Games.Include(g => g.Companies).Include(g => g.Genres).Include(g => g.Platforms).Include(g => g.Series).Skip(offset * limit).OrderBy(g => g.Id).ToArrayAsync();
+            return await _context.Games.Skip(offset * limit).OrderBy(g => g.Id).ToArrayAsync();
         }
 
         public async Task<GameData?> GetGameById(long id)
         {
-            return await _context.Games.Include(g => g.Companies).Include(g => g.Genres).Include(g => g.Platforms).Include(g => g.Series).FirstOrDefaultAsync(g => g.Id == id);
+            return await _context.Games
+                .Include(g => g.GameCompanies)
+                    .ThenInclude(gc => gc.Company)
+                .Include(g => g.GameGenres)
+                    .ThenInclude(gg => gg.Genre)
+                .Include(g => g.GamePlatforms)
+                    .ThenInclude(gp => gp.Platform)
+                .Include(g => g.GameSeries)
+                    .ThenInclude(gs => gs.Series)
+                .FirstOrDefaultAsync(g => g.Id == id);
         }
 
         public async Task CreateAndSaveAsync(GameData game)
@@ -34,7 +43,16 @@ namespace gremlin_eye.Server.Repositories
 
         public async Task<GameData?> GetGameBySlug(string slug)
         {
-            return await _context.Games.Include(g => g.Companies).Include(g => g.Genres).Include(g => g.Series).Include(g => g.Platforms).Where(g => g.Slug == slug).FirstOrDefaultAsync();
+            return await _context.Games
+                .Include(g => g.GameCompanies)
+                    .ThenInclude(gc => gc.Company)
+                .Include(g => g.GameGenres)
+                    .ThenInclude(gg => gg.Genre)
+                .Include(g => g.GamePlatforms)
+                    .ThenInclude(gp => gp.Platform)
+                .Include(g => g.GameSeries)
+                    .ThenInclude(gs => gs.Series)
+                .FirstOrDefaultAsync(g => g.Slug == slug);
         }
 
         public void Create(GameData data)
@@ -61,19 +79,19 @@ namespace gremlin_eye.Server.Repositories
 
         public async Task<List<GameData>?> GetRelatedGames(long seriesId, long gameId)
         {
-            var gs = await _context.Series.Where(s => s.Id == seriesId).SelectMany(s => s.Games).Distinct().OrderByDescending(g => g.ReleaseDate).ToListAsync();
+            var gs = await _context.GameSeries.Where(gsr => gsr.SeriesId == seriesId && gameId == gsr.GameId).OrderByDescending(gsr => gsr.Game.ReleaseDate).ToListAsync();
             if (gs == null)
                 return null;
 
             List<GameData> relatedGames = new List<GameData>();
-            var idx = gs.FindIndex(g => g.Id == gameId);
+            var idx = gs.FindIndex(g => g.GameId == gameId);
             if (idx < 3)
             {
-                foreach(GameData gd in gs)
+                foreach(GameSeries gd in gs)
                 {
-                    if (gd.Id == gameId)
+                    if (gd.GameId == gameId)
                         continue;
-                    relatedGames.Add(gd);
+                    relatedGames.Add(gd.Game);
                 }
             }
             else if (idx == gs.Count - 1) //last entry
@@ -82,8 +100,8 @@ namespace gremlin_eye.Server.Repositories
                 int cIdx = startIdx;
                 while (cIdx < gs.Count)
                 {
-                    if (gs[cIdx].Id != gameId)
-                        relatedGames.Add(gs[cIdx]);
+                    if (gs[cIdx].GameId != gameId)
+                        relatedGames.Add(gs[cIdx].Game);
                     cIdx++;
                 }
             }
@@ -93,8 +111,8 @@ namespace gremlin_eye.Server.Repositories
                 int cIdx = startIdx;
                 while (cIdx < gs.Count)
                 {
-                    if (gs[cIdx].Id != gameId)
-                        relatedGames.Add(gs[cIdx]);
+                    if (gs[cIdx].GameId != gameId)
+                        relatedGames.Add(gs[cIdx].Game);
                     cIdx++;
                 }
             }
@@ -105,8 +123,8 @@ namespace gremlin_eye.Server.Repositories
                 int currIdx = startIdx;
                 while (currIdx < endIdx)
                 {
-                    if (gs[currIdx].Id != gameId)
-                        relatedGames.Add(gs[currIdx]);
+                    if (gs[currIdx].GameId != gameId)
+                        relatedGames.Add(gs[currIdx].Game);
                     currIdx++;
                 }
             }

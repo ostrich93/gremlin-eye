@@ -36,6 +36,7 @@ namespace gremlin_eye.Server.Controllers
             var topReviews = await _unitOfWork.Reviews.GetGameTopReviews(data.Id, data.Slug, data.Name);
             int reviewCount = await _unitOfWork.Reviews.GetGameReviewCount(data.Id);
             int likeCount = _unitOfWork.Likes.GetGameLikeCount(data.Id);
+
             GameDetailsResponseDTO gameDetails = new GameDetailsResponseDTO
             {
                 Id = data.Id,
@@ -45,29 +46,29 @@ namespace gremlin_eye.Server.Controllers
                 BannerUrl = data.BannerUrl,
                 Summary = data.Summary,
                 Date = data.ReleaseDate,
-                Platforms = data.Platforms.Select(p => new PlatformDTO
+                Platforms = data.GamePlatforms.Select(p => new PlatformDTO
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Slug = p.Slug
+                    Id = p.PlatformId,
+                    Name = p.Platform.Name,
+                    Slug = p.Platform.Slug
                 }).ToList(),
-                Genres = data.Genres.Select(g => new GenreDTO
+                Genres = data.GameGenres.Select(g => new GenreDTO
                 {
-                    Id = g.Id,
-                    Name = g.Name,
-                    Slug = g.Slug
+                    Id = g.GenreId,
+                    Name = g.Genre.Name,
+                    Slug = g.Genre.Slug
                 }).ToList(),
-                Companies = data.Companies.Select(c => new CompanyDTO
+                Companies = data.GameCompanies.Select(c => new CompanyDTO
                 {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Slug = c.Slug
+                    Id = c.CompanyId,
+                    Name = c.Company.Name,
+                    Slug = c.Company.Slug
                 }).ToList(),
-                Series = data.Series.Count > 0 ? new SeriesDTO
+                Series = data.GameSeries.Count > 0 ? new SeriesDTO
                 {
-                    Id = data.Series.First().Id,
-                    Name = data.Series.First().Name,
-                    Slug = data.Series.First().Slug
+                    Id = data.GameSeries.First().SeriesId,
+                    Name = data.GameSeries.First().Series.Name,
+                    Slug = data.GameSeries.First().Series.Slug
                 } : null,
                 TopReviews = topReviews,
                 ReviewCount = reviewCount,
@@ -293,13 +294,13 @@ namespace gremlin_eye.Server.Controllers
                 }
             }
             if (genre != null)
-                predicate.And(g => g.Genres.Any(gen => gen.Slug == genre));
+                predicate.And(g => g.GameGenres.Any(gen => gen.Genre.Slug == genre));
 
             if (category != null)
                 predicate.And(g => g.GameType == category);
 
             if (platform != null)
-                predicate.And(g => g.Platforms.Any(p => p.Slug == platform));
+                predicate.And(g => g.GamePlatforms.Any(p => p.Platform.Slug == platform));
 
             var inner = PredicateBuilder.New<GameData>();
             inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() >= 2 * min);
@@ -348,9 +349,9 @@ namespace gremlin_eye.Server.Controllers
                 }
             }
             if (genre != null)
-                predicate.And(g => g.Genres.Any(gen => gen.Slug == genre));
+                predicate.And(g => g.GameGenres.Any(gen => gen.Genre.Slug == genre));
             if (releasePlatform != null)
-                predicate.And(g => g.Platforms.Any(p => p.Slug == releasePlatform));
+                predicate.And(g => g.GamePlatforms.Any(p => p.Platform.Slug == releasePlatform));
             if (playedPlatform != null)
                 predicate.And(g => g.GameLogs.Any(l => l.UserId == user.Id && l.Playthroughs.Where(p => p.Platform != null && p.Platform.Slug == playedPlatform).Any()));
             if (playStatus != null)

@@ -20,6 +20,6 @@ namespace gremlin_eye.Server.Entity
         [Column("checksum")]
         public string? Checksum { get; set; }
         //Navigation Properties
-        public virtual ICollection<GameData> Games { get; set; } = new List<GameData>();
+        public List<GameGenre>? GameGenres { get; set; }
     }
 }

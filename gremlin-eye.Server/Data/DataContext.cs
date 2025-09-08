@@ -27,43 +27,13 @@ namespace gremlin_eye.Server.Data
         public DbSet<SeriesData> Series { get; set; }
         public DbSet<GenreData> Genres { get; set; }
         public DbSet<PlatformData> Platforms { get; set; }
-
+        public DbSet<GameCompany> GameCompanies { get; set; }
+        public DbSet<GameSeries> GameSeries { get; set; }
+        public DbSet<GameGenre> GameGenres { get; set; }
+        public DbSet<GamePlatform> GamePlatforms { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            //Many to Many Relationships
-            modelBuilder.Entity<GameData>()
-                .HasMany(g => g.Companies)
-                .WithMany(c => c.Games)
-                .UsingEntity("GameCompany",
-                    l => l.HasOne(typeof(CompanyData)).WithMany().HasForeignKey("CompanyId").HasPrincipalKey(nameof(CompanyData.Id)),
-                    r => r.HasOne(typeof(GameData)).WithMany().HasForeignKey("GameId").HasPrincipalKey(nameof(GameData.Id)),
-                    j => j.HasKey("GameId", "CompanyId"));
-
-            modelBuilder.Entity<GameData>()
-                .HasMany(g => g.Series)
-                .WithMany(s => s.Games)
-                .UsingEntity("GameSeries",
-                    l => l.HasOne(typeof(SeriesData)).WithMany().HasForeignKey("SeriesId").HasPrincipalKey(nameof(SeriesData.Id)),
-                    r => r.HasOne(typeof(GameData)).WithMany().HasForeignKey("GameId").HasPrincipalKey(nameof(GameData.Id)),
-                    j => j.HasKey("GameId", "SeriesId"));
-
-            modelBuilder.Entity<GameData>()
-                .HasMany(g => g.Genres)
-                .WithMany(gn => gn.Games)
-                .UsingEntity("GameGenres",
-                    l => l.HasOne(typeof(GenreData)).WithMany().HasForeignKey("GenreId").HasPrincipalKey(nameof(GenreData.Id)),
-                    r => r.HasOne(typeof(GameData)).WithMany().HasForeignKey("GameId").HasPrincipalKey(nameof(GameData.Id)),
-                    j => j.HasKey("GameId", "GenreId"));
-
-            modelBuilder.Entity<GameData>()
-                .HasMany(g => g.Platforms)
-                .WithMany(p => p.Games)
-                .UsingEntity("GamePlatforms",
-                    l => l.HasOne(typeof(PlatformData)).WithMany().HasForeignKey("PlatformId").HasPrincipalKey(nameof(PlatformData.Id)),
-                    r => r.HasOne(typeof(GameData)).WithMany().HasForeignKey("GameId").HasPrincipalKey(nameof(GameData.Id)),
-                    j => j.HasKey("GameId", "PlatformId"));
 
             //One to Many Relationships
             modelBuilder.Entity<ListEntry>()

@@ -107,11 +107,11 @@ namespace gremlin_eye.Server.Controllers
                     GameName = gameData.Name,
                     ReleaseDate = gameData.ReleaseDate,
                     CoverUrl = gameData.CoverUrl,
-                    Platforms = gameData.Platforms.Select(p => new PlatformDTO
+                    Platforms = gameData.GamePlatforms.Select(p => new PlatformDTO
                     {
-                        Id = p.Id,
-                        Name = p.Name,
-                        Slug = p.Slug
+                        Id = p.Platform.Id,
+                        Name = p.Platform.Name,
+                        Slug = p.Platform.Slug
                     }).ToList(),
                     Playthroughs = gameLog.Playthroughs.Count > 0 ?
                         gameLog.Playthroughs.Select(pl => new PlaythroughDTO

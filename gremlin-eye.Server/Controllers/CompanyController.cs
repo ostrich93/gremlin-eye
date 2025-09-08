@@ -30,14 +30,12 @@ namespace gremlin_eye.Server.Controllers
             [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
             [FromQuery] int page = 1)
         {
-            var company = _unitOfWork.Context.Companies.AsNoTracking().Include(c => c.Games).Where(c => c.Slug == slug).FirstOrDefault();
+            var company = _unitOfWork.Context.GameCompanies.AsNoTracking().Select(c => c.Company).Where(c => c.Slug == slug).FirstOrDefault();
             if (company == null)
                 return NotFound();
 
-            var query = company.Games.AsQueryable();
-
             var predicate = PredicateBuilder.New<GameData>();
-            predicate.And(g => g.Companies.Contains(company));
+            predicate.And(g => g.GameCompanies.Select(gc => gc.Company).Contains(company));
 
             if (releaseYear != null)
             {
@@ -61,13 +59,13 @@ namespace gremlin_eye.Server.Controllers
                 }
             }
             if (genre != null)
-                predicate.And(g => g.Genres.Any(gen => gen.Slug == genre));
+                predicate.And(g => g.GameGenres.Any(gen => gen.Genre.Slug == genre));
 
             if (category != null)
                 predicate.And(g => g.GameType == category);
 
             if (platform != null)
-                predicate.And(g => g.Platforms.Any(p => p.Slug == platform));
+                predicate.And(g => g.GamePlatforms.Any(p => p.Platform.Slug == platform));
 
             var inner = PredicateBuilder.New<GameData>();
             inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() >= min);

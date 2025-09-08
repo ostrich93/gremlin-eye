@@ -54,10 +54,10 @@ namespace gremlin_eye.Server.Entity
         public virtual ICollection<GameLike> Likes { get; set; } = new List<GameLike>();
 
         //IGDB Data Relationships
-        public virtual ICollection<CompanyData> Companies { get; set; } = new List<CompanyData>();
-        public virtual ICollection<SeriesData> Series { get; set; } = new List<SeriesData>();
-        public virtual ICollection<PlatformData> Platforms { get; set; } = new List<PlatformData>();
-        public virtual ICollection<GenreData> Genres { get; set; } = new List<GenreData>();
+        public List<GameCompany> GameCompanies { get; set; } = new List<GameCompany>();
+        public List<GameSeries> GameSeries { get; set; } = new List<GameSeries>();
+        public List<GamePlatform> GamePlatforms { get; set; } = new List<GamePlatform>();
+        public List<GameGenre> GameGenres { get; set; } = new List<GameGenre>();
     }
 
 }
