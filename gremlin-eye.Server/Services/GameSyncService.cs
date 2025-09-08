@@ -265,13 +265,19 @@ namespace gremlin_eye.Server.Services
             var offset = (page - 1) * LIMIT;
 
             var sourceGames = await _igdbService.GetGames(offset);
+            
             //GameData[] gameDatas = new GameData[LIMIT];
             HashSet<GameData> gamesToUpdate = new HashSet<GameData>();
-            HashSet<GameData> gamesToAdd = new HashSet<GameData>(); ;
+            HashSet<GameData> gamesToAdd = new HashSet<GameData>();
 
-            //int counter = 0;
+            HashSet<GenreData> existingGenres = _unitOfWork.Context.Genres.ToHashSet();
+            HashSet<PlatformData> existingPlatforms = _unitOfWork.Context.Platforms.ToHashSet();
+            HashSet<SeriesData> existingSeries = await _unitOfWork.Context.Series.ToHashSetAsync();
+            HashSet<CompanyData> existingCompanies = await _unitOfWork.Context.Companies.ToHashSetAsync();
 
-            foreach(Game source in sourceGames)
+            long lastChangedId = -1;
+
+            foreach (Game source in sourceGames)
             {
                 if (source.Id == null)
                     continue;
@@ -291,6 +297,8 @@ namespace gremlin_eye.Server.Services
                         internalGame.BannerUrl = source.Screenshots != null && source.Screenshots.Values.Length > 0 ? ImageHelper.GetImageUrl(source.Screenshots.Values[0].ImageId, ImageSize.HD1080) : string.Empty;
                         internalGame.CoverUrl = source.Cover != null && source.Cover.Value != null ? ImageHelper.GetImageUrl(source.Cover.Value.ImageId, ImageSize.CoverBig, true) : string.Empty;
                     }
+                    _unitOfWork.Context.Games.Update(internalGame);
+                    lastChangedId = internalGame.Id;
                 }
                 else if (internalGame == null)
                 {
@@ -305,70 +313,49 @@ namespace gremlin_eye.Server.Services
                         ReleaseDate = source.FirstReleaseDate,
                         Checksum = source.Checksum
                     };
-                    shouldCreate = true;
                     //await _unitOfWork.Games.CreateAndSaveAsync(internalGame);
+                    _unitOfWork.Context.Add(internalGame);
+                    lastChangedId = internalGame.Id;
                 }
 
                 if (source.Genres != null && source.Genres.Values.Length > 0)
-                    rowsToUpdate += HandleGenres(internalGame, source);
+                    rowsToUpdate += HandleGenres(internalGame, source, existingGenres);
                 if (source.Platforms != null && source.Platforms.Values.Length > 0)
-                    rowsToUpdate += HandlePlatforms(internalGame, source);
+                    rowsToUpdate += HandlePlatforms(internalGame, source, existingPlatforms);
                 if (source.Collections != null && source.Collections.Values.Length > 0)
-                    rowsToUpdate += HandleSeries(internalGame, source);
+                    rowsToUpdate += HandleSeries(internalGame, source, existingSeries);
                 if (source.InvolvedCompanies != null && source.InvolvedCompanies.Values.Length > 0)
-                    rowsToUpdate += HandleCompanies(internalGame, source);
+                    rowsToUpdate += HandleCompanies(internalGame, source, existingCompanies);
 
-                if (shouldCreate)
-                    gamesToAdd.Add(internalGame);
-                else if (rowsToUpdate > 0 && !shouldCreate)
-                    gamesToUpdate.Add(internalGame);
-
-                /*gameDatas[counter] = internalGame;
-                await _unitOfWork.SaveChangesAsync();
-                counter++;*/
             }
 
-            long lastChangedId = -1;
-
-            if (gamesToUpdate.Count > 0)
-            {
-                await _unitOfWork.Games.UpdateRangeAndSaveAsync(gamesToUpdate);
-                lastChangedId = gamesToUpdate.Last().Id;
-            }
-            if (gamesToAdd.Count > 0)
-            {
-                await _unitOfWork.Games.CreateRangeAndSaveAsync(gamesToAdd);
-                long lastId = gamesToAdd.Last().Id;
-                if (lastId > lastChangedId)
-                    lastChangedId = lastId;
-            }
+            await _unitOfWork.SaveChangesAsync();
 
             return lastChangedId;
         }
 
-        private int HandleGenres(GameData gameData, Game sourceData)
+        private int HandleGenres(GameData gameData, Game sourceData, HashSet<GenreData> existingGenres)
         {
-            var existingGenres = _unitOfWork.Context.Genres.ToHashSet();
-            var localGenres = gameData.Genres;
+            var localGenres = gameData.GameGenres;
 
-            HashSet<GenreData> genresToDelete = new HashSet<GenreData>();
+            HashSet<GameGenre> genresToDelete = new HashSet<GameGenre>();
             HashSet<GenreData> genresToUpdate = new HashSet<GenreData>();
 
             //if there are more genres for the game locally than in IGDB, remove the excess genres from the game
             if (localGenres.Count > sourceData.Genres.Values.Length)
             {
                 IEnumerable<long> sourceIds = sourceData.Genres.Values.Where(g => g.Id != null).Select(g => (long)g.Id).ToArray();
-                IEnumerable<GenreData> localOnlyGenres = localGenres.ExceptBy(sourceIds, s => s.Id);
+                IEnumerable<GameGenre> localOnlyGenres = localGenres.ExceptBy(sourceIds, s => s.GenreId);
                 if (localOnlyGenres is not null)
                 {
-                    foreach (GenreData lGenre in localOnlyGenres)
+                    foreach (GameGenre lGenre in localOnlyGenres)
                         genresToDelete.Add(lGenre);
                 }
             }
             //if the game has more genres in IGDB than it does locally, handle the differences
             else if (localGenres.Count < sourceData.Genres.Values.Length)
             {
-                var localGenreIds = localGenres.Select(l => l.Id).ToArray();
+                var localGenreIds = localGenres.Select(l => l.GenreId).ToArray();
                 IEnumerable<Genre> sourceOnlyGenres = sourceData.Genres.Values.ExceptBy(localGenreIds, g => (long)g.Id);
                 if (sourceOnlyGenres is not null)
                 {
@@ -377,8 +364,15 @@ namespace gremlin_eye.Server.Services
                         //Check if the genre from IGDB even exists in the local database. If not, ignore it
                         //In both cases, add the genre to game's list
                         var existingGenre = existingGenres.FirstOrDefault(g => g.Id == sourceGenre.Id);
-                        if (existingGenre != null)
-                            gameData.Genres.Add(existingGenre);
+                        if (existingGenre != null) {
+                            _unitOfWork.Context.GameGenres.Add(new GameGenre
+                            {
+                                GameId = gameData.Id,
+                                GenreId = existingGenre.Id,
+                                Game = gameData,
+                                Genre = existingGenre
+                            });
+                        }
                     }
                 }
             }
@@ -397,38 +391,37 @@ namespace gremlin_eye.Server.Services
                 }
             }
 
-            foreach(var g in genresToDelete)
-                gameData.Genres.Remove(g);
+            if (genresToDelete.Count > 0)
+                _unitOfWork.Context.GameGenres.RemoveRange(genresToDelete);
             if (genresToUpdate.Count > 0)
             {
                 _unitOfWork.Context.Genres.UpdateRange(genresToUpdate);
-                _unitOfWork.Context.SaveChanges();
+                //_unitOfWork.Context.SaveChanges();
             }
             return genresToUpdate.Count + genresToDelete.Count;
         }
 
-        private int HandleCompanies(GameData gameData, Game sourceData)
+        private int HandleCompanies(GameData gameData, Game sourceData, HashSet<CompanyData> existingCompanies)
         {
-            var existingCompanies = _unitOfWork.Context.Companies.ToList();
             var involvedCompanies = sourceData.InvolvedCompanies.Values.Select(ic => ic.Company.Value).ToArray();
-            var localCompanies = gameData.Companies;
+            var localCompanies = gameData.GameCompanies;
 
-            HashSet<CompanyData> companiesToDelete = new HashSet<CompanyData>();
+            HashSet<GameCompany> companiesToDelete = new HashSet<GameCompany>();
             HashSet<CompanyData> companiesToUpdate = new HashSet<CompanyData>();
 
             if (localCompanies.Count > involvedCompanies.Length)
             {
                 var sourceCompanyIds = involvedCompanies.Select(c => c.Id).ToArray();
-                IEnumerable<CompanyData> localOnlyCompanies = localCompanies.ExceptBy(sourceCompanyIds, c => c.Id);
+                IEnumerable<GameCompany> localOnlyCompanies = localCompanies.ExceptBy(sourceCompanyIds, c => c.CompanyId);
                 if (localOnlyCompanies is not null)
                 {
-                    foreach (CompanyData lCompany in localOnlyCompanies)
+                    foreach (GameCompany lCompany in localOnlyCompanies)
                         companiesToDelete.Add(lCompany);
                 }
             }
             else if (involvedCompanies.Length > localCompanies.Count)
             {
-                var localCompanyIds = localCompanies.Select(c => c.Id);
+                var localCompanyIds = localCompanies.Select(c => c.CompanyId);
                 IEnumerable<Company> sourceOnlyCompanies = involvedCompanies.ExceptBy(localCompanyIds, c => (long)c.Id);
                 if (sourceOnlyCompanies is not null)
                 {
@@ -436,7 +429,13 @@ namespace gremlin_eye.Server.Services
                     {
                         var existingCompany = existingCompanies.FirstOrDefault(c => c.Id == sourceCompany.Id);
                         if (existingCompany != null)
-                            gameData.Companies.Add(existingCompany);
+                            _unitOfWork.Context.GameCompanies.Add(new GameCompany
+                            {
+                                GameId = gameData.Id,
+                                CompanyId = existingCompany.Id,
+                                Company = existingCompany,
+                                Game = gameData
+                            });
                     }
                 }
             }
@@ -456,30 +455,29 @@ namespace gremlin_eye.Server.Services
                 }
             }
 
-            foreach (var c in companiesToDelete)
-                gameData.Companies.Remove(c);
+            if (companiesToDelete.Count > 0)
+                _unitOfWork.Context.GameCompanies.RemoveRange(companiesToDelete);
             if (companiesToUpdate.Count > 0)
             {
                 _unitOfWork.Context.Companies.UpdateRange(companiesToUpdate);
-                _unitOfWork.Context.SaveChanges();
+                //_unitOfWork.Context.SaveChanges();
             }
 
             return companiesToDelete.Count + companiesToUpdate.Count;
         }
 
-        private int HandlePlatforms(GameData gameData, Game sourceData)
+        private int HandlePlatforms(GameData gameData, Game sourceData, HashSet<PlatformData> existingPlatforms)
         {
-            var existingPlatforms = _unitOfWork.Context.Platforms.ToHashSet();
-            var localPlatforms = gameData.Platforms;
+            var localPlatforms = gameData.GamePlatforms;
 
-            HashSet<PlatformData> platformsToDelete = new HashSet<PlatformData>();
+            HashSet<GamePlatform> platformsToDelete = new HashSet<GamePlatform>();
             HashSet<PlatformData> platformsToUpdate = new HashSet<PlatformData>();
 
             //remove excess platforms from the local data
             if (localPlatforms.Count > sourceData.Platforms.Values.Length)
             {
                 IEnumerable<long> sourceIds = sourceData.Platforms.Values.Where(g => g.Id != null).Select(p => (long)p.Id).ToArray();
-                IEnumerable<PlatformData> localOnlyPlatforms = localPlatforms.ExceptBy(sourceIds, p => p.Id);
+                IEnumerable<GamePlatform> localOnlyPlatforms = localPlatforms.ExceptBy(sourceIds, p => p.PlatformId);
                 if (localOnlyPlatforms is not null)
                 {
                     foreach (var localPlatform in localOnlyPlatforms)
@@ -488,7 +486,7 @@ namespace gremlin_eye.Server.Services
             }
             else if (localPlatforms.Count < sourceData.Platforms.Values.Length)
             {
-                var localPlatformIds = localPlatforms.Select(l => l.Id).ToArray();
+                var localPlatformIds = localPlatforms.Select(l => l.PlatformId).ToArray();
                 IEnumerable<Platform> sourceOnlyPlatforms = sourceData.Platforms.Values.ExceptBy(localPlatformIds, p => (long)p.Id);
                 if (sourceOnlyPlatforms is not null)
                 {
@@ -496,7 +494,13 @@ namespace gremlin_eye.Server.Services
                     {
                         var existingPlatform = existingPlatforms.FirstOrDefault(p => p.Id == sourcePlatform.Id);
                         if (existingPlatform != null)
-                            gameData.Platforms.Add(existingPlatform);
+                            _unitOfWork.Context.GamePlatforms.Add(new GamePlatform
+                            {
+                                GameId = gameData.Id,
+                                PlatformId = existingPlatform.Id,
+                                Game = gameData,
+                                Platform = existingPlatform
+                            });
                     }
                 }
             }
@@ -513,30 +517,29 @@ namespace gremlin_eye.Server.Services
                     platformsToUpdate.Add(platform);
                 }
             }
-            foreach(var p in platformsToDelete)
-                gameData.Platforms.Remove(p);
 
+            if (platformsToDelete.Count > 0)
+                _unitOfWork.Context.GamePlatforms.RemoveRange(platformsToDelete);
             if (platformsToUpdate.Count > 0)
             {
                 _unitOfWork.Context.Platforms.UpdateRange(platformsToUpdate);
-                _unitOfWork.Context.SaveChanges();
+                //_unitOfWork.Context.SaveChanges();
             }
 
             return platformsToDelete.Count + platformsToUpdate.Count;
         }
 
-        private int HandleSeries(GameData gameData, Game sourceData)
+        private int HandleSeries(GameData gameData, Game sourceData, HashSet<SeriesData> existingSeries)
         {
-            var existingSeries = _unitOfWork.Context.Series.ToHashSet();
-            var localSeries = gameData.Series;
+            var localSeries = gameData.GameSeries;
 
-            HashSet<SeriesData> seriesToDelete = new HashSet<SeriesData>();
+            HashSet<GameSeries> seriesToDelete = new HashSet<GameSeries>();
             HashSet<SeriesData> seriesToUpdate = new HashSet<SeriesData>();
 
             if (localSeries.Count > sourceData.Collections.Values.Length)
             {
                 IEnumerable<long> sourceIds = sourceData.Collections.Values.Where(c => c.Id != null).Select(c => (long)c.Id).ToArray();
-                IEnumerable<SeriesData> localOnlySeries = localSeries.ExceptBy(sourceIds, s => s.Id);
+                IEnumerable<GameSeries> localOnlySeries = localSeries.ExceptBy(sourceIds, s => s.SeriesId);
                 if (localOnlySeries is not null)
                 {
                     foreach (var localS in localOnlySeries)
@@ -545,7 +548,7 @@ namespace gremlin_eye.Server.Services
             }
             else if (localSeries.Count < sourceData.Collections.Values.Length)
             {
-                var localSeriesIds = localSeries.Select(s => s.Id).ToArray();
+                var localSeriesIds = localSeries.Select(s => s.SeriesId).ToArray();
                 IEnumerable<Collection> sourceOnlySeries = sourceData.Collections.Values.ExceptBy(localSeriesIds, s => (long)s.Id);
                 if (sourceOnlySeries is not null)
                 {
@@ -553,7 +556,13 @@ namespace gremlin_eye.Server.Services
                     {
                         var existingS = existingSeries.FirstOrDefault(s => s.Id == sourceSeries.Id);
                         if (existingS != null)
-                            existingSeries.Add(existingS);
+                            _unitOfWork.Context.GameSeries.Add(new GameSeries
+                            {
+                                GameId = gameData.Id,
+                                SeriesId = existingS.Id,
+                                Game = gameData,
+                                Series = existingS
+                            });
                     }
                 }
             }
@@ -570,13 +579,13 @@ namespace gremlin_eye.Server.Services
                     seriesToUpdate.Add(series);
                 }
             }
-            foreach (var s in seriesToDelete)
-                gameData.Series.Remove(s);
 
+            if (seriesToDelete.Count > 0)
+                _unitOfWork.Context.GameSeries.RemoveRange(seriesToDelete);
             if (seriesToUpdate.Count > 0)
             {
                 _unitOfWork.Context.Series.UpdateRange(seriesToUpdate);
-                _unitOfWork.Context.SaveChanges();
+                //_unitOfWork.Context.SaveChanges();
             }
 
             return seriesToDelete.Count + seriesToUpdate.Count;
