@@ -12,6 +12,7 @@ import apiClient from '../../config/apiClient';
 import JournalModalContent from './JournalModal';
 import PlayStatusModalContent from './PlayStatusModal';
 import { playStatusEnumStrings } from '../../utils/constants';
+import classNames from 'classnames';
 
 //InteractionSidebar contains GameRatings component and 
 const InteractionSidebar = ({ slug }) => {
@@ -180,6 +181,48 @@ const InteractionSidebar = ({ slug }) => {
         return `btn-play-fill btn-played play-type-color ${playStatusEnumStrings[playStatus]}`;
     };
 
+    const isGamePlayed = () => {
+        return played && playStatus != null;
+    };
+
+    const playingClass = classNames({
+        'px-0': true,
+        'mt-auto': true,
+        'btn-play-fill': playing
+    });
+
+    const backlogClass = classNames({
+        'px-0': true,
+        'mt-auto': true,
+        'btn-play-fill': backlog
+    });
+
+    const wishlistClass = classNames({
+        'px-0': true,
+        'mt-auto': true,
+        'btn-play-fill': wishlist
+    });
+
+    const playedClass = classNames({
+        'px-0': true,
+        'mt-auto': true,
+        'play-btn-container': true,
+        'btn-play-fill': played && playStatus != null
+    });
+
+    const playedButtonClass = classNames({
+        'mx-auto': true,
+        'btn-play': true,
+        'btn-unplayed': !isGamePlayed(),
+        'btn-play-fill': isGamePlayed(),
+        'play-type-color': isGamePlayed(),
+        'played': isGamePlayed() && playStatus == 0,
+        'completed': isGamePlayed() && playStatus == 1,
+        'retired': isGamePlayed() && playStatus == 2,
+        'shelved': isGamePlayed() && playStatus == 3,
+        'abandoned': isGamePlayed() && playStatus == 4,
+    });
+
     return (
         <>
             
@@ -224,7 +267,7 @@ const InteractionSidebar = ({ slug }) => {
                             </Row>
 
                             <Row id={`rating${gameId}`} className="my-2 star-rating star-rating-game">
-                                <Col className="col-auto mx-auto px-0 star-rating-field rate">
+                                <div className="col-auto mx-auto px-0 star-rating-field rate">
                                     <Rate
                                         defaultValue={rating ?? 0}
                                         value={rating ?? 0}
@@ -232,35 +275,38 @@ const InteractionSidebar = ({ slug }) => {
                                         allowHalf
                                         allowClear
                                         onChange={(value) => handleRating(value)}
+                                        style={{
+                                            fontSize: '2rem'
+                                        }}
                                     />
-                                </Col>
+                                </div>
                             </Row>
 
                             <hr className="my-1" />
 
                             <Row id="buttons" className="mx-0">
-                                <Col id="play" className="px-0 mt-auto btn-play-fill">
+                                <Col id="play" className={playedClass}>
                                     <Button variant="link" className={`btn-play mx-auto ${played && playStatus != null ? getPlayedStatusClassName() : "btn-unplayed"}`} onClick={handlePlayedClick} data-play_type={played && playStatus != null ? playStatusEnumStrings[playStatus] : null }>
                                         <FontAwesomeIcon icon={faGamepad} size="2x" />
                                         <br />
                                         <p className="label">Played</p>
                                     </Button>
                                 </Col>
-                                <Col id="playing" className={`px-0 mt-auto ${playing ? "btn-play-fill" : null}`}>
+                                <Col id="playing" className={playingClass}>
                                     <Button variant="link" className="btn-play mx-auto" onClick={togglePlaying}>
                                         <FontAwesomeIcon icon={faPlay} size="2x" />
                                         <br />
                                         <p className="label">Playing</p>
                                     </Button>
                                 </Col>
-                                <Col id="backlog" className={`px-0 mt-auto ${backlog ? "btn-play-fill" : null}`}>
+                                <Col id="backlog" className={backlogClass}>
                                     <Button variant="link" className="btn-play mx-auto" onClick={toggleBacklog}>
                                         <FontAwesomeIcon icon={faBook} size="2x" />
                                         <br />
                                         <p className="label">Backlog</p>
                                     </Button>
                                 </Col>
-                                <Col id="wishlist" className={`px-0 mt-auto ${wishlist ? "btn-play-fill" : null}`}>
+                                <Col id="wishlist" className={wishlistClass}>
                                     <Button variant="link" className="btn-play mx-auto" onClick={toggleWishlist}>
                                         <FontAwesomeIcon icon={faGift} size="2x" />
                                         <br />

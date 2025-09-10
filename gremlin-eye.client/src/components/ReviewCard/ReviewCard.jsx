@@ -101,7 +101,7 @@ const ReviewCard = ({ reviewData, isUserSubpage }) => {
                             <Row className="mt-2 mb-3 review-body" data-review_id={reviewData.reviewId}>
                                 <Col>
                                     <div className="position-relative">
-                                        <div id={`collapseReview${reviewData.reviewId}`} className="mb-0 card-text">
+                                        <div id={`collapseReview${reviewData.reviewId}`} className="mb-0 card-text" style="white-space: pre-wrap">
                                             {reviewData.reviewText}
                                         </div>
                                     </div>
