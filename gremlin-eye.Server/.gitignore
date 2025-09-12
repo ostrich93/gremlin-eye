@@ -2,7 +2,7 @@
 appsettings.*.json
 
 snippet.txt
-testCurl.ps1
+testCurl*.ps1
 
 obj/
 bin/

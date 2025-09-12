@@ -81,7 +81,7 @@ namespace gremlin_eye.Server.Repositories
         {
             if (string.IsNullOrEmpty(registerRequest.Username) || string.IsNullOrEmpty(registerRequest.Email))
                 return null;
-            return _context.Users.Where(u => registerRequest.Username == u.Email || registerRequest.Email == registerRequest.Email).FirstOrDefault();
+            return _context.Users.Where(u => registerRequest.Username == u.UserName || registerRequest.Email == u.Email).FirstOrDefault();
         }
 
         public AppUser? GetUserByEmail(string email)
