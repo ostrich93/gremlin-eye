@@ -179,7 +179,7 @@ namespace gremlin_eye.Server.Repositories
             if (max < 5)
                 gamesQuery = gamesQuery.Where(g => g.AverageRating <= 2 * max);
 
-            int totalItems = await gamesQuery.AsSplitQuery().CountAsync();
+            int totalItems = await gamesQuery.CountAsync();
 
             switch (orderBy)
             {
@@ -205,7 +205,7 @@ namespace gremlin_eye.Server.Repositories
                     break;
             }
 
-            var resultItems = await gamesQuery.AsSplitQuery().ToListAsync();
+            var resultItems = await gamesQuery.ToListAsync();
 
             return new PaginatedList<GameSummaryDTO>
             {
