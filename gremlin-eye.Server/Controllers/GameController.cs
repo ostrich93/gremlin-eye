@@ -270,7 +270,7 @@ namespace gremlin_eye.Server.Controllers
             [FromQuery] string orderBy = Constants.ORDER_TRENDING, [FromQuery] string sortOrder = Constants.DESC,
             [FromQuery] int page = 1)
         {
-            var predicate = PredicateBuilder.New<GameData>();
+            /*var predicate = PredicateBuilder.New<GameData>();
 
             if (releaseYear != null)
             {
@@ -306,9 +306,10 @@ namespace gremlin_eye.Server.Controllers
             inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() >= 2 * min);
             inner.And(g => g.Playthroughs.Select(p => p.Rating).DefaultIfEmpty().Average() <= 2 * max);
 
-            predicate.And(inner);
+            predicate.And(inner);*/
 
-            var paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, orderBy, sortOrder, page);
+            var paginatedList = await _unitOfWork.Games.GetFilteredResults(releaseYear, genre, platform, min, max, orderBy, sortOrder, page);
+            //var paginatedList = await _unitOfWork.Games.GetPaginatedList(predicate, orderBy, sortOrder, page);
             return Ok(paginatedList);
         }
 
