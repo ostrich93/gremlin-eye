@@ -132,6 +132,97 @@ namespace gremlin_eye.Server.Repositories
             return relatedGames;
         }
 
+        public async Task<PaginatedList<GameSummaryDTO>> GetFilteredResults(string? releaseYear, string? genre, string? platform, double min, double max, string orderBy, string sortOrder, int page)
+        {
+            var gamesQuery = _context.Games.AsNoTracking()
+                .Select(g =>
+                new {
+                    Id = g.Id,
+                    Name = g.Name,
+                    Slug = g.Slug,
+                    ReleaseDate = g.ReleaseDate,
+                    CoverUrl = g.CoverUrl,
+                    GameGenres = g.GameGenres,
+                    GamePlatforms = g.GamePlatforms,
+                    AverageRating = g.Playthroughs.Any() ? g.Playthroughs.Average(p => p.Rating) : 0
+                })
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(releaseYear))
+            {
+                switch (releaseYear) {
+                    case Constants.UPCOMING:
+                        gamesQuery = gamesQuery.Where(g => g.ReleaseDate == null || g.ReleaseDate > DateTimeOffset.UtcNow);
+                        break;
+                    case Constants.RELEASED:
+                        gamesQuery = gamesQuery.Where(g => g.ReleaseDate != null && g.ReleaseDate <= DateTimeOffset.UtcNow);
+                        break;
+                    default:
+                        if (releaseYear.Trim().Length == 0)
+                            break;
+                        int yearStr;
+                        if (int.TryParse(releaseYear, out yearStr))
+                        {
+                            gamesQuery = gamesQuery.Where(g => g.ReleaseDate.HasValue && yearStr == g.ReleaseDate.Value.Year);
+                        }
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(genre))
+                gamesQuery = gamesQuery.Where(g => g.GameGenres.Any(gg => string.Equals(genre, gg.Genre.Slug)));
+            if (!string.IsNullOrEmpty(platform))
+                gamesQuery = gamesQuery.Where(g => g.GamePlatforms.Any(gp => string.Equals(platform, gp.Platform.Slug)));
+
+            if (min > 0)
+                gamesQuery = gamesQuery.Where(g => g.AverageRating >= 2 * min);
+            if (max < 5)
+                gamesQuery = gamesQuery.Where(g => g.AverageRating <= 2 * max);
+
+            int totalItems = await gamesQuery.AsSplitQuery().CountAsync();
+
+            switch (orderBy)
+            {
+                case Constants.ORDER_RELEASE_DATE:
+                    gamesQuery = sortOrder == Constants.ASC ?
+                        gamesQuery.OrderBy(g => g.ReleaseDate).ThenBy(g => g.Slug).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A) :
+                        gamesQuery.OrderByDescending(g => g.ReleaseDate).ThenBy(g => g.Slug).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A);
+                    break;
+                case Constants.ORDER_GAME_TITLE:
+                    gamesQuery = sortOrder == Constants.ASC ?
+                        gamesQuery.OrderBy(g => g.Slug).ThenBy(g => g.Id).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A) :
+                        gamesQuery.OrderByDescending(g => g.Slug).ThenBy(g => g.Id).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A);
+                    break;
+                case Constants.ORDER_GAME_RATING:
+                    gamesQuery = sortOrder == Constants.ASC ?
+                        gamesQuery.OrderBy(g => g.AverageRating).ThenBy(g => g.Slug).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A) :
+                        gamesQuery.OrderByDescending(g => g.AverageRating).ThenBy(g => g.Slug).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A);
+                    break;
+                default:
+                    gamesQuery = sortOrder == Constants.ASC ?
+                        gamesQuery.OrderBy(g => g.Id).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A) :
+                        gamesQuery.OrderByDescending(g => g.Id).Skip((page - 1) * Constants.PAGE_LIMIT_A).Take(Constants.PAGE_LIMIT_A);
+                    break;
+            }
+
+            var resultItems = await gamesQuery.AsSplitQuery().ToListAsync();
+
+            return new PaginatedList<GameSummaryDTO>
+            {
+                Items = resultItems.Select(item => new GameSummaryDTO
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Slug = item.Slug,
+                    CoverUrl = item.CoverUrl,
+                    ReleaseDate = item.ReleaseDate
+                }).ToList(),
+                TotalItems = totalItems,
+                PageNumber = page,
+                PageLimit = Constants.PAGE_LIMIT_A
+            };
+        }
+
         public async Task<PaginatedList<GameSummaryDTO>> GetPaginatedList(ExpressionStarter<GameData> predicate, string orderBy, string sortOrder, int page = 1, int itemsPerPage = Constants.PAGE_LIMIT_A )
         {
             var totalItems = await _context.Games.AsNoTracking().CountAsync(predicate);
