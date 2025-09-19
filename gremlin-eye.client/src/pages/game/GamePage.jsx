@@ -30,7 +30,7 @@ const GamePage = () => {
                         coverUrl: res.data.coverUrl,
                         bannerUrl: res.data.bannerUrl,
                         summary: res.data.summary,
-                        date: new Date(res.data.date),
+                        date: res.data.date ? new Date(res.data.date) : null,
                         platforms: res.data.platforms,
                         companies: res.data.companies,
                         series: res.data.series,
